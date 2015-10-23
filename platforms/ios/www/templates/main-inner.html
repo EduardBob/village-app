@@ -1,0 +1,13 @@
+<header>
+  <span class="icon icon-back"></span>
+  <p class="title" ng-bind="mainTitle"></p>
+</header>
+<div class="main-inner-page">
+	
+</div>
+<footer ng-controller="FooterCtrl">
+  <div class="footer-block" ng-repeat="footerBlock in footerBlocks">
+    <span class="icon icon-{{footerBlock.icon}}"></span>
+    <span class="footer-title" ng-bind="footerBlock.title"></span>
+  </div>
+</footer>

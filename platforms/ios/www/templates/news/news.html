@@ -1,0 +1,8 @@
+<div ng-controller="NewsDetailCtrl">
+  <div class="news-item">
+    <span class="meta" ng-bind="article.created_at | date : 'd MMMM y'"></span>
+    <h3 class="news-title" ng-bind="article.title"></h3>
+    <img ng-src="{{basePath}}{{articleImage}}" alt="" ng-hide="{{imagePresentMain}}">
+    <p ng-bind="article.text"></p>
+  </div>
+</div>

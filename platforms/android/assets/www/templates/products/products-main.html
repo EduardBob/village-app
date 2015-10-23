@@ -1,0 +1,16 @@
+<div ng-controller="ProductsCategoriesCtrl">
+<!-- 	<a href="#/product" class="panel-item fw-b">
+    <span><span class="img-container"><img ng-src="{{basePath}}{{category.image.formats.smallThumb}}" alt=""></span></span>
+    <span class="panel-name">Все товары</span>
+    <span><span class="icon icon-right"></span></span>
+  </a> -->
+  <a href="#/product/category/{{category.id}}" class="panel-item" ng-repeat="category in categoriesBlocks track by category.id">
+  	<span>
+  		<span class="img-container"><img ng-src="{{basePath}}{{category.image}}" ng-hide="{{category.imagePresent}}" alt=""></span>
+		</span>
+		<span class="panel-name" ng-bind="category.title"></span>
+		<span>
+  		<span class="icon icon-right"></span>
+		</span>
+  </a>
+</div>

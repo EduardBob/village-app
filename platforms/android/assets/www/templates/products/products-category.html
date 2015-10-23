@@ -1,0 +1,15 @@
+<div ng-controller="ProductsCtrl">
+	<div class="panel-item fw-b"ng-hide="emptyService">
+    <span><span class="img-container"><img ng-src="{{basePath}}{{mainImage}}" ng-hide="{{imagePresentMain}}" alt=""></span></span>
+    <span class="panel-name" ng-bind="categoryMain.title"></span>
+    <span><span class="icon icon-down"></span></span>
+  </div>
+  <div tagged-infinite-scroll="getMore()">
+    <a href="#/product/{{product.id}}" class="panel-item" ng-repeat="product in productList | orderBy : '-price' track by product.id">
+    	<span><span class="img-container"><img ng-src="{{basePath}}{{product.image}}"  ng-hide="{{product.imagePresent}}" alt=""></span></span>
+    	<span class="panel-name" ng-bind="product.title"></span>
+      <span class="panel-price"><span ng-bind="product.price"></span><span> руб</span></span>
+    </a>
+  </div>
+  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
+</div>

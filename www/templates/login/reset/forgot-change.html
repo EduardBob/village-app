@@ -1,0 +1,13 @@
+<div class="bg-image no-p-b" ng-controller="ResetCtrl">
+  <form class="form form-dark">
+    <p class="fs-18 p-md col-orange fw-md">Новый пароль</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="password" placeholder="" ng-model="password">  
+    </div>
+    <p class="fs-18 p-md col-orange fw-md">Новый пароль еще раз</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="password" placeholder="" ng-model="password_confirmation">  
+    </div>
+    <button class="button button-main no-mg" ng-click="changePassword(password, password_confirmation)">Изменить</button>
+  </form>
+</div>

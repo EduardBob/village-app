@@ -1,0 +1,15 @@
+<div ng-controller="ServicesCtrl">
+  <div class="panel-item fw-b" ng-hide="emptyService">
+    <span><span class="img-container"><img ng-src="{{basePath}}{{mainImage}}" ng-hide="{{imagePresentMain}}" alt=""></span></span>
+    <span class="panel-name" ng-bind="categoryMain.title"></span>
+    <span><span class="icon icon-down"></span></span>
+  </div>
+  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
+  <div tagged-infinite-scroll="getMore()">
+    <a href="#/service/{{service.id}}" class="panel-item"  ng-repeat="service in serviceList">
+      <span><span class="img-container"><img ng-src="{{basePath}}{{service.image}}" ng-hide="{{service.imagePresent}}"></span></span>
+      <span class="panel-name" ng-bind="service.title"></span>
+      <span><span class="icon icon-right"></span></span>
+    </a>
+  </div>
+</div>
