@@ -1,0 +1,11 @@
+<div class="news-list" ng-controller="NewsListCtrl">
+	<div tagged-infinite-scroll="getMore()">
+	  <a href="#/newsitem/{{news.id}}" class="news-item" ng-repeat="news in newsBlocks track by news.id">
+	    <span class="meta" ng-bind="news.created_at | date : 'd MMMM y'"></span>
+	    <h3 class="news-title" ng-bind="news.title"></h3>
+	    <img ng-src="{{basePath}}{{news.image}}" alt="" ng-hide="{{news.imagePresent}}">
+	    <p ng-bind="news.short"></p>
+	  </a>
+	  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
+	</div>
+</div>

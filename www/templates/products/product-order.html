@@ -1,0 +1,44 @@
+<form class="form form-order" ng-controller="ProductOrderCtrl">
+  <div>
+    <div class="product-item ta-c">
+      <div class="img-container"><img ng-src="{{basePath}}{{productImage}}" ng-hide="{{imagePresentMain}}" alt=""></div>
+      <h3 class="fs-18 fw-n" ng-bind="productData.title"></h3>
+      <span class="d-b fs-18 fw-b col-orange">
+        <span class="" ng-bind="productData.price"></span>
+        <span> руб</span>
+        <span> / </span>
+        <span class="" ng-bind="productData.unit_title"></span>
+      </span>
+      <span class="fs-12 fw-lt" ng-bind="productPaymentInfo"></span>
+    </div>
+    <div class="input-container input-nr-container">
+      <label for="">Количество товара</label>
+      <div class="input-container">
+        <span class="icon icon-minus" ng-click="changeMinus()"></span>
+        <input type="text" placeholder="0" ng-model="quantity" ng-readonly="true">
+        <span class="icon icon-plus" ng-click="changePlus()"></span>
+      </div>
+    </div>
+    <p class="col-orange fz-15 p-md mb-md">Самовывоз из магазина «<span ng-bind="shopName"></span>», <span ng-bind="shopAddress"></span></p>
+    <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
+      <input type="date" ng-model="date" ng-change="changeDate()">
+      <div class="panel-item">
+        <span class="panel-name">Укажите дату исполнения услуги</span>
+        <span><span class="icon icon-down"></span></span>
+      </div>
+    </div>
+    <div class="input-date" ng-class="changedTime ? 'input-date is-chosen' : 'input-date'">
+      <input type="time" ng-model="time" ng-change="changeTime()">
+      <div class="panel-item">
+        <span class="panel-name">Укажите удобное вам время</span>
+        <span><span class="icon icon-down"></span></span>
+      </div>
+    </div>
+    <div class="textarea-block">
+      <input type="text" ng-attr-placeholder="{{productData.comment_label}}" ng-model="comment">
+    </div>
+    <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан с вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
+    <button class="button button-main" ng-click="sendData($event, quantity, comment)">Заказать</button>
+    <div class="link-xl d-b ta-c col-l-gray fs-12" ng-bind="productBottomText" ng-hide="textHide"></div>
+  </div>
+</form>

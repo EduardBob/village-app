@@ -1,0 +1,10 @@
+<div class="services clearfix" ng-controller="ServicesCategoriesCtrl">
+  <div class="service-block" ng-repeat="service in serviceBlocks">
+  	<a href="#/service/category/{{service.id}}">
+      <span class="img-block">
+        <img ng-src="{{basePath}}{{service.image}}" ng-hide="{{service.imagePresent}}" alt="">
+      </span>
+  		<span class="service-title" ng-bind="service.title"></span>
+		</a>
+  </div>
+</div>

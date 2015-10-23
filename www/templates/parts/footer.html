@@ -1,0 +1,6 @@
+<footer class="footer" ng-controller="FooterCtrl" ng-show="isShownFooter(routeFooter())">
+  <a href="#/{{footerBlock.path}}" class="footer-block" ng-repeat="footerBlock in footerBlocks" ng-class="{active : isActive('{{footerBlock.path}}') || isActive('{{footerBlock.path1}}')}">
+    <span class="icon icon-{{footerBlock.icon}}"></span>
+    <span class="footer-title">{{footerBlock.title}}</span>
+  </a>
+</footer>

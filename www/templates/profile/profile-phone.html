@@ -1,0 +1,15 @@
+<div class="bg-image VerifyCtrl no-p-b" ng-controller="ProfileChangeDataCtrl">
+  <form class="form form-dark">
+    <p class="fs-18 p-md col-orange fw-md">Телефон</p>
+    <div class="input-container input-container-sm mb-sm">
+      <input type="tel" name="phone" data-inputmask="'mask': '+7(999)9999999'" data-mask="" ng-attr-placeholder="{{phone}}"  ng-model="new_phone">  
+      <script>
+          $( document ).ready(function() {
+              $("[data-mask]").inputmask();
+          });
+      </script>  
+    </div>
+    <p class="fs-12 col-gray mb-lg p-md">При изменении номера вам будем предложено подтвердить его с помощью проверочного кода из SMS</p>
+    <button class="button button-main no-mg" ng-click="changePhone(new_phone)">Прислать смс</button>
+  </form>
+</div>

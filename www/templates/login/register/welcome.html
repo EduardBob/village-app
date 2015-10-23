@@ -1,0 +1,25 @@
+<div class="bg-image LoginCtrl" ng-controller="ProfileDataCtrl">
+  <div class="form form-dark">
+    <p class="fs-18 p-md col-orange">Вы успешно зарегистрировались. Остался последний шаг!</p>
+    <div class="input-container">
+      <span class="icon icon-user"></span>
+      <input type="text" placeholder="Ваше имя" name="first_name" ng-model="first_name">  
+    </div>
+    <div class="input-container">
+      <span class="icon icon-user"></span>
+      <input type="text" placeholder="Фамилия" name="last_name" ng-model="last_name">  
+    </div>
+    <div class="input-container">
+      <span class="icon icon-password"></span>
+      <input type="password" placeholder="Пароль" name="password" ng-model="password">  
+    </div>
+    <div class="input-container">
+      <span class="icon icon-password"></span>
+      <input type="password" placeholder="Пароль еще раз" name="password_confirmation" ng-model="password_confirmation">  
+    </div>
+    <p class="fs-12 col-gray mt-md mb-lg p-md">Этот пароль будет использоваться для входа в приложение</p>
+    <button class="button button-main no-mg" ng-click="submitData(first_name, last_name, password, password_confirmation)">Сохранить</button>
+    <!-- <a href="#/profile" class="button button-main no-mg" type="submit">Сохранить</a> -->
+    <p class="link-xl d-b ta-c">Все данные можно будет поменять позже в вашем Профиле</p>
+  </div>
+</div>

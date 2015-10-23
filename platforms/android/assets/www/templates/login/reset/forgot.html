@@ -1,0 +1,16 @@
+<div class="bg-image VerifyCtrl no-p-b" ng-controller="ResetCtrl">
+  <form class="form form-dark" name="LoginForm">
+    <p class="fs-18 p-md col-orange fw-md">Введите ваш номер телефона</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="tel" name="phone" data-inputmask="'mask': '+7(999)9999999'" data-mask="" ng-attr-placeholder="{{phone}}" ng-model="phone">  
+      <script>
+          $( document ).ready(function() {
+              $("[data-mask]").inputmask();
+          });
+      </script>  
+    </div>
+    <p class="fs-12 col-gray mb-lg p-md">В течение 2 минут на указанный номер придёт SMS с проверочным кодом. </p>
+    <button class="button button-main no-mg" ng-click="checkPhone(phone)">Прислать смс</button>
+    <a href="#/login" class="link-xl d-b ta-c">Назад, я вспомнил пароль</a>
+  </form>
+</div>

@@ -1,0 +1,13 @@
+<div class="survey-block" ng-controller="SurveyCtrl">
+  <form class="form form-survey">
+    <h3 class="form-title" ng-bind="surveyData.title"></h3>
+    <!-- <radio-button ng-model="selectedValue" label="{{survey}}" value="{{$index}}" ng-repeat="survey in surveyData.options" ttt="RadioChange({{$index}})"></radio-button> -->
+    <div class="checkbox-container" ng-repeat="survey in surveyData.options">
+    	<input type="radio" ng-model="selectedValue.value" value="{{$index}}" name="survey" id="survey{{$index}}" ng-change="radioChange({{$index}})">
+    	<label for="survey{{$index}}">{{survey}}</label>
+    </div>
+    <p class="meta">Голосование анонимное. Вы можете изменить свой голос до окончания голосования.</p>
+    <p class="ta-c col-orange">Текуший опрос продлится до <span ng-bind="surveyData.ends_at | date : 'd MMMM y'"></span> </p>
+    <span>{{newSelectedValue}}</span>
+  </form>
+</div>
