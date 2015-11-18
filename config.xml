@@ -25,6 +25,7 @@
     <preference name="android-installLocation" value="auto" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="orientation" value="portrait" />
+    <preference name="fullscreen" value="false" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />

@@ -54,6 +54,7 @@ angular.module('headerDirective', [])
             case '/profile':
             case '/profile/history':
             case '/profile/name':
+            case '/profile/email':
             case '/profile/password':
             case '/profile/phone':
               title = 'Мой профиль';

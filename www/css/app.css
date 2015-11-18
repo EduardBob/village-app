@@ -11,6 +11,12 @@
   box-sizing: border-box;
 }
 
+html, body {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+}
+
 html {
   height: 100%;
   -ms-text-size-adjust: 100%;
@@ -291,6 +297,31 @@ input[type="radio"]:checked + label:after {
   color: #ef5711;
 }
 
+.radio-block {
+  border-bottom: 1px solid rgba(112, 111, 114, 0.1);
+  overflow: hidden;
+}
+.radio-block .radio-container {
+  width: 50%;
+  float: left;
+}
+.radio-block .radio-container input[type="radio"] + label {
+  margin-right: 0;
+  margin-left: 30px;
+  padding: 15px 5px 15px 20px;
+  font-size: 12px;
+}
+.radio-block .radio-container input[type="radio"] + label:before {
+  top: 15px;
+  right: auto;
+  left: -10px;
+}
+.radio-block .radio-container input[type="radio"]:checked + label:after {
+  right: auto;
+  left: -5px;
+  top: 20px;
+}
+
 /*common styles*/
 .bg-image {
   padding: 30px 0 20px;
@@ -315,13 +346,6 @@ input[type="radio"]:checked + label:after {
 }
 .wrapper.dark .bg-image {
   padding: 0;
-}
-.wrapper.dark.white header {
-  background: url("../img/header-bg.jpg") center center no-repeat;
-  background-size: cover;
-}
-.wrapper.dark.white .main-inner-page {
-  background: #fff;
 }
 
 .wrapper.ispadding .main-container {
@@ -973,7 +997,7 @@ select {
 }
 .panel .links span,
 .panel .links a {
-  display: inline-block;
+  display: inline;
   padding: 8px 0 0;
   font-size: 12px;
 }
@@ -990,25 +1014,29 @@ select {
 .panel .links a {
   text-decoration: underline;
 }
+.panel .links.not_paid span,
+.panel .links.not_paid a {
+  color: #FF1919;
+}
+.panel .links.processing span,
+.panel .links.processing a {
+  color: #1456d0;
+}
 .panel .links.running span,
 .panel .links.running a {
   color: #ef5711;
 }
-.panel .links.processing span,
-.panel .links.processing a {
-  color: #599c2d;
-}
-.panel .links.rejected span,
-.panel .links.rejected a {
-  color: #FF1919;
-}
 .panel .links.done span,
 .panel .links.done a {
-  color: #1456d0;
+  color: #599c2d;
 }
 .panel .links.done.status-product span,
 .panel .links.done.status-product a {
   color: #ef5711;
+}
+.panel .links.rejected span,
+.panel .links.rejected a {
+  color: #FF1919;
 }
 
 .alert {
@@ -1042,6 +1070,7 @@ footer {
   width: 20%;
   padding: 13px 5px 13px 0;
   text-align: center;
+  position: relative;
 }
 .footer-block span {
   display: block;
@@ -1052,6 +1081,23 @@ footer {
   .footer-block span {
     font-size: 13px;
   }
+}
+.footer-block .bage {
+  display: block;
+  min-width: 22px;
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  padding: 0 2px;
+  background-color: #ef5711;
+  line-height: 18px;
+  border: 2px solid #484852;
+  -moz-border-radius: 1000px;
+  -webkit-border-radius: 1000px;
+  border-radius: 1000px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
 }
 .footer-block .icon {
   width: 24px;

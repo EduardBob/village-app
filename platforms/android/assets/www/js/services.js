@@ -154,20 +154,39 @@ var tokenHandlerModule = angular.module('tokenHandlerModule', []);
   });
 
 
-var users = angular.module('users', ['ngResource', 'tokenHandlerModule']);
+// var users = angular.module('users', ['ngResource', 'tokenHandlerModule']);
 
-users.factory('Users', ['$resource', 'TokenHandler', 
-  function($resource, tokenHandler) {
+// users.factory('Users', ['$resource', 'TokenHandler', 
+//   function($resource, tokenHandler) {
+//     return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+//       get: {
+//         method: 'GET',
+//         params: {urlId: '@urlId', routeId: '@routeId'},
+//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+//       },
+//       save: {
+//         method: 'POST',
+//         params: {urlId: '@urlId', routeId: '@routeId'},
+//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+//       }
+//     });
+//   }]);
+
+
+var users = angular.module('users', ['LocalStorageModule', 'ngResource']);
+
+users.factory('Users', ['localStorageService', '$resource', 
+  function(localStorageService, $resource) {
     return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: {'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: {'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
   }]);

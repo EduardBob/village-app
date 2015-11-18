@@ -31,7 +31,7 @@
   </head>
   <body>
 
-  <div class="wrapper" ng-controller="PathCtrl" ng-class="{dark : addClass(routeMain()), ispadding: isPadding(routeUser())}">
+  <div class="wrapper" ng-controller="PathCtrl" ng-class="{dark : addClass(routeMain()), ispadding: isPadding(routeUser())}" smooth-scroll>
     <div class="main-container">
       <header-inner></header-inner>
       <div class="main-inner-page">
@@ -48,9 +48,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
     <script src="bower_components/angular-route-segment/build/angular-route-segment.js"></script>
+    <!-- <script src="bower_components/angular-route-segment/build/angular-smooth-scroll.js"></script> -->
     <script src="js/lib/inputmask.js"></script>
     <script src="js/lib/jquery.inputmask.js"></script>
     <script src="js/lib/inputmask.phone.extensions.js"></script>

@@ -3,7 +3,7 @@
     <div class="product-item ta-c">
       <div class="img-container"><img ng-src="{{basePath}}{{serviceImage}}"  ng-hide="{{imagePresentMain}}" alt=""></div>
       <h3 class="fs-18 fw-n" ng-bind="serviceData.title"></h3>
-      <span class="d-b fs-18 fw-b col-orange">
+      <span class="d-b fs-18 fw-b col-orange" ng-hide="hideBlock">
         <span ng-bind="serviceData.price"></span>
         <span> руб</span>
       </span>
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="input-date" ng-class="changedTime ? 'input-date is-chosen' : 'input-date'">
-      <input type="time" ng-model="time" ng-change="changeTime()">
+      <input type="time" ng-model="time" ng-change="changeTime()" placeholder="HH:mm">
       <div class="panel-item">
         <span class="panel-name">Укажите удобное вам время</span>
         <span><span class="icon icon-down"></span></span>
@@ -26,6 +26,10 @@
     </div>
     <div class="textarea-block">
       <input type="text" name="" id="" cols="30" rows="10" ng-attr-placeholder="{{serviceData.comment_label}}" ng-model="comment">
+    </div>
+    <div class="radio-block" ng-hide="hideBlock">
+      <div class="radio-container"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="paymentOnline" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплата онлайн</label></div>
+      <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="paymentCash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплата наличными</label></div>
     </div>
     <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан с вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
     <button class="button button-main" ng-bind="serviceData.order_button_label" ng-click="sendData($event, comment)"></button>

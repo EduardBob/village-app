@@ -24,6 +24,12 @@ $l-gray-2: rgba(60, 61, 65, 0.75);
   box-sizing: border-box;
 }
 
+html, body{ 
+    min-height: 100%;
+    height: auto !important;        
+    height:100%; 
+}
+
 html {
   height: 100%;
   -ms-text-size-adjust: 100%;
@@ -324,21 +330,12 @@ input {
   .bg-image {
     padding: 0;
   }
-  &.white {
-    header {
-      background: url('../img/header-bg.jpg') center center no-repeat;
-      background-size: cover;
-    }
-    .main-inner-page {
-      background: #fff;
-    }
+
+  .main-container {
+    // background: url('../img/screen-bg.jpg') center center no-repeat;
+    // background-size: cover;
   }
 }
-// .wrapper {
-//   position: relative;
-//   overflow-y: auto;
-//   -webkit-overflow-scrolling: touch; 
-// }
 .wrapper.ispadding {
   .main-container {
     padding-bottom: 70px;
@@ -893,7 +890,7 @@ select {
   .links {
      span,
      a {
-      display: inline-block;
+      display: inline;
       padding: 8px 0 0;
       font-size: 12px;
       &:first-child {
@@ -910,34 +907,40 @@ select {
     a {
       text-decoration: underline;
     }
+    &.not_paid {
+      span,
+      a {
+        color: #FF1919;
+      }
+    }
+    &.processing {
+      span,
+      a {
+        color: #1456d0;
+      }
+    }
     &.running {
       span,
       a {
         color: $orange;
       }
     }
-    &.processing {
-      span,
-      a {
-        color: #599c2d;
-      }
-    }
-    &.rejected {
-      span,
-      a {
-        color: #FF1919;
-      }
-    }
     &.done {
       span,
       a {
-        color: #1456d0;
+        color: #599c2d;
       }
       &.status-product {
         span,
         a {
           color: $orange;
         }
+      }
+    }
+    &.rejected {
+      span,
+      a {
+        color: #FF1919;
       }
     }
   }
@@ -973,6 +976,7 @@ footer {
 	width: 20%;
 	padding: 13px 5px 13px 0;
 	text-align: center;
+  position: relative;
 	span {
 		display: block;
 		font-weight: 500;
@@ -981,6 +985,21 @@ footer {
       font-size: 13px;
     }
 	}
+  .bage {
+    display: block;
+    min-width: 22px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    padding: 0 2px;
+    background-color: #ef5711;
+    line-height: 18px;
+    border: 2px solid #484852;
+    @include border-radius(1000px);
+    font-size: 10px;
+    font-weight: bold;
+    color: #fff;
+  }
 	.icon {
 		width: 24px;
 		height: 24px;

@@ -2,13 +2,13 @@
   <form class="form form-dark">
     <p class="fs-18 p-md col-orange fw-md">Имя</p>
     <div class="input-container input-container-sm mb-lg">
-      <input type="text" ng-attr-placeholder="{{first_name}}" ng-model="first_name">  
+      <input type="text" ng-attr-placeholder="{{first_name}}" ng-model="first_name" ng-focus="nameSuccess = false">  
     </div>
     <p class="fs-18 p-md col-orange fw-md">Фамилия</p>
     <div class="input-container input-container-sm mb-lg">
-      <input type="text" ng-attr-placeholder="{{last_name}}" ng-model="last_name">  
+      <input type="text" ng-attr-placeholder="{{last_name}}" ng-model="last_name" ng-focus="nameSuccess = false">  
     </div>
-    <div class="alert alert-success" ng-show="nameSuccess" ng-bind="nameSuccess"></div>
+    <div class="alert alert-success" ng-if="nameSuccess" ng-bind="nameSuccess"></div>
     <button class="button button-main no-mg" ng-click="changeName(first_name, last_name)">Изменить</button>
   </form>
 </div>
