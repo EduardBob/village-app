@@ -79,6 +79,7 @@ var app = {
         app.receivedEvent('deviceready');
     },
     showAlert: function() {
+        // if (navigator.notification) { // Override default HTML alert with native dialog
           window.alert = function (message) {
               navigator.notification.alert(
                   message,    // message
@@ -87,6 +88,7 @@ var app = {
                   'OK'        // buttonName
               );
           };
+        // }
     },
     handleExternalURLs: function() {
         // Handle click events for all external URLs

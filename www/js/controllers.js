@@ -234,6 +234,7 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       $scope.last_name = data.data.last_name;
       $scope.phone = data.data.phone;
       $scope.villageName = data.data.building.data.village.data.name;
+      localStorageService.set('villageName', $scope.villageName);
       $scope.address = data.data.building.data.address;
       if (data.data.email != null) {
         $scope.email = data.data.email;
@@ -397,11 +398,12 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
         params: {urlId: '@urlId', routeId: '@routeId'}
       }
     });
-    $timeout(function() {
-        angular.element('.main-container').css('min-height', $(window).height());
-    });
-    alert('sasdasd');
-    if (localStorageService.get('invitecode') != null) {
+    // $timeout(function() {
+    //     angular.element('.main-container').css('min-height', $(window).height());
+    // });
+    if (localStorageService.get('villageName') != null) {
+      $scope.siteName = localStorageService.get('villageName');
+    } else if (localStorageService.get('invitecode') != null) {
       user.get({urlId: 'buildings', routeId: localStorageService.get('invitecode')}, {}, function(data) {
         $scope.siteName = data.data.village.data.name;
       }, function(response) {
