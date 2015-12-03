@@ -12,18 +12,29 @@
           <div class="panel-content">
             <span class="meta" ng-bind="service.created_at | date : 'dd-MM-yyyy h:mm'"></span>
             <span class="title" ng-bind="service.service.data.title"></span>
+            <span class="comment" ng-bind="service.comment"></span>
             <div class="links {{service.status}}" ng-switch on="service.status">
-              <div ng-switch-when="not_paid">
-                <span>не оплачен</span><a href="https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru">оплатить</a>
-              </div>
               <div ng-switch-when="processing">
                 <span>обрабатывается</span>
+                <span class="{{service.payment_status}}" ng-switch on="service.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{service.paymentLink}}" ng-if="service.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
               </div>
               <div ng-switch-when="running">
                 <span>выполняется</span>
+                <span class="{{service.payment_status}}" ng-switch on="service.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{service.paymentLink}}" ng-if="service.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
               </div>
               <div ng-switch-when="done">
-                <span>выполнено</span><a href="#/service/order/{{service.service.data.id}}">повторить</a>
+                <span>выполнено</span>
+                <span class="{{service.payment_status}}" ng-switch on="service.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
+                <a href="#/service/{{service.service.data.id}}?payment_type={{service.payment_type}}&comment={{service.comment}}">повторить</a>
               </div>
               <div ng-switch-when="rejected">
                 <span>отклонено</span><span> "</span><span ng-bind="service.decline_reason"></span><span>"</span>
@@ -43,23 +54,33 @@
           <div class="panel-content">
             <span class="meta" ng-bind="product.created_at | date : 'dd-MM-yyyy h:mm'"></span>
             <span class="title"><span ng-bind="product.product.data.title"></span> - <span ng-bind="product.price"></span><span> руб</span></span> 
+            <span class="comment" ng-bind="product.comment"></span>
             <div class="links {{product.status}}" ng-switch on="product.status">
-              <div ng-switch-when="not_paid">
-                <span>не оплачен</span><a href="https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru">оплатить</a>
-              </div>
               <div ng-switch-when="processing">
                 <span>обрабатывается</span>
+                <span class="{{product.payment_status}}" ng-switch on="product.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{product.paymentLink}}" ng-if="product.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
               </div>
               <div ng-switch-when="running">
                 <span>выполняется</span>
+                <span class="{{product.payment_status}}" ng-switch on="product.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{product.paymentLink}}" ng-if="product.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
               </div>
               <div ng-switch-when="done">
-                <span>выполнено</span><a href="#/product/order/{{product.product.data.id}}">повторить</a>
+                <span>выполнено</span>
+                <span class="{{product.payment_status}}" ng-switch on="product.payment_status">
+                  <span ng-switch-when="not_paid"><span>не оплачено</span></span>
+                  <span ng-switch-when="paid">оплачено</span>
+                </span>
+                <a href="#/product/{{product.product.data.id}}?qty={{product.quantity}}&payment_type={{product.payment_type}}&comment={{product.comment}}">повторить</a>
               </div>
               <div ng-switch-when="rejected">
                 <span>отклонено</span><span> "</span><span ng-bind="product.decline_reason"></span><span>"</span>
               </div>
-            </div>
             </div>
           </div>
         </div>

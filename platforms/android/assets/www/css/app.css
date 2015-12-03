@@ -13,7 +13,6 @@
 
 html, body {
   min-height: 100%;
-  height: auto !important;
   height: 100%;
 }
 
@@ -297,23 +296,73 @@ input[type="radio"]:checked + label:after {
   color: #ef5711;
 }
 
+.radio-block {
+  border-bottom: 1px solid rgba(112, 111, 114, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+.radio-block .radio-container {
+  width: 50%;
+  float: left;
+}
+.radio-block .radio-container input[type="radio"] + label {
+  margin-right: 0;
+  margin-left: 30px;
+  padding: 15px 5px 15px 18px;
+  font-size: 12px;
+}
+.radio-block .radio-container input[type="radio"] + label:before {
+  top: 15px;
+  right: auto;
+  left: -10px;
+}
+.radio-block .radio-container input[type="radio"]:checked + label:after {
+  right: auto;
+  left: -5px;
+  top: 20px;
+}
+.radio-block .radio-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
+
 /*common styles*/
-.bg-image {
-  padding: 30px 0 20px;
+body {
   background: url("../img/screen-bg.jpg") center center no-repeat;
   background-size: cover;
+}
+body.dark {
+  background: transparent;
+}
+body.dark .main-container {
+  background: url("../img/screen-bg.jpg") center center no-repeat;
+  background-size: cover;
+}
+body.dark header,
+body.dark .bg-image,
+body.dark .main-inner-page,
+body.dark .wrapper {
+  background: transparent;
+}
+body.dark .bg-image {
+  padding: 0;
+}
+body.ispadding .main-container {
+  padding-bottom: 70px;
+}
+
+.bg-image {
+  padding: 30px 0 20px;
   color: #fff;
 }
 .bg-image a {
   color: #fff;
 }
 
-.wrapper.dark {
-  background: url("../img/screen-bg.jpg") center center no-repeat;
-  background-size: cover;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
 .wrapper.dark header,
 .wrapper.dark .bg-image,
 .wrapper.dark .main-inner-page {
@@ -325,6 +374,30 @@ input[type="radio"]:checked + label:after {
 
 .wrapper.ispadding .main-container {
   padding-bottom: 70px;
+}
+
+body .bg-image.wrapper {
+  display: none;
+  background: url("../img/screen-bg.jpg") center center no-repeat;
+  background-size: cover;
+}
+body .bg-image.wrapper p:first-child {
+  padding-top: 50px;
+}
+body .bg-image.wrapper.offline-wrapper {
+  display: block;
+}
+
+.main-container {
+  background: #fff;
+}
+
+.wrapper {
+  background: #fff;
+}
+
+.main-inner-page {
+  padding: 40px 0 20px;
 }
 
 .d-b {
@@ -353,6 +426,10 @@ input[type="radio"]:checked + label:after {
 
 .fs-15 {
   font-size: 15px;
+}
+
+.fs-14 {
+  font-size: 14px;
 }
 
 .fs-12 {
@@ -513,6 +590,10 @@ input[type="radio"]:checked + label:after {
   padding: 10px;
 }
 
+.link-md-t {
+  padding: 10px 0;
+}
+
 .link-xl {
   padding: 17px 10px;
 }
@@ -539,29 +620,27 @@ input[type="radio"]:checked + label:after {
   color: #fff;
 }
 
+.agreement-text a {
+  display: inline-block;
+  word-wrap: break-word;
+  text-decoration: underline;
+}
+
 /* Form pages */
 .greeting {
-  margin-bottom: 50px;
-  padding: 20px;
+  margin-bottom: 30px;
+  padding: 20px 9px;
 }
 
 /* Header styles */
 header {
-  padding: 39px 10px 19px;
+  padding: 19px 10px 19px;
   background: url("../img/header-bg.jpg") center center no-repeat;
   background-size: cover;
   text-transform: uppercase;
   font-weight: 900;
   font-size: 25px;
   color: #fff;
-}
-header .fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  background: #484852;
 }
 header .icon {
   float: left;
@@ -573,11 +652,6 @@ header .title {
 }
 
 /* Main styles */
-.main-inner-page {
-  padding: 40px 0 20px;
-  background: #fff;
-}
-
 .meta {
   font-size: 12px;
   font-weight: 300;
@@ -675,6 +749,10 @@ select {
   font-size: 18px;
 }
 
+.form-height {
+  min-height: 505px;
+}
+
 .form-dark {
   color: #fff;
 }
@@ -688,7 +766,8 @@ select {
 }
 .form-dark .input-container input[type="text"],
 .form-dark .input-container input[type="tel"],
-.form-dark .input-container input[type="password"] {
+.form-dark .input-container input[type="password"],
+.form-dark .input-container input[type="email"] {
   float: left;
   width: auto;
   height: 37px;
@@ -966,9 +1045,18 @@ select {
 .panel .panel-content {
   margin-left: 45px;
 }
-.panel .meta,
 .panel .title {
+  margin-bottom: 5px;
+}
+.panel .meta,
+.panel .title,
+.panel .comment {
   display: block;
+}
+.panel .comment {
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: #999;
 }
 .panel .links span,
 .panel .links a {
@@ -976,18 +1064,17 @@ select {
   padding: 8px 0 0;
   font-size: 12px;
 }
-.panel .links span:first-child,
-.panel .links a:first-child {
-  padding-right: 10px;
-}
-.panel .links span:first-child + a:before,
-.panel .links a:first-child + a:before {
-  content: "/";
-  display: inline-block;
-  padding-right: 10px;
+.panel .links > div > span:first-child {
+  margin-right: 5px;
 }
 .panel .links a {
   text-decoration: underline;
+}
+.panel .links a:before {
+  content: "/";
+  display: inline-block;
+  padding-right: 3px;
+  padding-left: 3px;
 }
 .panel .links.not_paid span,
 .panel .links.not_paid a {
@@ -997,17 +1084,61 @@ select {
 .panel .links.processing a {
   color: #1456d0;
 }
+.panel .links.processing .not_paid {
+  color: #FF1919;
+}
+.panel .links.processing .not_paid span {
+  color: #FF1919;
+}
+.panel .links.processing .not_paid a {
+  color: #FF1919;
+}
+.panel .links.processing .paid {
+  color: #599c2d;
+}
+.panel .links.processing .paid span {
+  color: #599c2d;
+}
 .panel .links.running span,
 .panel .links.running a {
-  color: #ef5711;
+  color: #f7bc49;
+}
+.panel .links.running .not_paid {
+  color: #FF1919;
+}
+.panel .links.running .not_paid span {
+  color: #FF1919;
+}
+.panel .links.running .not_paid a {
+  color: #FF1919;
+}
+.panel .links.running .paid {
+  color: #599c2d;
+}
+.panel .links.running .paid span {
+  color: #599c2d;
 }
 .panel .links.done span,
 .panel .links.done a {
   color: #599c2d;
 }
-.panel .links.done.status-product span,
-.panel .links.done.status-product a {
-  color: #ef5711;
+.panel .links.done .not_paid {
+  color: #FF1919;
+}
+.panel .links.done .not_paid span {
+  color: #FF1919;
+}
+.panel .links.done .not_paid a {
+  color: #FF1919;
+}
+.panel .links.done .paid {
+  color: #599c2d;
+}
+.panel .links.done .paid span {
+  color: #599c2d;
+}
+.panel .links.done a {
+  color: #1456d0;
 }
 .panel .links.rejected span,
 .panel .links.rejected a {
@@ -1067,6 +1198,9 @@ footer {
   background-color: #ef5711;
   line-height: 18px;
   border: 2px solid #484852;
+  -moz-border-radius: 100%;
+  -webkit-border-radius: 100%;
+  border-radius: 100%;
   -moz-border-radius: 1000px;
   -webkit-border-radius: 1000px;
   border-radius: 1000px;

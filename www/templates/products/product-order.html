@@ -7,9 +7,9 @@
         <span class="" ng-bind="productData.price"></span>
         <span> руб</span>
         <span> / </span>
-        <span class="" ng-bind="productData.unit_title"></span>
+        <span class="" ng-bind="unitRus"></span>
       </span>
-      <span class="fs-12 fw-lt" ng-bind="productPaymentInfo"></span>
+      <span class="fs-12 fw-lt" ng-bind="productPaymentInfo" ng-hide="hideBlock"></span>
     </div>
     <div class="input-container input-nr-container">
       <label for="">Количество товара</label>
@@ -21,28 +21,29 @@
     </div>
     <p class="col-orange fz-15 p-md mb-md">Самовывоз из магазина «<span ng-bind="shopName"></span>», <span ng-bind="shopAddress"></span></p>
     <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
-      <input type="date" ng-model="date" ng-change="changeDate()">
+      <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="productOrdered">
       <div class="panel-item">
         <span class="panel-name">Укажите дату исполнения услуги</span>
         <span><span class="icon icon-down"></span></span>
       </div>
     </div>
-    <div class="input-date" ng-class="changedTime ? 'input-date is-chosen' : 'input-date'">
-      <input type="time" ng-model="time" ng-change="changeTime()" placeholder="HH:mm">
+    <div class="input-date" ng-class="changedTime ? 'input-date is-chosen' : 'input-date'" ng-hide="hideTime">
+      <input type="time" ng-model="time" ng-change="changeTime()" placeholder="HH:mm" ng-readonly="productOrdered">
       <div class="panel-item">
         <span class="panel-name">Укажите удобное вам время</span>
         <span><span class="icon icon-down"></span></span>
       </div>
     </div>
     <div class="textarea-block">
-      <input type="text" ng-attr-placeholder="{{productData.comment_label}}" ng-model="comment" value="{{productComment}}">
+      <input type="text" ng-attr-placeholder="{{productData.comment_label}}" ng-model="comment" ng-value="{{productComment}}" ng-readonly="productOrdered">
     </div>
     <div class="radio-block" ng-hide="hideBlock">
-      <div class="radio-container"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="paymentOnline" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплата онлайн</label></div>
-      <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="paymentCash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплата наличными</label></div>
+      <div class="radio-hover" ng-show="productOrdered"></div>
+      <div class="radio-container"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="card" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплатить сейчас</label></div>
+      <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="cash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплатить на месте</label></div>
     </div>
     <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан с вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
-    <button class="button button-main" ng-click="sendData($event, quantity, comment)">Заказать</button>
-    <div class="link-xl d-b ta-c col-l-gray fs-12" ng-bind="productBottomText" ng-hide="textHide"></div>
+    <button class="button button-main" ng-click="sendData($event, quantity, comment, paymentOption)">Заказать</button>
+    <div class="link-xl d-b ta-c col-l-gray fs-12" ng-bind="productBottomText" ng-hide="textHide || hideBlock"></div>
   </div>
 </form>

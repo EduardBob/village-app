@@ -1,12 +1,16 @@
 <div class="bg-image VerifyCtrl no-p-b" ng-controller="InviteCodeCtrl">
   <form class="form form-dark">
-    <p class="fs-18 p-md col-orange fw-md">Введите инвайт-код</p>
-    <!-- <div class="alert alert-error" ng-show="codeError" ng-bind="codeError"></div> -->
-    <div class="input-container input-container-sm mb-lg">
-      <input type="text" placeholder="" name="building.code" ng-model="inviteCode" required>  
+    <div ng-hide="terms">
+      <p class="fs-18 p-md col-orange fw-md" >Введите инвайт-код</p>
+      <div class="input-container input-container-sm mb-lg">
+        <input type="text" placeholder="" name="building.code" ng-model="inviteCode" required auto-focus>  
+      </div>
+      <div class="button button-main no-mg" ng-click="updateCode(inviteCode)">Зарегистрироваться</div>
     </div>
-    <div class="button button-main no-mg" ng-click="updateCode(inviteCode)">Зарегистрироваться</div>
-    <!-- <a href="#/register/phone" class="button button-main no-mg">Зарегистрироваться</a> -->
+    <div ng-show="terms">
+      <p class="p-md fs-15 mb-lg agreement-text" ng-bind-html="agreementText"></p>
+      <div class="button button-main no-mg" ng-click="goToPhone()">Принимаю условия соглашения</div>
+    </div>
     <a href="#/login" class="link-xl d-b ta-c">Уже есть логин и пароль? <span class="td-u">Войдите</span></a>
   </form>
 </div>

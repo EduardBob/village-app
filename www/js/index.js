@@ -16,6 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+
+// document.addEventListener('deviceready', onDeviceReady, false);
+
+// function onDeviceReady() {
+
+//     // Mock device.platform property if not available
+//     if (!window.device) {
+//         window.device = { platform: 'Browser' };
+//     }
+
+//     handleExternalURLs();
+// }
+
+// function handleExternalURLs() {
+//     // Handle click events for all external URLs
+//     if (device.platform.toUpperCase() === 'ANDROID') {
+//         $(document).on('click', 'a[href^="http"]', function (e) {
+//             var url = $(this).attr('href');
+//             navigator.app.loadUrl(url, { openExternal: true });
+//             e.preventDefault();
+//         });
+//     }
+//     else if (device.platform.toUpperCase() === 'IOS') {
+//         $(document).on('click', 'a[href^="http"]', function (e) {
+//             var url = $(this).attr('href');
+//             window.open(url, '_system');
+//             e.preventDefault();
+//         });
+//     }
+//     else {
+//         // Leave standard behaviour
+//     }
+// }
+
 var app = {
     // Application Constructor
     initialize: function() {
@@ -27,6 +62,14 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+
+        if (!window.device) {
+            window.device = { platform: 'Browser' };
+        }
+        
+
+        app.handleExternalURLs();
+        app.showAlert();
     },
     // deviceready Event Handler
     //
@@ -34,6 +77,36 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+    },
+    showAlert: function() {
+          window.alert = function (message) {
+              navigator.notification.alert(
+                  message,    // message
+                  null,       // callback
+                  "Консьерж", // title
+                  'OK'        // buttonName
+              );
+          };
+    },
+    handleExternalURLs: function() {
+        // Handle click events for all external URLs
+        if (device.platform.toUpperCase() === 'ANDROID') {
+            $(document).on('click', 'a[href^="http"]', function (e) {
+                var url = $(this).attr('href');
+                navigator.app.loadUrl(url, { openExternal: true });
+                e.preventDefault();
+            });
+        }
+        else if (device.platform.toUpperCase() === 'IOS') {
+            $(document).on('click', 'a[href^="http"]', function (e) {
+                var url = $(this).attr('href');
+                window.open(url, '_system');
+                e.preventDefault();
+            });
+        }
+        else {
+            // Leave standard behaviour
+        }
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -47,3 +120,4 @@ var app = {
         console.log('Received Event: ' + id);
     }
 };
+

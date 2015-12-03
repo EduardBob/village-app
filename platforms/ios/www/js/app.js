@@ -9,12 +9,16 @@ var villageApp = angular.module('villageApp', [
   'view-segment',
   'basePath',
   'getMeta',
+  'onlineStatusApp',
   'registerCode',
   'users',
+  'notificationModule',
   'LocalStorageModule',
   'tokenHandlerModule',
   'headerDirective',
   'footerDirective',
+  'utils.autofocus',
+  'NotificationServiceApp',
   'radioButtonDirective',
   'tagged.directives.infiniteScroll',
   'footerCustom',
@@ -117,10 +121,7 @@ villageApp
         when('/register/welcome', {
           templateUrl: 'templates/login/register/welcome.html'
         }).
-        // when('/main-inner', {
-        //   templateUrl: 'templates/main-inner.html'
-        // }).
         otherwise({
-          redirectTo: '/login'
+          redirectTo: '/services'
         });
     }]);

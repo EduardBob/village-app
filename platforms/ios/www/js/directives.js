@@ -23,7 +23,7 @@ angular.module('headerDirective', [])
           }
         }
         $scope.isShownHeader = function(path) {
-          if (path === '/login') {
+          if (path === '/login' || path === '/offline') {
             return true;
           }
         }
@@ -129,3 +129,15 @@ angular.module('radioButtonDirective', [])
       replace: true
     };
   });
+
+angular.module('utils.autofocus', [])
+.directive('autoFocus', ['$timeout', function($timeout) {
+  return {
+    restrict: 'A',
+    link : function($scope, $element) {
+      $timeout(function() {
+        $element[0].focus();
+      });
+    }
+  }
+}]);

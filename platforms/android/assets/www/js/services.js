@@ -229,3 +229,56 @@ footerCustom.factory('FooterCustom', ['$resource',
     });
   }]);
 
+var notificationModule = angular.module('notificationModule', []);
+
+notificationModule.factory("NotificationService", function () {
+    return {
+        alert: function (message, title, buttonText, buttonAction) {
+            navigator.notification.alert(message,
+                buttonAction,
+                title,
+                buttonText);
+        }
+    }
+});
+
+
+var onlineStatusApp = angular.module('onlineStatusApp', []);
+
+onlineStatusApp.factory('onlineStatus', ["$window", "$rootScope", function ($window, $rootScope) {
+    var onlineStatus = {};
+
+    onlineStatus.onLine = $window.navigator.onLine;
+
+    onlineStatus.isOnline = function() {
+        return onlineStatus.onLine;
+    }
+
+    $window.addEventListener("online", function () {
+        onlineStatus.onLine = true;
+        $rootScope.$digest();
+    }, true);
+
+    $window.addEventListener("offline", function () {
+        onlineStatus.onLine = false;
+        $rootScope.$digest();
+    }, true);
+
+    return onlineStatus;
+}]);
+
+var notificationService = angular.module('NotificationServiceApp', []);
+
+notificationService.factory("NotificationService", function () {
+    return {
+      alert: function (message) {
+        navigator.notification.alert(
+          message,
+          null,
+          'Консьерж',
+          'OK'
+        );
+      }
+    }
+});
+
