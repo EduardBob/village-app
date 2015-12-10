@@ -1,0 +1,10 @@
+<div class="bg-image VerifyCtrl no-p-b" ng-controller="ProfileChangeDataCtrl">
+  <form class="form form-dark">
+    <p class="fs-18 p-md col-orange fw-md">Email</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="email" ng-attr-placeholder="{{email}}" ng-model="email" ng-focus="nameSuccess = false">  
+    </div>
+    <div class="alert alert-success" ng-if="nameSuccess" ng-bind="nameSuccess"></div>
+    <button class="button button-main no-mg" ng-click="changeEmail(email)">Изменить</button>
+  </form>
+</div>

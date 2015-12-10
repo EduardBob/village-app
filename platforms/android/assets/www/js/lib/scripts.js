@@ -2,9 +2,5 @@ $( document ).ready(function() {
 
   // height of the wrapper
   $('.wrapper').height($(window).height());
-
-  // $('body').on('touchmove', function(e) {
-  //     e.preventDefault();
-  // });
-
+  $('.main-container').css('min-height', $(window).height());
 });

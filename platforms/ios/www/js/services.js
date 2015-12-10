@@ -154,20 +154,39 @@ var tokenHandlerModule = angular.module('tokenHandlerModule', []);
   });
 
 
-var users = angular.module('users', ['ngResource', 'tokenHandlerModule']);
+// var users = angular.module('users', ['ngResource', 'tokenHandlerModule']);
 
-users.factory('Users', ['$resource', 'TokenHandler', 
-  function($resource, tokenHandler) {
+// users.factory('Users', ['$resource', 'TokenHandler', 
+//   function($resource, tokenHandler) {
+//     return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+//       get: {
+//         method: 'GET',
+//         params: {urlId: '@urlId', routeId: '@routeId'},
+//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+//       },
+//       save: {
+//         method: 'POST',
+//         params: {urlId: '@urlId', routeId: '@routeId'},
+//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+//       }
+//     });
+//   }]);
+
+
+var users = angular.module('users', ['LocalStorageModule', 'ngResource']);
+
+users.factory('Users', ['localStorageService', '$resource', 
+  function(localStorageService, $resource) {
     return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: {'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: {'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
   }]);
@@ -209,4 +228,57 @@ footerCustom.factory('FooterCustom', ['$resource',
       }
     });
   }]);
+
+var notificationModule = angular.module('notificationModule', []);
+
+notificationModule.factory("NotificationService", function () {
+    return {
+        alert: function (message, title, buttonText, buttonAction) {
+            navigator.notification.alert(message,
+                buttonAction,
+                title,
+                buttonText);
+        }
+    }
+});
+
+
+var onlineStatusApp = angular.module('onlineStatusApp', []);
+
+onlineStatusApp.factory('onlineStatus', ["$window", "$rootScope", function ($window, $rootScope) {
+    var onlineStatus = {};
+
+    onlineStatus.onLine = $window.navigator.onLine;
+
+    onlineStatus.isOnline = function() {
+        return onlineStatus.onLine;
+    }
+
+    $window.addEventListener("online", function () {
+        onlineStatus.onLine = true;
+        $rootScope.$digest();
+    }, true);
+
+    $window.addEventListener("offline", function () {
+        onlineStatus.onLine = false;
+        $rootScope.$digest();
+    }, true);
+
+    return onlineStatus;
+}]);
+
+var notificationService = angular.module('NotificationServiceApp', []);
+
+notificationService.factory("NotificationService", function () {
+    return {
+      alert: function (message) {
+        navigator.notification.alert(
+          message,
+          null,
+          'Консьерж',
+          'OK'
+        );
+      }
+    }
+});
 
