@@ -7,7 +7,8 @@
   {"icon": "news",
     "title": "Новости",
     "path": "news",
-    "path1": "newsitem"
+    "path1": "newsitem",
+    "newArticle": "true"
   },
   {"icon": "shop",
     "title": "Магазин",

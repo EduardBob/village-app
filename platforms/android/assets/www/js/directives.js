@@ -23,12 +23,12 @@ angular.module('headerDirective', [])
           }
         }
         $scope.isShownHeader = function(path) {
-          if (path === '/login') {
+          if (path === '/login' || path === '/offline') {
             return true;
           }
         }
         $scope.arrowHidden = function(path) {
-          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/request/sent') {
+          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/request/sent' || path === '/survey') {
             return true;
           }
         }
@@ -54,6 +54,7 @@ angular.module('headerDirective', [])
             case '/profile':
             case '/profile/history':
             case '/profile/name':
+            case '/profile/email':
             case '/profile/password':
             case '/profile/phone':
               title = 'Мой профиль';
@@ -128,3 +129,15 @@ angular.module('radioButtonDirective', [])
       replace: true
     };
   });
+
+angular.module('utils.autofocus', [])
+  .directive('autoFocus', ['$timeout',  function($timeout) {
+    return {
+      restrict: 'A',
+      link : function($scope, $element) {
+        $timeout(function() {
+          $element[0].focus();
+        });
+      }
+    }
+  }]);

@@ -3,21 +3,70 @@
 var villageAppControllers = angular.module('villageAppControllers', []);
 
 
-villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', 'TransferDataService',
-  function($scope, $resource, $location, TransferDataService) {
+villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService',
+  function($scope, $resource, $location, TransferDataService, localStorageService) {
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        isArray: true
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        isArray: true
+      }
+    });
+    $scope.sendRequest = function(phone, full_name, position, address) {
+      user.save({urlId: 'villages', routeId: 'request'}, {'phone' : phone, 'full_name' : full_name, 'position' : position, 'address' : address}, function(data) {
+         $location.path('/request/sent');
+      }, function(response) {
+        if (response.status === 400) {
+          // var messages = [];
+          // var message = messages.concat(response.data.error.message.address, response.data.error.message.full_name, response.data.error.message.phone, response.data.error.message.position);
+          // alert(message.join("\r\n"));
+          alert('Все поля обязательны для заполнения');
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    }
+  }]);
+
+villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce',
+  function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce) {
     var building = $resource('http://village.fruitware.ru/api/v1/buildings/:buildingCode', {buildingCode: '@buildingCode'});
+    $scope.terms = false;
+    
+
+    $timeout(function() {
+        angular.element('.main-container').css('min-height', $(window).height());
+        // angular.element('#invite-code').focus();
+    });
+    $resource('http://village.fruitware.ru/api/v1/settings').get({}, function(data) {
+      GetMeta.setData(data.data);
+      $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
+    }, function(response) {
+      $scope.agreementText = 'Соглашение'
+    });
     $scope.updateCode = function(code) {
       building.get({buildingCode: code}, function(data) {
-        $location.path('/register/phone');
         $scope.address = data.data.address;
         $scope.building_id = data.data.id;
         TransferDataService.addData('address', data.data.address);
+        localStorageService.set('invitecode', code);
+        localStorageService.set('token', 'none');
         TransferDataService.addData('building_id', data.data.id);
+
+        $scope.terms = true;
+        $scope.goToPhone = function() {
+          $location.path('/register/phone');
+        }
       }, function(response) {
         if (response.status === 404 || response.status === 400) {
           alert('Неверный инвайт-код');
         } else if (response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -28,9 +77,18 @@ villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$loc
   function($scope, $resource, $location, TransferDataService) {
     $scope.addressVillage = TransferDataService.getData('address');
     $scope.buildingId = TransferDataService.getData('building_id');
-    var users = $resource('http://village.fruitware.ru/api/v1/users', {});
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'}
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'}
+      }
+    });
     $scope.checkPhone = function(phone) {
-      users.save({'phone' : phone, 'building_id' : $scope.buildingId}, function(data) {
+      user.save({urlId: 'users'}, {'phone' : phone, 'building_id' : $scope.buildingId}, function(data) {
         $location.path('/register/confirm');
         TransferDataService.addData('phone', phone);
         TransferDataService.addData('session', data.data.session);
@@ -39,12 +97,44 @@ villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$loc
         if (response.status === 400) {
           alert(response.data.error.message.phone);
         } else if (response.status === 403) {
-          if (response.data.error.message === "user_exist") {
-            alert('Пользователь с таким номером уже существует');
-            $location.path('/login');
+          // if (response.data.error.message === "user_exist") {
+          //   alert('Пользователь с таким номером уже существует');
+          // } else if (response.data.error.message === "user_not_activated") {
+          //   alert('Ваш аккаунт деактивирован. Обратитесь в техподдержку');
+          // } else if (response.data.error.message === "user_without_building") {
+          //   alert('У вашего аккаунта  не указан номер дома. Обратитесь в техподдержку');
+          // } else if (response.data.error.message === "village_not_activated") {
+          //   alert('Ваш посёлок отключен от нашей системы');
+          // } else if (response.data.error.message === 'sms_invalid_mobile_phone') {
+          //   alert('sms gate не работает с этим номер телефона');
+          // } else if (response.data.error.message === '') {
+
+          // }
+          var alertMsg = '';
+          switch(response.data.error.message) {
+            case 'user_exist':
+              alertMsg = 'Пользователь с таким номером уже существует';
+              break;
+            case 'user_not_activated':
+              alertMsg = 'Ваш аккаунт деактивирован. Пожалуйста, обратитесь в техподдержку';
+              break;
+            case 'user_without_building':
+              alertMsg = 'У вашего аккаунта  не указан номер дома. Пожалуйста, обратитесь в техподдержку';
+              break;
+            case 'village_not_activated':
+              alertMsg = 'Ваш посёлок отключен от нашей системы';
+              break;
+            case 'sms_invalid_mobile_phone':
+              alertMsg = 'Неверный номер телефона.';
+              break;
+            case 'sms_internal_error':
+              alertMsg = 'Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте позже.';
+              break;
           }
+          alert(alertMsg);
+          $location.path('/login');
         } else if (response.status === 404 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -54,10 +144,19 @@ villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$locat
   function($scope, $resource, $location, TransferDataService) {
     $scope.phone = TransferDataService.getData('phone');
     $scope.session = TransferDataService.getData('session');
-    var users = $resource('http://village.fruitware.ru/api/v1/tokens/check', {});
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'}
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'}
+      }
+    });
     $scope.code = TransferDataService.getData('code');
     $scope.checkCode = function(code) {
-      users.save({'code' : $scope.code, 'session' : $scope.session, 'type' : 'registration'}, function(data) {
+      user.save({urlId: 'tokens', routeId: 'check'}, {'code' : $scope.code, 'session' : $scope.session, 'type' : 'registration'}, function(data) {
         $location.path('/register/welcome');
       }, function(response) {
         console.log(response);
@@ -66,89 +165,138 @@ villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$locat
         } else if (response.status === 404) {
           alert('Неправильный код');
         } else if (response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
   }]);
 
-villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler',
-  function($scope, $resource, $location, TransferDataService, tokenHandler) {
+villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
     $scope.code = TransferDataService.getData('code');
     $scope.session = TransferDataService.getData('session');
-    var users = $resource('http://village.fruitware.ru/api/v1/users/confirm', {});
-    $scope.submitData = function(first_name, last_name, password, password_confirmation) {
-      users.save({'code' : $scope.code, 'session' : $scope.session, 'first_name' : first_name, 'last_name' : last_name, 'password' : password, 'password_confirmation' : password_confirmation}, function(data) {
+    $scope.submitData = function(first_name, last_name, email, password, password_confirmation) {
+      user.save({urlId: 'users', routeId: 'confirm'}, {'code' : $scope.code, 'session' : $scope.session, 'first_name' : first_name, 'last_name' : last_name, 'email' : email, 'password' : password, 'password_confirmation' : password_confirmation}, function(data) {
         $location.path('/profile');
         TransferDataService.addData('first_name', first_name);
         TransferDataService.addData('last_name', last_name);
+        TransferDataService.addData('email', email);
         TransferDataService.addData('password', password);
         TransferDataService.addData('password_confirmation', password_confirmation);
+        localStorageService.set('token', data.data.token);
         tokenHandler.set(data.data.token);
         TransferDataService.addData('token', data.data.token);
       }, function(response) {
         console.log(response);
         if (response.status === 400) {
           var messages = [];
-          var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.password);
+          var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
           alert(message.join("\r\n"));
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          // alert('Повторите попытку или обратитесь в техподдержку');
+          // alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
   }]);
 
 
-villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler',
-  function($scope, $resource, $location, TransferDataService, tokenHandler) {
-     var user = $resource('http://village.fruitware.ru/api/v1/me', {}, {
+villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService) {
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
-    user.get(function(data) {
+    $timeout(function() {
+      angular.element('.main-container').css('min-height', $(window).height());
+    });
+
+    $scope.first_name = TransferDataService.getData('first_name');
+    $scope.last_name = TransferDataService.getData('last_name');
+    $scope.phone = TransferDataService.getData('phone');
+    $scope.email = TransferDataService.getData('email'); 
+    $scope.villageName = TransferDataService.getData('villageName'); 
+    $scope.address = TransferDataService.getData('address'); 
+    
+    user.get({urlId: 'me'}, function(data) {
       $scope.first_name = data.data.first_name;
       $scope.last_name = data.data.last_name;
       $scope.phone = data.data.phone;
+      $scope.villageName = data.data.building.data.village.data.name;
+      localStorageService.set('villageName', $scope.villageName);
       $scope.address = data.data.building.data.address;
+      if (data.data.email != null) {
+        $scope.email = data.data.email;
+      } else {
+        $scope.emailPresent = false;
+      }
       TransferDataService.addData('first_name', data.data.first_name);
+      TransferDataService.addData('villageName', data.data.building.data.village.data.name);
       TransferDataService.addData('last_name', data.data.last_name);
       TransferDataService.addData('phone', data.data.phone);
+      TransferDataService.addData('email', data.data.email);
       TransferDataService.addData('address', data.data.building.data.address);
     }, function(response) {
       console.log(response);
       if (response.status === 400) {
-        alert(response.data.error.message.join("\r\n"));
+        if (response.data.error === 'token_not_provided') {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+        } else {
+          alert(response.data.error.message.join("\r\n"));
+        }
       } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
     $scope.userLogout = function() {
       TransferDataService.resetData();
+      localStorageService.set('token', 'none');
       tokenHandler.set("none");
       $location.path('/login');
     };
   }]);
 
-villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler) {
-    $scope.first_name = TransferDataService.getData('first_name');
-    $scope.last_name = TransferDataService.getData('last_name');
-    $scope.phone = TransferDataService.getData('phone');
+villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    $timeout(function() {
+        angular.element('.main-container').css('min-height', $(window).height());
+    });
+    $scope.first_name = TransferDataService.getData('first_name');
+    $scope.last_name = TransferDataService.getData('last_name');
+    $scope.phone = TransferDataService.getData('phone');
+    $scope.email = TransferDataService.getData('email');
     $scope.changeName = function(first_name, last_name) {
       user.save({urlId: 'me', routeId: 'name'}, {'first_name' : first_name, 'last_name' : last_name}, function(data) {
         $scope.nameSuccess = 'Данные успешно изменены';
@@ -160,7 +308,20 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
           var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name);
           alert(message.join("\r\n"));
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    }
+    $scope.changeEmail = function(email) {
+      user.save({urlId: 'me', routeId: 'email'}, {'email' : email}, function(data) {
+        $scope.nameSuccess = 'Данные успешно изменены';
+      }, function(response) {
+        console.log(response);
+        if (response.status === 400) {
+          $scope.nameSuccess = false;
+          alert(response.data.error.message.email);
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -175,7 +336,7 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
           var message = messages.concat(response.data.error.message.error, response.data.error.message.new_password, response.data.error.message.password);
           alert(message.join("\r\n"));
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -189,8 +350,19 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         console.log(response);
         if (response.status === 400) {
           alert(response.data.error.message.new_phone);
+        } else if (response.status === 403) {
+          var alertMsg = '';
+          switch(response.data.error.message) {
+            case 'sms_invalid_mobile_phone':
+              alertMsg = 'Неверный номер телефона.';
+              break;
+            case 'sms_internal_error':
+              alertMsg = 'Произошла ошибка при отправке сообщения. Пожалуйста, попробуйте позже.';
+              break;
+          }
+          alert(alertMsg);
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -211,42 +383,58 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         } else if (response.status === 404) {
           alert('Неправильный код');
         } else if (response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
   }]);
 
 
-villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location', 'GetMeta', 'Users', 'TransferDataService', 'TokenHandler',
-  function($scope, $resource, $location, GetMeta, Users, TransferDataService, tokenHandler) {
+villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+    if(localStorageService.isSupported) {
+      // function submit(key, val) {
+      //   return localStorageService.set(key, val);
+      // }
+    }
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
-        params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        params: {urlId: '@urlId', routeId: '@routeId'}
       },
       save: {
         method: 'POST',
-        params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        params: {urlId: '@urlId', routeId: '@routeId'}
       }
     });
-    user.get({urlId: 'settings'}, {}, function(data) {
-      GetMeta.setData(data.data);
-      $scope.siteName = GetMeta.getData('core::site-name');
-    }, function(response) {
-      console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
-      }
-    });
-
+    // $timeout(function() {
+    //     angular.element('.main-container').css('min-height', $(window).height());
+    // });
+    if (localStorageService.get('villageName') != null) {
+      $scope.siteName = localStorageService.get('villageName');
+    } else if (localStorageService.get('invitecode') != null) {
+      user.get({urlId: 'buildings', routeId: localStorageService.get('invitecode')}, {}, function(data) {
+        $scope.siteName = data.data.village.data.name;
+      }, function(response) {
+        console.log(response);
+        if (response.status === 404) {
+          localStorageService.remove('invitecode');
+          alert('Вы должны зарегистрироваться');
+        } else if (response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    } else {
+      $scope.siteName = '"Консьерж"';
+    }
     $scope.login = function(phone, password) {
       TransferDataService.addData('phone', phone);
       user.save({urlId: 'auth', routeId: 'token'}, {'phone': phone, 'password': password}, function(data) {
         TransferDataService.addData('phone', phone);
         tokenHandler.set(data.data.token);
+        // window.localStorage['token'] = data.data.token;
+        localStorageService.set('token', data.data.token);
+        // console.log(localStorageService.get('token'));
         $location.path('/services');
       }, function(response) {
         console.log(response);
@@ -256,27 +444,27 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
           alert('Вы должны зарегистрироваться');
           $location.path('/register');
         } else if (response.status === 404 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
   }]);
 
-villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler) {
-    $scope.phone = TransferDataService.getData('phone');
+villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    $scope.phone = TransferDataService.getData('phone');
     $scope.checkPhone = function(phone) {
       user.save({urlId: 'tokens'}, {'type' : 'reset_password', 'phone' : phone}, function(data) {
         TransferDataService.addData('phone', phone);
@@ -288,11 +476,22 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
         if (response.status === 400) {
           alert(response.data.error.message.phone);
         } else if (response.status === 403) {
-          alert('Ваш номер не был активирован. Пожалуйста, активируйте его')
+          var alertMsg = '';
+          switch(response.data.error.message) {
+            case 'sms_invalid_mobile_phone':
+              alertMsg = 'sms gate не работает с этим номер телефона';
+              break;
+            case 'sms_internal_error':
+              alertMsg = 'закончился баланс или неверная валидация данных';
+              break;
+            default:
+              alertMsg = 'Ваш номер не был активирован. Пожалуйста, активируйте его';
+          }
+          alert(alertMsg);
           $scope.phone = TransferDataService.getData('phone');
           $location.path('/register');
         } else if (response.status === 404 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -308,7 +507,7 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
         } else if (response.status === 404) {
           alert('Неверный код');
         } else if (response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -326,26 +525,86 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
           var message = messages.concat(response.data.error.message.error, response.data.error.message.new_password, response.data.error.message.password);
           alert(message.join("\r\n"));
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
   }]);
 
-villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+    // Users.get({urlId: 'articles'}, {}, function(data) {
+    //   $scope.allNews = [];
+    //   angular.forEach(data.data, function (news) {
+    //     $scope.allNews.push(news.id);
+    //   });
+    //   //       if (!angular.equals($scope.allNews, $scope.allNews2)) {
+    //   //         $scope.allNews2 = $scope.allNews2.concat($scope.allNews);
+    //   //       }
+
+    //   // $scope.allNews2 = ["502", "38"];
+    //   // $scope.result = [];
+    //   // angular.forEach($scope.allNews2, function(key) {
+    //   //   if (-1 === $scope.allNews.indexOf(key)) {
+    //   //     $scope.result.push(key);
+    //   //   }
+    //   // });
+    //   // $scope.nrNew = $scope.result.length;
+
+    //   $scope.maxNews = Math.max.apply(Math, $scope.allNews);
+
+    //   localStorageService.set('nrNews', $scope.maxNews);
+
+
+    //   // GetMeta.setData(data.data);
+    //   // $scope.siteName = GetMeta.getData('core::site-name');
+
+    //   // for (var i in $scope.allNews) {
+    //   //       if (!$scope.allNews2.hasOwnProperty(i)) {
+    //   //               $scope.allNews2 = $scope.allNews2.concat($scope.allNews);
+    //   //       }
+    //   //   }
+    //   //   console.log($scope.allNews2);
+    // }, function(response) {
+    //   console.log(response);
+    //   if (response.status === 404 || response.status === 403 || response.status === 500) {
+    //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+    //   }
+    // });
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
+    $scope.allNews = [];
+
+    localStorageService.set('newArticles', false);
+    user.get({urlId: 'articles'}, {}, function(data) {
+      angular.forEach(data.data, function (news) {
+        $scope.allNews.push(news.id);
+      });
+      localStorageService.set('oldNews', $scope.allNews);
+      
+      // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1'  && localStorageService.get('maxNews') != null) {
+      //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
+      // } else {
+      //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
+      // }
+    }, function(response) {
+      console.log(response);
+      if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      }
+    });
+
     $scope.page = 0;
     $scope.newsBlocks = [];
     $scope.fetching = false;
@@ -357,7 +616,9 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       user.get({urlId: 'articles', page: $scope.page}, {}, function(data) {
         $scope.fetching = false;
         angular.forEach(data.data, function (news) {
-          news.created_at = Date.parse(news.created_at);
+          // news.created_at = Date.parse(news.created_at);
+          $scope.arr = news.created_at.split(/[- :]/);
+          news.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
         });
         angular.forEach(data.data, function(news) {
           if (news.image != null) {
@@ -371,63 +632,32 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
-// villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler',
-//   function($scope, $resource, $location, Users, TransferDataService, tokenHandler) {
-//     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
-//       get: {
-//         method: 'GET',
-//         params: {urlId: '@urlId', routeId: '@routeId'},
-//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
-//       },
-//       save: {
-//         method: 'POST',
-//         params: {urlId: '@urlId', routeId: '@routeId'},
-//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
-//       }
-//     });
-//     user.get({urlId: 'articles', page: '1'}, {}, function(data) {
-//       if (!data.data.length ) {
-//         $scope.emptyService = "На данный момент новостей нет";
-//       } else {
-//         $scope.newsBlocks = data.data;
-//         $scope.addMoreItems = function(){
-//           $scope.first = '5';
-//           if($scope.first < $scope.newsBlocks.length){
-//              $scope.first = $scope.first + 5;
-//           }
-//        };
-//       }
-//     }, function(response) {
-//       console.log(response);
-//       if (response.status === 404 || response.status === 403 || response.status === 500) {
-//         alert('Повторите попытку или обратитесь в техподдержку');
-//       }
-//     });
-//   }]);
 
-villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
     $scope.articleData = user.get({urlId: 'articles', routeId: $routeParams.articleId}, function(data) {
       $scope.article = data.data;
-      $scope.article.created_at = Date.parse($scope.article.created_at);
+      // $scope.article.created_at = Date.parse($scope.article.created_at);
+      $scope.arr = $scope.article.created_at.split(/[- :]/);
+      $scope.article.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
       if (data.data.image != null) {
         $scope.articleImage = data.data.image.formats.bigThumb;
       } else {
@@ -437,41 +667,163 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
     });
   }]);
 
-villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler, BasePath) {
-    var user = $resource('http://village.fruitware.ru/api/v1/services/categories', {}, {
-      get: {
-        method: 'GET',
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
-      }
-    });
-    user.get({}, function(data) {
-      $scope.serviceBlocks = data.data;
-      angular.forEach($scope.serviceBlocks, function(service) {
-        if (service.image != null) {
-          service.image = service.image.formats.mediumThumb;
-        } else {
-          service.imagePresent = true;
-        }
-      })
-      $scope.basePath = BasePath.domain;
-    }, function(response) {
-      console.log(response);
-    });
-  }]);
-
-villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+    if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
+      user.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+        $scope.serviceBlocks = data.data;
+        angular.forEach($scope.serviceBlocks, function(service) {
+          if (service.image != null) {
+            service.image = service.image.formats.mediumThumb;
+          } else {
+            service.imagePresent = true;
+          }
+        })
+        $scope.basePath = BasePath.domain;
+      }, function(response) {
+        console.log(response);
+        if (response.data.error = 'token_expired') {
+          user.save({urlId: 'auth', routeId: 'refresh'}, {}, function(data) {
+            localStorageService.set('token', data.data.token);
+            var newTokenUser = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+              get: {
+                method: 'GET',
+                params: {urlId: '@urlId', routeId: '@routeId'},
+                headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+              },
+              save: {
+                method: 'POST',
+                params: {urlId: '@urlId', routeId: '@routeId'},
+                headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+              }
+            });
+            newTokenUser.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+              $scope.serviceBlocks = data.data;
+              angular.forEach($scope.serviceBlocks, function(service) {
+                if (service.image != null) {
+                  service.image = service.image.formats.mediumThumb;
+                } else {
+                  service.imagePresent = true;
+                }
+              })
+              $scope.basePath = BasePath.domain;
+            });
+            $scope.allNews = [];
+            if (localStorageService.get('oldNews') != null) {
+              $scope.oldNews = localStorageService.get('oldNews');
+            } else {
+              $scope.oldNews = ["0"];
+            }
+            $scope.result = [];
+            newTokenUser.get({urlId: 'articles'}, {}, function(data) {
+              angular.forEach(data.data, function (news) {
+                $scope.allNews.push(news.id);
+              });
+              angular.forEach($scope.allNews, function(key) {
+                if (-1 === $scope.oldNews.indexOf(key)) {
+                  if (key > Math.min.apply(Math, $scope.oldNews)) {
+                    $scope.result.push(key);
+                  }
+                }
+              });
+              if ($scope.result.length && Math.max.apply(Math, $scope.result) > Math.max.apply(Math, $scope.oldNews)) {
+                $scope.nrNews = $scope.result.length;
+                TransferDataService.addData('nrNews', $scope.nrNews);
+                localStorageService.set('newArticles', true);
+              } else {
+                localStorageService.set('newArticles', false);
+              }
+              // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1' && localStorageService.get('maxNews') != null) {
+              //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
+              //   TransferDataService.addData('nrNews', $scope.nrNews);
+              //   localStorageService.set('newArticles', true);
+              // } else {
+              //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
+              //   localStorageService.set('newArticles', false);
+              // }
+            }, function(response) {
+              console.log(response);
+              if (response.status === 404 || response.status === 403 || response.status === 500) {
+                alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+              }
+            });
+          }, function(response) {
+            console.log(response);
+            if (response.status === 404 || response.status === 403 || response.status === 500) {
+              alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+            }
+          });
+        }
+      });
+      
+      $scope.allNews = [];
+      if (localStorageService.get('oldNews') != null) {
+        $scope.oldNews = localStorageService.get('oldNews');
+      } else {
+        $scope.oldNews = ["0"];
+      }
+      $scope.result = [];
+      user.get({urlId: 'articles'}, {}, function(data) {
+        angular.forEach(data.data, function (news) {
+          $scope.allNews.push(news.id);
+        });
+        angular.forEach($scope.allNews, function(key) {
+          if (-1 === $scope.oldNews.indexOf(key)) {
+            if (key > Math.min.apply(Math, $scope.oldNews)) {
+              $scope.result.push(key);
+            }
+          }
+        });
+        if ($scope.result.length && Math.max.apply(Math, $scope.result) > Math.max.apply(Math, $scope.oldNews)) {
+          $scope.nrNews = $scope.result.length;
+          TransferDataService.addData('nrNews', $scope.nrNews);
+          localStorageService.set('newArticles', true);
+        } else {
+          localStorageService.set('newArticles', false);
+        }
+        // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1' && localStorageService.get('maxNews') != null) {
+        //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
+        //   TransferDataService.addData('nrNews', $scope.nrNews);
+        //   localStorageService.set('newArticles', true);
+        // } else {
+        //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
+        //   localStorageService.set('newArticles', false);
+        // }
+      }, function(response) {
+        console.log(response);
+        if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    } else {
+      $location.path('/login');
+    }
+  }]);
+
+villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
 
@@ -503,51 +855,82 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
 
-villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', 'Users', 'GetMeta', '$routeParams', '$filter', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, GetMeta, $routeParams, $filter, TransferDataService, tokenHandler, BasePath) {
-    $scope.servicePaymentInfo = GetMeta.getData('village::service-payment-info');
-    $scope.serviceBottomText = GetMeta.getData('village::service-bottom-text');
-    TransferDataService.addData('serviceDate', '');
-    TransferDataService.addData('serviceTime', '');
-    TransferDataService.addData('service_perform_at', '');
+villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $window, $routeParams, $filter, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
+    });
+    TransferDataService.addData('serviceDate', '');
+    TransferDataService.addData('serviceTime', '');
+    TransferDataService.addData('service_perform_at', '');
+    TransferDataService.addData('hideBlockPayment', 'false');
+    TransferDataService.addData('paymentOption', 'cash');
+    user.get({urlId: 'me'}, {}, function(data) {
+      $scope.servicePaymentInfo = data.data.building.data.village.data.service_payment_info;
+      $scope.serviceBottomText = data.data.building.data.village.data.service_bottom_text;
     });
     user.get({urlId: 'services', routeId: $routeParams.serviceId}, {}, function(data) {
       $scope.serviceData = data.data;
+      if (data.data.price == 0) {
+        $scope.hideBlock = true;
+        TransferDataService.addData('hideBlockPayment', 'true');
+        TransferDataService.addData('paymentOption', 'cash');
+        $scope.paymentOption = 'cash';
+      } else {
+        TransferDataService.addData('hideBlockPayment', 'false');
+        TransferDataService.addData('paymentOption', 'card');
+        $scope.paymentOption = 'card';
+      }
+
+      if (data.data.show_perform_time == 0) {
+        $scope.hideTime = true;
+      }
+
+      if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
+        TransferDataService.addData('paymentOption', $routeParams.payment_type);
+        $scope.paymentOption = $routeParams.payment_type;
+      }
+
+      // console.log(localStorageService.get('serviceOrder' + $routeParams.serviceId));
       if (data.data.image != null) {
         $scope.serviceImage = data.data.image.formats.mediumThumb;
       } else {
         $scope.imagePresentMain = true;
       }
+
+      if (typeof $routeParams.comment != 'undefined' && $routeParams.comment) {
+        $scope.comment = $routeParams.comment;
+      }
+
+      $scope.serviceOrdered = false;
       $scope.basePath = BasePath.domain; 
     }, function(response) {
       console.log(response);
       if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
-    $scope.$watchGroup(['date', 'time'], function() {
-      if (typeof TransferDataService.getData('serviceDate') != 'undefined' && typeof TransferDataService.getData('serviceTime') != 'undefined') {
-        TransferDataService.addData('service_perform_at', TransferDataService.getData('serviceDate') + ' ' + TransferDataService.getData('serviceTime'));
-      }
-    });
+    // $scope.$watchGroup(['date', 'time'], function() {
+    //   if (typeof TransferDataService.getData('serviceDate') != 'undefined' && typeof TransferDataService.getData('serviceTime') != 'undefined') {
+    //     TransferDataService.addData('service_perform_at', TransferDataService.getData('serviceDate') + ' ' + TransferDataService.getData('serviceTime'));
+    //   }
+    // });
     $scope.changeDate = function() {
       $scope.changedDate = true;
       $scope.dateNew = $filter('date')($scope.date, 'yyyy-MM-dd');
@@ -562,39 +945,65 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       $scope.timeNew = $scope.hh + ':' + $scope.mm;
       TransferDataService.addData('serviceTime', $scope.timeNew);
     };
-    $scope.sendData = function($event, comment) {
-      $scope.perform_at = TransferDataService.getData('service_perform_at');
+    $scope.paymentOptionChange = function(value) {
+      TransferDataService.addData('paymentOption', $scope.paymentOption);
+    }
+    $scope.currentDate = new Date().toISOString().split("T")[0];
+    $scope.sendData = function($event, comment, paymentOption) {
+      // $scope.perform_at = TransferDataService.getData('service_perform_at');
+      $scope.perform_date = TransferDataService.getData('serviceDate');
+      $scope.perform_time = TransferDataService.getData('serviceTime');
       $scope.service_id = $routeParams.serviceId;
-      user.save({urlId: 'services', routeId: 'orders'}, {'perform_at': $scope.perform_at, 'comment': comment, 'service_id': $scope.service_id}, function(data) {
-        $scope.orderMessage = true;
-        $($event.target).css('display','none');
-        $scope.textHide = true;
-      }, function(response) {
-        console.log(response);
-        if (response.status === 400) {
-          alert('Введите дату и время заказа');
-          // var messages = [];
-          // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
-          // alert(message.join("\r\n"));
-        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
-        }
-      });
+      // localStorageService.set('serviceOrder' + $scope.service_id, {'comment': $scope.comment});
+      if (!$scope.serviceOrderForm.inputDate.$valid) {
+       alert('Выбранная дата не может быть меньше текущей даты');
+      } else {
+        user.save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
+          $scope.orderMessage = true;
+          $($event.target).css('display','none');
+          $scope.textHide = true;
+
+          $scope.serviceOrdered = true;
+          
+          $scope.dataOrder = data.data;
+          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+            $scope.link = $scope.dataOrder.pay.data.link;
+            $window.open($scope.link, '_system');
+          }
+          // if (TransferDataService.getData('paymentOption') === 'card') {
+          //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+          // }
+        }, function(response) {
+          $scope.changedDate = false;
+          $scope.changedTime = false;
+          $scope.orderMessage = false;
+          console.log(response);
+          if (response.status === 400) {
+            // alert('Введите дату и время заказа');
+            alert('Введите дату заказа');
+            // var messages = [];
+            // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
+            // alert(message.join("\r\n"));
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      }
     }
   }]);
 
-villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
     user.get({urlId: 'products', routeId: 'categories'}, {}, function(data) {
@@ -614,23 +1023,23 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
     }, function(response) {
       console.log(response);
       if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
   }]);
 
-villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$location', 'Users', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
     $scope.page = 0;
@@ -650,24 +1059,24 @@ villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$lo
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
-villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
 
@@ -700,66 +1109,136 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
-villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', 'Users', 'GetMeta', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', 'BasePath',
-  function($scope, $resource, $location, Users, GetMeta, $routeParams, TransferDataService, tokenHandler, $filter, BasePath) {
-    $scope.shopName = GetMeta.getData('village::shop-name');
-    $scope.shopAddress = GetMeta.getData('village::shop-address');
-    $scope.productPaymentInfo = GetMeta.getData('village::product-payment-info');
-    $scope.productBottomText = GetMeta.getData('village::product-bottom-text');
-    TransferDataService.addData('unit_title', '');
-    TransferDataService.addData('productDate', '');
-    TransferDataService.addData('productTime', '');
-    TransferDataService.addData('product_perform_at', '');
+villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get() }
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
-    user.get({urlId: 'products', routeId: $routeParams.productId}, {}, function(data) {
-      $scope.productData = data.data;
-      if (data.data.image != null) {
-        $scope.productImage = data.data.image.formats.mediumThumb;
-      } else {
-        $scope.imagePresentMain = true;
-      }
-      $scope.basePath = BasePath.domain;
-      // $scope.productData = $filter('filter')(data.data, {id: $routeParams.productId})[0];
-      TransferDataService.addData('unit_title', $scope.productData.unit_title);
-      $scope.productUnit = TransferDataService.getData('unit_title');
-      $scope.unit_step = GetMeta.getData('village::product-unit-step-' + $scope.productUnit);
-      $scope.quantity = $scope.unit_step;
-      $scope.changePlus = function() {
-        $scope.quantity = ($scope.quantity*1) + ($scope.unit_step*1);
-      }
-      $scope.changeMinus = function() {
-        if ($scope.quantity > $scope.unit_step) {
-          $scope.quantity = $scope.quantity - $scope.unit_step;
+    TransferDataService.addData('unit_title', '');
+    TransferDataService.addData('productDate', '');
+    TransferDataService.addData('productTime', '');
+    TransferDataService.addData('product_perform_at', '');
+    TransferDataService.addData('hideBlockPayment', 'false');
+    TransferDataService.addData('paymentOption', 'cash');
+    user.get({urlId: 'me'}, {}, function(data) {
+      $scope.dataVillage = data.data.building.data.village.data;
+      $scope.shopName = $scope.dataVillage.shop_name;
+      $scope.shopAddress = $scope.dataVillage.shop_address;
+      $scope.productPaymentInfo = $scope.dataVillage.product_payment_info;
+      $scope.productBottomText = $scope.dataVillage.product_bottom_text;
+      $scope.productUnitStepKg = $scope.dataVillage.product_unit_step_kg;
+      $scope.productUnitStepBottle = $scope.dataVillage.product_unit_step_bottle;
+      $scope.productUnitStepPiece = $scope.dataVillage.product_unit_step_piece;
+      user.get({urlId: 'products', routeId: $routeParams.productId}, {}, function(data) {
+        $scope.productData = data.data;
+        
+        if (data.data.price == 0) {
+          $scope.hideBlock = true;
+          TransferDataService.addData('hideBlockPayment', 'true');
+          TransferDataService.addData('paymentOption', 'cash');
+          $scope.paymentOption = 'cash';
+        } else {
+          TransferDataService.addData('hideBlockPayment', 'false');
+          TransferDataService.addData('paymentOption', 'card');
+          $scope.paymentOption = 'card';
         }
-      }
-    }, function(response) {
-      console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
-      }
+
+        if (data.data.show_perform_time == 0) {
+          $scope.hideTime = true;
+        }
+
+        if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
+          TransferDataService.addData('paymentOption', $routeParams.payment_type);
+          $scope.paymentOption = $routeParams.payment_type;
+        }
+
+        if (data.data.image != null) {
+          $scope.productImage = data.data.image.formats.mediumThumb;
+        } else {
+          $scope.imagePresentMain = true;
+        }
+
+        if (typeof $routeParams.comment != 'undefined' && $routeParams.comment) {
+          $scope.comment = $routeParams.comment;
+        }
+
+        $scope.productOrdered = false;
+
+        $scope.basePath = BasePath.domain;
+        
+        // $scope.productData = $filter('filter')(data.data, {id: $routeParams.productId})[0];
+        TransferDataService.addData('unit_title', $scope.productData.unit_title);
+        $scope.productUnit = $scope.productData.unit_title;
+        // $scope.unit_step = GetMeta.getData('village::product-unit-step-' + $scope.productUnit);
+        
+        if ($scope.productUnit === 'kg') {
+          $scope.unitRus = 'кг';
+        } else if ($scope.productUnit === 'bottle') {
+          $scope.unitRus = 'бут.';
+        } else if ($scope.productUnit === 'piece') {
+          $scope.unitRus = 'шт.';
+        }
+        var unitStep = function(s) {
+          if (s === 'kg') {
+            return $scope.productUnitStepKg;
+          } else if (s === 'bottle') {
+            return $scope.productUnitStepBottle;
+          } else if (s === 'piece') {
+            return $scope.productUnitStepPiece;
+          }
+        }
+        $scope.unit_step = unitStep($scope.productUnit);
+        
+        if (typeof $routeParams.qty != 'undefined') {
+          $scope.quantity = $routeParams.qty;
+        } else {
+          $scope.quantity = $scope.unit_step;
+        }
+        
+        $scope.changePlus = function() {
+          if ($scope.productOrdered === true) {
+            return false;
+          } else {
+            $scope.quantity = ($scope.quantity*1) + ($scope.unit_step*1);
+          }
+        }
+        
+        $scope.changeMinus = function() {
+          if ($scope.productOrdered === true) {
+            return false;
+          } else if ($scope.quantity > $scope.unit_step) {
+            $scope.quantity = $scope.quantity - $scope.unit_step;
+          }
+        }
+      }, function(response) {
+        console.log(response);
+        if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+
     });
-    $scope.$watchGroup(['date', 'time'], function() {
-      if (typeof TransferDataService.getData('productDate') != 'undefined' && typeof TransferDataService.getData('productTime') != 'undefined') {
-        TransferDataService.addData('product_perform_at', TransferDataService.getData('productDate') + ' ' + TransferDataService.getData('productTime'));
-      }
-    });
+    // $scope.$watchGroup(['date', 'time'], function() {
+    //   if (typeof TransferDataService.getData('productDate') != 'undefined' && typeof TransferDataService.getData('productTime') != 'undefined') {
+    //     TransferDataService.addData('product_perform_at', TransferDataService.getData('productDate') + ' ' + TransferDataService.getData('productTime'));
+    //   }
+    // });
+
     $scope.changeDate = function() {
       $scope.changedDate = true;
       $scope.dateNew = $filter('date')($scope.date, 'yyyy-MM-dd');
@@ -774,104 +1253,62 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
       $scope.timeNew = $scope.hh + ':' + $scope.mm;
       TransferDataService.addData('productTime', $scope.timeNew);
     };
-    $scope.sendData = function($event, quantity, comment) {
-      $scope.perform_at = TransferDataService.getData('product_perform_at');
+    $scope.paymentOptionChange = function(value) {
+      TransferDataService.addData('paymentOption', $scope.paymentOption);
+    }
+    $scope.currentDate = new Date().toISOString().split("T")[0];
+    $scope.sendData = function($event, quantity, comment, paymentOption) {
+      // $scope.perform_at = TransferDataService.getData('product_perform_at');
+
+      $scope.perform_date = TransferDataService.getData('productDate');
+      $scope.perform_time = TransferDataService.getData('productTime');
       $scope.product_id = $routeParams.productId;
-      console.log($scope.service_id);
-      user.save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_at': $scope.perform_at, 'comment': comment, 'product_id': $scope.product_id}, function(data) {
-        $scope.orderMessage = true;
-        $($event.target).css('display','none');
-        $scope.textHide = true;
-      }, function(response) {
-        console.log(response);
-        if (response.status === 400) {
-          alert('Введите дату и время заказа');
-        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
-        }
-      });
+      if (!$scope.productOrderForm.inputDate.$valid) {
+       alert('Выбранная дата не может быть меньше текущей даты');
+      } else {
+        user.save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'product_id': $scope.product_id, 'payment_type' : paymentOption}, function(data) {
+          $scope.orderMessage = true;
+          $($event.target).css('display','none');
+          $scope.textHide = true;
+          $scope.productOrdered = true;
+
+          $scope.dataOrder = data.data;
+          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+            $scope.link = $scope.dataOrder.pay.data.link;
+            $window.open($scope.link, '_system');
+          }
+          // if (TransferDataService.getData('paymentOption') === 'card') {
+          //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+          // }
+        }, function(response) {
+          console.log(response);
+          $scope.changedDate = false;
+          $scope.changedTime = false;
+          $scope.orderMessage = false;
+          if (response.status === 400) {
+            alert('Введите дату заказа');
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      }
     }
   }]);
 
 
-// villageAppControllers.controller('OrdersCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 
-//   function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler) {
-//     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
-//       get: {
-//         method: 'GET',
-//         params: {urlId: '@urlId', routeId: '@routeId'},
-//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
-//       },
-//       save: {
-//         method: 'POST',
-//         params: {urlId: '@urlId', routeId: '@routeId'},
-//         headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
-//       }
-//     });
-//     $scope.pageServices = 0;
-//     $scope.pageProducts = 0;
-//     $scope.services = [];
-//     $scope.products = [];
-//     $scope.fetching = false;
 
-//     // Fetch more items
-//     $scope.getMoreServices = function() {
-//       $scope.page++;
-//       $scope.fetching = true;
-//       user.get({urlId: 'services', routeId: 'orders', page: $scope.pageServices}, {}, function(data) {
-//         $scope.fetching = false;
-//         $scope.services = $scope.services.concat(data.data);
-//       }, function(response) {
-//         console.log(response);
-//         if (response.status === 404 || response.status === 403 || response.status === 500) {
-//           alert('Повторите попытку или обратитесь в техподдержку');
-//         }
-//       });
-//     };
-//     $scope.getMoreProducts = function() {
-//       $scope.page++;
-//       $scope.fetching = true;
-//       user.get({urlId: 'products', routeId: 'orders', page: $scope.pageProducts}, {}, function(data) {
-//         $scope.fetching = false;
-//         $scope.products = $scope.products.concat(data.data);
-//       }, function(response) {
-//         console.log(response);
-//         if (response.status === 404 || response.status === 403 || response.status === 500) {
-//           alert('Повторите попытку или обратитесь в техподдержку');
-//         }
-//       });
-//     };
-//     // user.get({urlId: 'products', routeId: 'orders', page: '1'}, {}, function(data) {
-//     //   $scope.products = data.data;
-//     // }, function(response) {
-//     //   console.log(response);
-//     //   if (response.status === 404 || response.status === 403 || response.status === 500) {
-//     //     alert('Повторите попытку или обратитесь в техподдержку');
-//     //   }
-//     // });
-//     // user.get({urlId: 'services', routeId: 'orders', page: '1'}, {}, function(data) {
-//     //   $scope.services = data.data;
-//     // }, function(response) {
-//     //   console.log(response);
-//     //   if (response.status === 404 || response.status === 403 || response.status === 500) {
-//     //     alert('Повторите попытку или обратитесь в техподдержку');
-//     //   }
-//     // });
-//   }]);
-
-
-villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
     $scope.page = 0;
@@ -884,36 +1321,46 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
       $scope.fetching = true;
       user.get({urlId: 'services', routeId: 'orders', page: $scope.page}, {}, function(data) {
         $scope.fetching = false;
-        angular.forEach(data.data, function(service) {
+        angular.forEach(data.data, function (service) {
           if (service.service.data.image != null) {
             service.image = service.service.data.image.formats.mediumThumb;
           } else {
             service.imagePresent = true;
           }
+          if (service.payment_type === 'card' && service.payment_status === 'not_paid') {
+            service.paymentLink = service.pay.data.link;
+            $scope.openPaymentLink = function() {
+              $window.open(service.paymentLink, '_system');
+            }
+          }
+
+          // service.created_at = Date.parse(service.created_at);
+          $scope.arr = service.created_at.split(/[- :]/);
+          service.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
         });
         $scope.services = $scope.services.concat(data.data);
         $scope.basePath = BasePath.domain;
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
-villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath',
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler, BasePath) {
+villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
     $scope.page = 0;
@@ -926,42 +1373,56 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
       $scope.fetching = true;
       user.get({urlId: 'products', routeId: 'orders', page: $scope.page}, {}, function(data) {
         $scope.fetching = false;
-        angular.forEach(data.data, function(product) {
+        angular.forEach(data.data, function (product) {
           if (product.product.data.image != null) {
             product.image = product.product.data.image.formats.mediumThumb;
           } else {
             product.imagePresent = true;
           }
+          if (product.payment_type === 'card' && product.payment_status === 'not_paid') {
+            product.paymentLink = product.pay.data.link;
+            $scope.openPaymentLink = function() {
+              $window.open(product.paymentLink, '_system');
+            }
+          }
+          // product.created_at = Date.parse(product.created_at);
+          $scope.arr = product.created_at.split(/[- :]/);
+          product.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
+
         });
         $scope.products = $scope.products.concat(data.data);
         $scope.basePath = BasePath.domain;
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Повторите попытку или обратитесь в техподдержку');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     };
   }]);
 
-villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', 'Users', '$routeParams', 'TransferDataService', 'TokenHandler', 
-  function($scope, $resource, $location, Users, $routeParams, TransferDataService, tokenHandler) {
+villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       },
       save: {
         method: 'POST',
         params: {urlId: '@urlId', routeId: '@routeId'},
-        headers: { 'Authorization': 'Bearer ' + tokenHandler.get()}
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    // $scope.noCurrentSurvey = true;
     user.get({urlId: 'surveys', routeId: 'current'}, {}, function(data) {
+      // $scope.noCurrentSurvey = false;
       $scope.surveyData = data.data;
       $scope.surveyId = data.data.id;
-      $scope.surveyData.ends_at = Date.parse($scope.surveyData.ends_at);
+      // $scope.surveyData.ends_at = Date.parse($scope.surveyData.ends_at);
+      $scope.arr = $scope.surveyData.ends_at.split(/[- :]/);
+      $scope.surveyData.ends_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2]);
       if (data.data.my_vote) {
         $scope.selectedValue = {
           value: data.data.my_vote.data.choice
@@ -977,16 +1438,33 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
       }
     }, function(response) {
       console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Повторите попытку или обратитесь в техподдержку');
+      if (response.status === 404) {
+        $scope.noCurrentSurvey = true;
+      } else if (response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
   }]);
 
 
-villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom',
-  function($scope, $location, FooterCustom) {
+villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService',
+  function($scope, $location, FooterCustom, TransferDataService, localStorageService) {
     $scope.footerBlocks = FooterCustom.query();
+    // $scope.nrNews = TransferDataService.getData('nrNews');
+    // $scope.newArticles = localStorageService.get('newArticles');
+    // $scope.$watch(localStorageService.get('newArticles'), function() {
+    //   $scope.newArticles = localStorageService.get('newArticles');
+    // console.log(localStorageService.get('newArticles'));
+    // });
+    // $scope.$watch(TransferDataService.getData('nrNews'), function() {
+    //   $scope.nrNews = TransferDataService.getData('nrNews');
+    // });
+    // $scope.newArticles = function() {
+    //   return localStorageService.get('newArticles');
+    // }
+    // $scope.nrNews = function() {
+    //   return TransferDataService.getData('nrNews');
+    // }
     $scope.isActive = function(route) {
       return route === $location.path().split('/', 2)[1];
     }
@@ -1006,11 +1484,36 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
           return true;
       }
     }
-
+    $scope.newNewsNr = function(path) {
+      switch (path) {
+        case 'profile':
+        case 'services':
+        case 'service':
+        case 'news':
+        case 'newsitem':
+        case 'survey':
+        case 'products':
+        case 'product':
+          return TransferDataService.getData('nrNews');
+      }
+    }
+    $scope.newNewsAre = function(path) {
+      switch (path) {
+        case 'profile':
+        case 'services':
+        case 'service':
+        case 'news':
+        case 'newsitem':
+        case 'survey':
+        case 'products':
+        case 'product':
+          return localStorageService.get('newArticles');
+      }
+    }
   }]);
 
-villageAppControllers.controller('PathCtrl', ['$scope', '$location',
-  function($scope, $location) {
+villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location', 'onlineStatus',
+  function($scope, $timeout, $location, onlineStatus) {
     $scope.routeMain = function() {
       return $location.path();
       // return route === $location.path().split('/', 2)[1];
@@ -1023,6 +1526,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$location',
         case '/login':
         case '/profile':
         case '/profile/name':
+        case '/profile/email':
         case '/profile/phone':
         case '/profile/confirm':
         case '/profile/password':
@@ -1035,6 +1539,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$location',
         case '/register/phone':
         case '/register/confirm':
         case '/register/welcome':
+        case '/offline':
           return true;
       }
     }
@@ -1054,5 +1559,12 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$location',
     $scope.isWhite = function(routeSnd) {
       return routeSnd === $location.path().split('/', 3)[2];
     }
+
+    $scope.onlineStatus = onlineStatus;
+    $scope.locationRemember = $location.path();
+
+    $scope.$watch('onlineStatus.isOnline()', function(online) {
+        $scope.offlineShow = online ? false : true;
+    });
   }]);
 

@@ -29,10 +29,11 @@
     <title>Village</title>
     <link rel="stylesheet" type="text/css" href="css/app.css"/>
   </head>
-  <body>
+  <body ng-controller="PathCtrl" ng-class="{dark : addClass(routeMain()), ispadding: isPadding(routeUser())}" smooth-scroll>
 
-  <div class="wrapper" ng-controller="PathCtrl" ng-class="{dark : addClass(routeMain()), ispadding: isPadding(routeUser())}">
-    <div class="main-container">
+  <div class="fixed"></div>
+  <div class="wrapper" ng-hide="offlineShow">
+    <div class="main-container" id="test">
       <header-inner></header-inner>
       <div class="main-inner-page">
         <!-- <div ui-view></div> -->
@@ -41,16 +42,22 @@
     </div>
     <footer-inner></footer-inner>
   </div>
+  <div class="bg-image no-p-b wrapper" ng-show="offlineShow" ng-class="{'offline-wrapper' : offlineShow === true}">
+    <p class="col-orange fs-18 fw-md p-md mb-md">Соединение с интернетом отсутствует.</p>
+    <p class="p-md fs-15">Когда связь восстановится, вы сможете продолжить работу.</p>
+  </div>
 
 
-    <!-- <script type="text/javascript" src="cordova.js"></script> -->
+    <script type="text/javascript" src="cordova.js"></script>
+    <script src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
+    <script src="bower_components/angular-local-storage/dist/angular-local-storage.min.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
     <script src="bower_components/angular-route-segment/build/angular-route-segment.js"></script>
+    <script src="bower_components/ngSmoothScroll/dist/angular-smooth-scroll.min.js"></script>
     <script src="js/lib/inputmask.js"></script>
     <script src="js/lib/jquery.inputmask.js"></script>
     <script src="js/lib/inputmask.phone.extensions.js"></script>

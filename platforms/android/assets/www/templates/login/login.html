@@ -1,5 +1,5 @@
 <div class="bg-image ta-c LoginCtrl" ng-controller="AuthCtrl">
-  <div class="greeting fs-18">Добро пожаловать в <p class="fs-25 fw-bl tt-u">"<span ng-bind="siteName"></span>"</p></div>
+  <div class="greeting fs-18">Добро пожаловать в <p class="fs-25 fw-bl tt-u"><span ng-bind="siteName"></span></p><a href="#/register" class="link-md-t d-b tt-u fs-14 td-u">Зарегистрироваться по инвайт-коду</a></div>  
   <form class="form form-dark">
     <div class="input-container">
       <span class="icon icon-phone"></span>
@@ -16,11 +16,10 @@
     </div>
     <a href="#/reset" class="link-lg col-gray d-b ta-r">Забыли пароль</a>
     <button class="button button-main lgin" ng-click="login(phone, password)">Войти</button>
-    <p class="ta-c fs-12 col-gray p-md">Нажав на кнопку "Войти", Вы соглашаетесь с <a href="#" class=" d-b col-gray">Лицензионным соглашением</a></p>
+    <a href="" onclick="window.open('http://village.fruitware.ru/', '_system');" class="ta-c d-b fs-12 col-gray p-md mb-sm">Нажав на кнопку "Войти", Вы соглашаетесь с Лицензионным соглашением</a>
     <div class="ta-c tt-u">
-      <a href="#/register" class="link-md d-b">Зарегистрироваться по инвайт-коду</a>
       <a href="#/request" class="link-md d-b">У меня нет соглашения, хочу посмотреть</a>
     </div>
-    <a href="#" class="button button-main-sm">Стать партнером</a>
+    <a onclick="window.open('http://village.fruitware.ru/', '_system');" class="button button-main-sm">Стать партнером</a>
   </form>
 </div>

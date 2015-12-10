@@ -1,6 +1,7 @@
 <footer class="footer" ng-controller="FooterCtrl" ng-show="isShownFooter(routeFooter())">
   <a href="#/{{footerBlock.path}}" class="footer-block" ng-repeat="footerBlock in footerBlocks" ng-class="{active : isActive('{{footerBlock.path}}') || isActive('{{footerBlock.path1}}')}">
     <span class="icon icon-{{footerBlock.icon}}"></span>
-    <span class="footer-title">{{footerBlock.title}}</span>
+    <span class="footer-title" ng-bind="footerBlock.title"></span>
+    <span class="bage" ng-show="{{footerBlock.newArticle}}" ng-if="newNewsAre(routeFooter())" ng-bind="newNewsNr(routeFooter())"></span>
   </a>
 </footer>

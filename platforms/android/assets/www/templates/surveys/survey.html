@@ -6,8 +6,9 @@
     	<input type="radio" ng-model="selectedValue.value" value="{{$index}}" name="survey" id="survey{{$index}}" ng-change="radioChange({{$index}})">
     	<label for="survey{{$index}}">{{survey}}</label>
     </div>
-    <p class="meta">Голосование анонимное. Вы можете изменить свой голос до окончания голосования.</p>
-    <p class="ta-c col-orange">Текуший опрос продлится до <span ng-bind="surveyData.ends_at | date : 'd MMMM y'"></span> </p>
+    <p class="meta" ng-hide="noCurrentSurvey">Голосование анонимное. Вы можете изменить свой голос до окончания голосования.</p>
+    <p class="ta-c col-orange" ng-hide="noCurrentSurvey">Текуший опрос продлится до <span ng-bind="surveyData.ends_at | date : 'dd-MM-yyyy'"></span> </p>
     <span>{{newSelectedValue}}</span>
+    <p class="meta" ng-show="noCurrentSurvey">На данный момент опросов нет</p>
   </form>
 </div>

@@ -1,0 +1,69 @@
+<div class="tabs-container" ng-init="tab = 1">
+  <div class="tabs">
+    <div class="tab-item active" ng-click="tab = 1" ng-class="{'active': tab == 1}">Услуги</div>
+    <div class="tab-item" ng-click="tab = 2" ng-class="{'active': tab == 2}">Магазин</div>
+  </div>
+  <div class="tabs-content" ng-show="tab == 1" ng-controller="OrdersServicesCtrl">
+    <div class="content" tagged-infinite-scroll="getMoreServices()">
+      <p class="fw-b p-md">История заказов</p>
+      <div class="panels-block">
+        <div class="panel" ng-repeat="service in services">
+          <span class="img-container"><img ng-src="{{basePath}}{{service.image}}"  ng-hide="{{service.imagePresent}}" alt=""></span>
+          <div class="panel-content">
+            <span class="meta" ng-bind="service.created_at | date : 'dd-MM-yyyy h:mm'"></span>
+            <span class="title" ng-bind="service.service.data.title"></span>
+            <div class="links {{service.status}}" ng-switch on="service.status">
+              <div ng-switch-when="not_paid">
+                <span>не оплачен</span><a href="https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru">оплатить</a>
+              </div>
+              <div ng-switch-when="processing">
+                <span>обрабатывается</span>
+              </div>
+              <div ng-switch-when="running">
+                <span>выполняется</span>
+              </div>
+              <div ng-switch-when="done">
+                <span>выполнено</span><a href="#/service/{{service.service.data.id}}?comment={{service.comment}}">повторить</a>
+              </div>
+              <div ng-switch-when="rejected">
+                <span>отклонено</span><span> "</span><span ng-bind="service.decline_reason"></span><span>"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs-content" ng-show="tab == 2" ng-controller="OrdersProductsCtrl">
+    <div class="content" tagged-infinite-scroll="getMoreProducts()">
+      <p class="fw-b p-md">История заказов</p>
+      <div class="panels-block">
+        <div class="panel" ng-repeat="product in products">
+          <span class="img-container"><img ng-src="{{basePath}}{{product.image}}"  ng-hide="{{product.imagePresent}}" alt=""></span>
+          <div class="panel-content">
+            <span class="meta" ng-bind="product.created_at | date : 'dd-MM-yyyy h:mm'"></span>
+            <span class="title"><span ng-bind="product.product.data.title"></span> - <span ng-bind="product.price"></span><span> руб</span></span> 
+            <div class="links {{product.status}}" ng-switch on="product.status">
+              <div ng-switch-when="not_paid">
+                <span>не оплачен</span><a href="https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru">оплатить</a>
+              </div>
+              <div ng-switch-when="processing">
+                <span>обрабатывается</span>
+              </div>
+              <div ng-switch-when="running">
+                <span>выполняется</span>
+              </div>
+              <div ng-switch-when="done">
+                <span>выполнено</span><a href="#/product/{{product.product.data.id}}?qty={{product.quantity}}&comment={{product.comment}}">повторить</a>
+              </div>
+              <div ng-switch-when="rejected">
+                <span>отклонено</span><span> "</span><span ng-bind="product.decline_reason"></span><span>"</span>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

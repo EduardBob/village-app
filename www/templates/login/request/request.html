@@ -1,27 +1,31 @@
-<div class="bg-image no-p-b" ng-controller="ProfileCtrl">
+<div class="bg-image no-p-b" ng-controller="RequestCtrl">
   <form class="form form-dark">
     <p class="fs-15 p-md">Подключите “Консъерж” в моем поселке</p>
     <p class="fs-18 p-md col-orange fw-md">Поселок расположен</p>
     <div class="input-container input-container-sm mb-lg">
-      <input type="text" placeholder="введите адрес">  
+      <input type="text" placeholder="введите адрес" ng-model="address">  
     </div>
     <p class="fs-18 p-md col-orange fw-md">Контактное лицо</p>
     <div class="input-container input-container-sm mb-lg">
-      <select name="" id="">
-          <option value="">председатель</option>
-          <option value="">администратор</option>
-          <option value="">председатель</option>
+      <select name="" id="" ng-model="position">
+          <option value="chairman">председатель</option>
+          <option value="admin">администратор</option>
+          <option value="director">директор</option>
         </select>   
     </div>
     <p class="fs-18 p-md col-orange fw-md">ФИО</p>
     <div class="input-container input-container-sm mb-lg">
-      <input type="text" placeholder="">  
+      <input type="text" placeholder="" ng-model="full_name">  
     </div>
     <p class="fs-18 p-md col-orange fw-md">Контактный телефон</p>
     <div class="input-container input-container-sm mb-lg">
-      <input type="text" placeholder="">  
+      <input type="tel" name="phone" data-inputmask="'mask': '+7(999)9999999'" data-mask="" placeholder="" ng-model="phone">  
+      <script>
+          $( document ).ready(function() {
+              $("[data-mask]").inputmask();
+          });
+      </script>  
     </div>
-    <!-- <button class="button button-main no-mg" type="submit">Оставить заявку</button> -->
-    <a href="#/request/sent" class="button button-main no-mg">Оставить заявку</a>
+    <button class="button button-main no-mg" ng-click="sendRequest(phone, full_name, position, address)">Оставить заявку</button>
   </form>
 </div>
