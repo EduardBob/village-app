@@ -1,6 +1,9 @@
 $( document ).ready(function() {
 
   // height of the wrapper
-  $('.wrapper').height($(window).height());
-  $('.main-container').css('min-height', $(window).height());
+
+  var H = $(window).height() - 20; // for IOS
+  // var H = $(window).height(); // for android
+  $('.wrapper').height(H);
+  $('.main-container').css('min-height', H);
 });

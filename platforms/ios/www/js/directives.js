@@ -28,7 +28,7 @@ angular.module('headerDirective', [])
           }
         }
         $scope.arrowHidden = function(path) {
-          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/request/sent') {
+          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/request/sent' || path === '/survey') {
             return true;
           }
         }
@@ -131,13 +131,13 @@ angular.module('radioButtonDirective', [])
   });
 
 angular.module('utils.autofocus', [])
-.directive('autoFocus', ['$timeout', function($timeout) {
-  return {
-    restrict: 'A',
-    link : function($scope, $element) {
-      $timeout(function() {
-        $element[0].focus();
-      });
+  .directive('autoFocus', ['$timeout',  function($timeout) {
+    return {
+      restrict: 'A',
+      link : function($scope, $element) {
+        $timeout(function() {
+          $element[0].focus();
+        });
+      }
     }
-  }
-}]);
+  }]);

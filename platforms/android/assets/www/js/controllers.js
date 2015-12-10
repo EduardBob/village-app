@@ -37,10 +37,11 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
   function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce) {
     var building = $resource('http://village.fruitware.ru/api/v1/buildings/:buildingCode', {buildingCode: '@buildingCode'});
     $scope.terms = false;
-    angular.element('#invite-code').focus();
+    
 
     $timeout(function() {
         angular.element('.main-container').css('min-height', $(window).height());
+        // angular.element('#invite-code').focus();
     });
     $resource('http://village.fruitware.ru/api/v1/settings').get({}, function(data) {
       GetMeta.setData(data.data);
@@ -228,7 +229,14 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
     $timeout(function() {
       angular.element('.main-container').css('min-height', $(window).height());
     });
-      
+
+    $scope.first_name = TransferDataService.getData('first_name');
+    $scope.last_name = TransferDataService.getData('last_name');
+    $scope.phone = TransferDataService.getData('phone');
+    $scope.email = TransferDataService.getData('email'); 
+    $scope.villageName = TransferDataService.getData('villageName'); 
+    $scope.address = TransferDataService.getData('address'); 
+    
     user.get({urlId: 'me'}, function(data) {
       $scope.first_name = data.data.first_name;
       $scope.last_name = data.data.last_name;
@@ -242,6 +250,7 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
         $scope.emailPresent = false;
       }
       TransferDataService.addData('first_name', data.data.first_name);
+      TransferDataService.addData('villageName', data.data.building.data.village.data.name);
       TransferDataService.addData('last_name', data.data.last_name);
       TransferDataService.addData('phone', data.data.phone);
       TransferDataService.addData('email', data.data.email);
@@ -939,42 +948,47 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
     $scope.paymentOptionChange = function(value) {
       TransferDataService.addData('paymentOption', $scope.paymentOption);
     }
+    $scope.currentDate = new Date().toISOString().split("T")[0];
     $scope.sendData = function($event, comment, paymentOption) {
       // $scope.perform_at = TransferDataService.getData('service_perform_at');
       $scope.perform_date = TransferDataService.getData('serviceDate');
       $scope.perform_time = TransferDataService.getData('serviceTime');
       $scope.service_id = $routeParams.serviceId;
       // localStorageService.set('serviceOrder' + $scope.service_id, {'comment': $scope.comment});
-      user.save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
-        $scope.orderMessage = true;
-        $($event.target).css('display','none');
-        $scope.textHide = true;
+      if (!$scope.serviceOrderForm.inputDate.$valid) {
+       alert('Выбранная дата не может быть меньше текущей даты');
+      } else {
+        user.save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
+          $scope.orderMessage = true;
+          $($event.target).css('display','none');
+          $scope.textHide = true;
 
-        $scope.serviceOrdered = true;
-        
-        $scope.dataOrder = data.data;
-        if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-          $scope.link = $scope.dataOrder.pay.data.link;
-          $window.open($scope.link, '_system');
-        }
-        // if (TransferDataService.getData('paymentOption') === 'card') {
-        //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
-        // }
-      }, function(response) {
-        $scope.changedDate = false;
-        $scope.changedTime = false;
-        $scope.orderMessage = false;
-        console.log(response);
-        if (response.status === 400) {
-          // alert('Введите дату и время заказа');
-          alert('Введите дату заказа');
-          // var messages = [];
-          // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
-          // alert(message.join("\r\n"));
-        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        }
-      });
+          $scope.serviceOrdered = true;
+          
+          $scope.dataOrder = data.data;
+          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+            $scope.link = $scope.dataOrder.pay.data.link;
+            $window.open($scope.link, '_system');
+          }
+          // if (TransferDataService.getData('paymentOption') === 'card') {
+          //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+          // }
+        }, function(response) {
+          $scope.changedDate = false;
+          $scope.changedTime = false;
+          $scope.orderMessage = false;
+          console.log(response);
+          if (response.status === 400) {
+            // alert('Введите дату и время заказа');
+            alert('Введите дату заказа');
+            // var messages = [];
+            // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
+            // alert(message.join("\r\n"));
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      }
     }
   }]);
 
@@ -1224,6 +1238,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
     //     TransferDataService.addData('product_perform_at', TransferDataService.getData('productDate') + ' ' + TransferDataService.getData('productTime'));
     //   }
     // });
+
     $scope.changeDate = function() {
       $scope.changedDate = true;
       $scope.dateNew = $filter('date')($scope.date, 'yyyy-MM-dd');
@@ -1241,43 +1256,49 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
     $scope.paymentOptionChange = function(value) {
       TransferDataService.addData('paymentOption', $scope.paymentOption);
     }
+    $scope.currentDate = new Date().toISOString().split("T")[0];
     $scope.sendData = function($event, quantity, comment, paymentOption) {
       // $scope.perform_at = TransferDataService.getData('product_perform_at');
+
       $scope.perform_date = TransferDataService.getData('productDate');
       $scope.perform_time = TransferDataService.getData('productTime');
       $scope.product_id = $routeParams.productId;
-      user.save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'product_id': $scope.product_id, 'payment_type' : paymentOption}, function(data) {
-        $scope.orderMessage = true;
-        $($event.target).css('display','none');
-        $scope.textHide = true;
-        $scope.productOrdered = true;
+      if (!$scope.productOrderForm.inputDate.$valid) {
+       alert('Выбранная дата не может быть меньше текущей даты');
+      } else {
+        user.save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'product_id': $scope.product_id, 'payment_type' : paymentOption}, function(data) {
+          $scope.orderMessage = true;
+          $($event.target).css('display','none');
+          $scope.textHide = true;
+          $scope.productOrdered = true;
 
-        $scope.dataOrder = data.data;
-        if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-          $scope.link = $scope.dataOrder.pay.data.link;
-          $window.open($scope.link, '_system');
-        }
-        // if (TransferDataService.getData('paymentOption') === 'card') {
-        //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
-        // }
-      }, function(response) {
-        console.log(response);
-        $scope.changedDate = false;
-        $scope.changedTime = false;
-        $scope.orderMessage = false;
-        if (response.status === 400) {
-          alert('Введите дату заказа');
-        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        }
-      });
+          $scope.dataOrder = data.data;
+          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+            $scope.link = $scope.dataOrder.pay.data.link;
+            $window.open($scope.link, '_system');
+          }
+          // if (TransferDataService.getData('paymentOption') === 'card') {
+          //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+          // }
+        }, function(response) {
+          console.log(response);
+          $scope.changedDate = false;
+          $scope.changedTime = false;
+          $scope.orderMessage = false;
+          if (response.status === 400) {
+            alert('Введите дату заказа');
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      }
     }
   }]);
 
 
 
-villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1308,6 +1329,9 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
           }
           if (service.payment_type === 'card' && service.payment_status === 'not_paid') {
             service.paymentLink = service.pay.data.link;
+            $scope.openPaymentLink = function() {
+              $window.open(service.paymentLink, '_system');
+            }
           }
 
           // service.created_at = Date.parse(service.created_at);
@@ -1325,8 +1349,8 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
     };
   }]);
 
-villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1357,6 +1381,9 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
           }
           if (product.payment_type === 'card' && product.payment_status === 'not_paid') {
             product.paymentLink = product.pay.data.link;
+            $scope.openPaymentLink = function() {
+              $window.open(product.paymentLink, '_system');
+            }
           }
           // product.created_at = Date.parse(product.created_at);
           $scope.arr = product.created_at.split(/[- :]/);

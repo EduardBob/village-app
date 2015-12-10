@@ -26,6 +26,9 @@
     <preference name="DisallowOverscroll" value="true" />
     <preference name="orientation" value="portrait" />
     <preference name="fullscreen" value="false" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#484852" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />
@@ -44,6 +47,7 @@
     <gap:plugin name="org.apache.cordova.media" />
     <gap:plugin name="org.apache.cordova.network-information" />
     <gap:plugin name="org.apache.cordova.splashscreen" />
+    <gap:plugin name="org.apache.cordova.statusbar" />
     <gap:plugin name="org.apache.cordova.vibration" />
     <icon src="icon.png" />
     <icon gap:platform="android" gap:qualifier="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />

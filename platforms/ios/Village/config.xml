@@ -26,6 +26,12 @@
     <feature name="NetworkStatus">
         <param name="ios-package" value="CDVConnection" />
     </feature>
+    <feature name="StatusBar">
+        <param name="ios-package" value="CDVStatusBar" />
+        <param name="onload" value="true" />
+    </feature>
+    <preference name="StatusBarOverlaysWebView" value="true" />
+    <preference name="StatusBarStyle" value="lightcontent" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <name>Village</name>
@@ -54,6 +60,9 @@
     <preference name="DisallowOverscroll" value="true" />
     <preference name="orientation" value="portrait" />
     <preference name="fullscreen" value="false" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#484852" />
+    <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
     <gap:plugin name="org.apache.cordova.media-capture" />
@@ -72,6 +81,7 @@
     <gap:plugin name="org.apache.cordova.media" />
     <gap:plugin name="org.apache.cordova.network-information" />
     <gap:plugin name="org.apache.cordova.splashscreen" />
+    <gap:plugin name="org.apache.cordova.statusbar" />
     <gap:plugin name="org.apache.cordova.vibration" />
     <icon src="icon.png" />
     <icon gap:platform="android" gap:qualifier="ldpi" src="www/res/icon/android/icon-36-ldpi.png" />

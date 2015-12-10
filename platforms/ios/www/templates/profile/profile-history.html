@@ -17,14 +17,14 @@
               <div ng-switch-when="processing">
                 <span>обрабатывается</span>
                 <span class="{{service.payment_status}}" ng-switch on="service.payment_status">
-                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{service.paymentLink}}" ng-if="service.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-click="openPaymentLink()" ng-if="service.payment_type === 'card'">оплатить</a></span>
                   <span ng-switch-when="paid">оплачено</span>
                 </span>
               </div>
               <div ng-switch-when="running">
                 <span>выполняется</span>
                 <span class="{{service.payment_status}}" ng-switch on="service.payment_status">
-                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{service.paymentLink}}" ng-if="service.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-click="openPaymentLink()" ng-if="service.payment_type === 'card'">оплатить</a></span>
                   <span ng-switch-when="paid">оплачено</span>
                 </span>
               </div>
@@ -59,14 +59,14 @@
               <div ng-switch-when="processing">
                 <span>обрабатывается</span>
                 <span class="{{product.payment_status}}" ng-switch on="product.payment_status">
-                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{product.paymentLink}}" ng-if="product.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-click="openPaymentLink()" ng-if="product.payment_type === 'card'">оплатить</a></span>
                   <span ng-switch-when="paid">оплачено</span>
                 </span>
               </div>
               <div ng-switch-when="running">
                 <span>выполняется</span>
                 <span class="{{product.payment_status}}" ng-switch on="product.payment_status">
-                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-href="{{product.paymentLink}}" ng-if="product.payment_type === 'card'">оплатить</a></span>
+                  <span ng-switch-when="not_paid"><span>не оплачено</span><a ng-click="openPaymentLink()" ng-if="product.payment_type === 'card'">оплатить</a></span>
                   <span ng-switch-when="paid">оплачено</span>
                 </span>
               </div>

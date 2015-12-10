@@ -1,4 +1,4 @@
-<form class="form form-order" ng-controller="ProductOrderCtrl">
+<form class="form form-order" ng-controller="ProductOrderCtrl" name="productOrderForm">
   <div>
     <div class="product-item ta-c">
       <div class="img-container"><img ng-src="{{basePath}}{{productImage}}" ng-hide="{{imagePresentMain}}" alt=""></div>
@@ -21,7 +21,7 @@
     </div>
     <p class="col-orange fz-15 p-md mb-md">Самовывоз из магазина «<span ng-bind="shopName"></span>», <span ng-bind="shopAddress"></span></p>
     <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
-      <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="productOrdered">
+      <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="productOrdered" min="{{currentDate | date:'yyyy-MM-dd'}}" name="inputDate">
       <div class="panel-item">
         <span class="panel-name">Укажите дату исполнения услуги</span>
         <span><span class="icon icon-down"></span></span>

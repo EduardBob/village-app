@@ -5,6 +5,7 @@
 	    <h3 class="news-title" ng-bind="news.title"></h3>
 	    <img ng-src="{{basePath}}{{news.image}}" alt="" ng-hide="{{news.imagePresent}}">
 	    <p ng-bind="news.short"></p>
+	    <span class="read-more">Читать далее</span>
 	  </a>
 	  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
 	</div>

@@ -27,6 +27,10 @@
                         {
                             "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
                             "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"StatusBar\"><param name=\"android-package\" value=\"org.apache.cordova.statusbar.StatusBar\" /><param name=\"onload\" value=\"true\" /></feature>",
+                            "count": 1
                         }
                     ]
                 }
@@ -57,6 +61,9 @@
             "PACKAGE_NAME": "ru.fruitware.village"
         },
         "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "ru.fruitware.village"
+        },
+        "cordova-plugin-statusbar": {
             "PACKAGE_NAME": "ru.fruitware.village"
         }
     },

@@ -1,5 +1,5 @@
 <div ng-controller="ServiceOrderCtrl">
-  <form class="form form-order">
+  <form class="form form-order" name="serviceOrderForm">
     <div class="product-item ta-c">
       <div class="img-container"><img ng-src="{{basePath}}{{serviceImage}}"  ng-hide="{{imagePresentMain}}" alt=""></div>
       <h3 class="fs-18 fw-n" ng-bind="serviceData.title"></h3>
@@ -11,7 +11,7 @@
     </div>
     <p class="fs-15 p-md mb-md fw-lt ta-c" ng-bind="serviceData.text"</p>
     <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
-      <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="serviceOrdered">
+      <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="serviceOrdered" min="{{currentDate | date:'yyyy-MM-dd'}}" name="inputDate">
       <div class="panel-item">
         <span class="panel-name">Укажите дату исполнения услуги</span>
         <span><span class="icon icon-down"></span></span>

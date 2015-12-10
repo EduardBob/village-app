@@ -380,9 +380,10 @@ body .bg-image.wrapper {
   display: none;
   background: url("../img/screen-bg.jpg") center center no-repeat;
   background-size: cover;
+  padding: 0;
 }
 body .bg-image.wrapper p:first-child {
-  padding-top: 50px;
+  padding-top: 70px;
 }
 body .bg-image.wrapper.offline-wrapper {
   display: block;
@@ -394,10 +395,6 @@ body .bg-image.wrapper.offline-wrapper {
 
 .wrapper {
   background: #fff;
-}
-
-.main-inner-page {
-  padding: 40px 0 20px;
 }
 
 .d-b {
@@ -650,6 +647,9 @@ header .title {
   margin-bottom: 0;
   padding-top: 5px;
 }
+header + .main-inner-page {
+  padding: 40px 0 20px;
+}
 
 /* Main styles */
 .meta {
@@ -680,6 +680,14 @@ header .title {
 .news-item p {
   font-size: 15px;
   font-weight: 400;
+}
+
+.read-more {
+  display: block;
+  padding-bottom: 10px;
+  color: #ef5711;
+  font-style: italic;
+  font-size: 12px;
 }
 
 .form-title {
