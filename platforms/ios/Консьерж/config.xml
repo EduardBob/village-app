@@ -34,9 +34,9 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
-    <name>Village</name>
+    <name>Консьерж</name>
     <description>
-        Village
+        Консьерж
     </description>
     <author email="support@phonegap.com" href="http://phonegap.com">
         PhoneGap Team
