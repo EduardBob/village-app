@@ -15,7 +15,7 @@
 //       };
 //       var _testData = function() {
 //         if (!saved_data) {
-//           var resource = $resource('http://village.fruitware.ru/api/v1/settings', {}, {
+//           var resource = $resource('http://1centr.com/api/v1/settings', {}, {
 //             get: {
 //               method: 'GET'
 //             }
@@ -46,13 +46,13 @@
 var basePath = angular.module('basePath', []);
 
   basePath.constant('BasePath', {
-    'domain' : 'http://village.fruitware.ru/',
-    'api' : 'http://village.fruitware.ru/api/v1/'
+    'domain' : 'http://1centr.com/',
+    'api' : 'http://1centr.com/api/v1/'
   });
 
   // basePath
-  //   .constant('domain', 'http://village.fruitware.ru/')
-  //   .constant('api', 'http://village.fruitware.ru/api/v1/');
+  //   .constant('domain', 'http://1centr.com/')
+  //   .constant('api', 'http://1centr.com/api/v1/');
 
 var getMeta = angular.module('getMeta', []);
 
@@ -158,7 +158,7 @@ var tokenHandlerModule = angular.module('tokenHandlerModule', []);
 
 // users.factory('Users', ['$resource', 'TokenHandler', 
 //   function($resource, tokenHandler) {
-//     return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+//     return $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
 //       get: {
 //         method: 'GET',
 //         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -177,7 +177,7 @@ var users = angular.module('users', ['LocalStorageModule', 'ngResource']);
 
 users.factory('Users', ['localStorageService', '$resource', 
   function(localStorageService, $resource) {
-    return $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    return $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
