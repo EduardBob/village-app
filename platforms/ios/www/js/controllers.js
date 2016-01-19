@@ -5,7 +5,7 @@ var villageAppControllers = angular.module('villageAppControllers', []);
 
 villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService',
   function($scope, $resource, $location, TransferDataService, localStorageService) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -35,7 +35,7 @@ villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$locati
 
 villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce',
   function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce) {
-    var building = $resource('http://village.fruitware.ru/api/v1/buildings/:buildingCode', {buildingCode: '@buildingCode'});
+    var building = $resource('http://1centr.com/api/v1/buildings/:buildingCode', {buildingCode: '@buildingCode'});
     $scope.terms = false;
     
 
@@ -43,7 +43,7 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
         angular.element('.main-container').css('min-height', $(window).height());
         // angular.element('#invite-code').focus();
     });
-    $resource('http://village.fruitware.ru/api/v1/settings').get({}, function(data) {
+    $resource('http://1centr.com/api/v1/settings').get({}, function(data) {
       GetMeta.setData(data.data);
       $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
     }, function(response) {
@@ -77,7 +77,7 @@ villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$loc
   function($scope, $resource, $location, TransferDataService) {
     $scope.addressVillage = TransferDataService.getData('address');
     $scope.buildingId = TransferDataService.getData('building_id');
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -144,7 +144,7 @@ villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$locat
   function($scope, $resource, $location, TransferDataService) {
     $scope.phone = TransferDataService.getData('phone');
     $scope.session = TransferDataService.getData('session');
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -173,7 +173,7 @@ villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -214,7 +214,7 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
 
 villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService',
   function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -278,7 +278,7 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
 
 villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
   function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -397,7 +397,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
       //   return localStorageService.set(key, val);
       // }
     }
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -452,7 +452,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
 
 villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -571,7 +571,7 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
     //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
     //   }
     // });
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -641,7 +641,7 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -669,7 +669,7 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
 
 villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -697,7 +697,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         if (response.data.error = 'token_expired') {
           user.save({urlId: 'auth', routeId: 'refresh'}, {}, function(data) {
             localStorageService.set('token', data.data.token);
-            var newTokenUser = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+            var newTokenUser = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
               get: {
                 method: 'GET',
                 params: {urlId: '@urlId', routeId: '@routeId'},
@@ -814,7 +814,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
 
 villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -864,7 +864,7 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $window, $routeParams, $filter, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -994,7 +994,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
 
 villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1030,7 +1030,7 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
 
 villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1067,7 +1067,7 @@ villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$lo
 
 villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1117,7 +1117,7 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1299,7 +1299,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
 
 villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1351,7 +1351,7 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
 
 villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1403,7 +1403,7 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
 
 villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://village.fruitware.ru/api/v1/:urlId/:routeId', {}, {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},

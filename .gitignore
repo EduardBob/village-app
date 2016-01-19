@@ -1,5 +1,5 @@
 
-
+.idea
 # exclude imac
 *.DS_Store
 
@@ -8,3 +8,4 @@ www/Gemfile
 www/Gemfile.lock
 www/node_modules
 www/.sass-cache/
+.idea
