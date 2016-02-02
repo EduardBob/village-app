@@ -70,6 +70,7 @@ var app = {
 
         app.handleExternalURLs();
         app.showAlert();
+
     },
     // deviceready Event Handler
     //

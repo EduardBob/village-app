@@ -106,6 +106,9 @@ villageApp
         when('/request', {
           templateUrl: 'templates/login/request/request.html'
         }).
+        when('/request/partner', {
+          templateUrl: 'templates/login/request/request-partner.html'
+        }).
         when('/request/sent', {
           templateUrl: 'templates/login/request/request-sent.html'
         }).

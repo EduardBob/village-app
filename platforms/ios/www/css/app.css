@@ -307,7 +307,7 @@ input[type="radio"]:checked + label:after {
 }
 .radio-block .radio-container input[type="radio"] + label {
   margin-right: 0;
-  margin-left: 30px;
+  margin-left: 25px;
   padding: 15px 5px 15px 18px;
   font-size: 12px;
 }
@@ -657,6 +657,10 @@ header + .main-inner-page {
   font-weight: 300;
 }
 
+.news-list .news-item img {
+  width: 180px;
+}
+
 .news-item {
   display: block;
   padding: 35px 27px 10px;
@@ -980,9 +984,9 @@ select {
   height: 110px;
   overflow: hidden;
   background: #c6d2de;
-  -moz-border-radius: 1000px;
-  -webkit-border-radius: 1000px;
-  border-radius: 1000px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
 }
 .product-item .img-container img {
   width: 100%;

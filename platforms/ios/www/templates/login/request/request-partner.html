@@ -1,0 +1,23 @@
+<div class="bg-image no-p-b" ng-controller="RequestPartnerCtrl">
+  <form class="form form-dark">
+    <p class="fs-15 p-md">Хочу стать партнером системы "Консьерж"</p>
+    <p class="fs-18 p-md col-orange fw-md">Наименование организации</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="text" placeholder="" ng-model="company_name">  
+    </div>
+    <p class="fs-18 p-md col-orange fw-md">Контактное лицо</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="text" placeholder="ФИО" ng-model="full_name">  
+    </div>
+    <p class="fs-18 p-md col-orange fw-md">Контактный телефон</p>
+    <div class="input-container input-container-sm mb-lg">
+      <input type="tel" name="phone" data-inputmask="'mask': '+7(999)9999999'" data-mask="" placeholder="" ng-model="phone">  
+      <script>
+          $( document ).ready(function() {
+              $("[data-mask]").inputmask();
+          });
+      </script>  
+    </div>
+    <button class="button button-main no-mg" ng-click="sendRequest(phone, full_name, company_name)">Оставить заявку</button>
+  </form>
+</div>

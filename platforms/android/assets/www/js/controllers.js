@@ -32,6 +32,35 @@ villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$locati
       });
     }
   }]);
+villageAppControllers.controller('RequestPartnerCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService',
+  function($scope, $resource, $location, TransferDataService, localStorageService) {
+    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        isArray: true
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        isArray: true
+      }
+    });
+    $scope.sendRequest = function(phone, full_name, company_name) {
+      user.save({urlId: 'villages', routeId: 'partner-request'}, {'phone' : phone, 'full_name' : full_name, 'company_name' : company_name}, function(data) {
+         $location.path('/request/sent');
+      }, function(response) {
+        if (response.status === 400) {
+          var messages = [];
+          var message = messages.concat(response.data.error.message.company_name, response.data.error.message.full_name, response.data.error.message.phone);
+          alert(message.join("\r\n"));
+          // alert('Все поля обязательны для заполнения');
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    }
+  }]);
 
 villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce',
   function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce) {
@@ -977,7 +1006,6 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
           $scope.changedDate = false;
           $scope.changedTime = false;
           $scope.orderMessage = false;
-          console.log(response);
           if (response.status === 400) {
             // alert('Введите дату и время заказа');
             alert('Введите дату заказа');
@@ -1239,11 +1267,15 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
     //   }
     // });
 
+    var today=new Date();
+    $scope.currentDate = today.toISOString().split("T")[0];
+
     $scope.changeDate = function() {
       $scope.changedDate = true;
       $scope.dateNew = $filter('date')($scope.date, 'yyyy-MM-dd');
       TransferDataService.addData('productDate', $scope.dateNew);
     };
+
     $scope.changeTime = function() {
       $scope.changedTime = true;
       $scope.hh1 = new Date($scope.time).getHours();
@@ -1256,7 +1288,6 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
     $scope.paymentOptionChange = function(value) {
       TransferDataService.addData('paymentOption', $scope.paymentOption);
     }
-    $scope.currentDate = new Date().toISOString().split("T")[0];
     $scope.sendData = function($event, quantity, comment, paymentOption) {
       // $scope.perform_at = TransferDataService.getData('product_perform_at');
 
@@ -1273,6 +1304,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           $scope.productOrdered = true;
 
           $scope.dataOrder = data.data;
+
           if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
             $scope.link = $scope.dataOrder.pay.data.link;
             $window.open($scope.link, '_system');
@@ -1281,10 +1313,10 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
           // }
         }, function(response) {
-          console.log(response);
           $scope.changedDate = false;
           $scope.changedTime = false;
           $scope.orderMessage = false;
+          $scope.orderMessageDeclined = false;
           if (response.status === 400) {
             alert('Введите дату заказа');
           } else if (response.status === 404 || response.status === 403 || response.status === 500) {
@@ -1534,6 +1566,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case '/reset/confirm':
         case '/reset/change':
         case '/request':
+        case '/request/partner':
         case '/request/sent':
         case '/register':
         case '/register/phone':

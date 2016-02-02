@@ -23,7 +23,7 @@ angular.module('headerDirective', [])
           }
         }
         $scope.isShownHeader = function(path) {
-          if (path === '/login' || path === '/offline') {
+          if (path === '/login' || path === '/offline' || path === '/request' || path === '/request/partner') {
             return true;
           }
         }
@@ -44,9 +44,6 @@ angular.module('headerDirective', [])
               break;
             case '/register/welcome':
               title = 'Поздравляем!';
-              break;
-            case '/request':
-              title = 'Ваш поселок не найден';
               break;
             case '/request/sent':
               title = 'Спасибо за заявку';
