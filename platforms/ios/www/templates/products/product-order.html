@@ -41,7 +41,7 @@
     <div class="radio-block" ng-hide="hideBlock">
       <div class="radio-hover" ng-show="productOrdered"></div>
       <div class="radio-container"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="card" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплатить сейчас</label></div>
-      <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="cash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплатить на месте</label></div>
+      <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="cash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплатить по факту</label></div>
     </div>
     <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан с вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
     <div class="alert alert-padding" ng-show="orderMessageDeclined">Платеж не прошел.<br> Ваш заказ отклонен. <span class="col-orange" ng-click="$back()">Попробуйте еще раз</span></div>

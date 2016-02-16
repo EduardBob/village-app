@@ -23,12 +23,12 @@ angular.module('headerDirective', [])
           }
         }
         $scope.isShownHeader = function(path) {
-          if (path === '/login' || path === '/offline' || path === '/request' || path === '/request/partner') {
+          if (path === '/login' || path === '/offline') {
             return true;
           }
         }
         $scope.arrowHidden = function(path) {
-          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/request/sent' || path === '/survey') {
+          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/survey') {
             return true;
           }
         }
@@ -44,6 +44,12 @@ angular.module('headerDirective', [])
               break;
             case '/register/welcome':
               title = 'Поздравляем!';
+              break;
+            case '/request':
+              title = 'Заявка';
+              break;
+            case '/request/partner':
+              title = 'Стать партнером';
               break;
             case '/request/sent':
               title = 'Спасибо за заявку';
