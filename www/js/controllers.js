@@ -1002,8 +1002,11 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       $scope.serviceOrdered = false;
       $scope.basePath = BasePath.domain; 
     }, function(response) {
-      console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
+      if ((response.data.error.message === "Not Found") && response.status === 404) {
+        alert('Эта услуга была удалена');
+        $location.path('/profile/history');
+      }
+      if (esponse.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
@@ -1343,7 +1346,11 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           }
         }
       }, function(response) {
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if ((response.data.error.message === "Not Found") && response.status === 404) {
+          alert('Этот продукт был удален');
+          $location.path('/profile/history');
+        }
+        if (esponse.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
