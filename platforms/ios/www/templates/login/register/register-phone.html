@@ -1,8 +1,8 @@
 <div class="bg-image no-p-b" ng-controller="PhoneCheckCtrl">
   <div class="form form-dark">
-    <p class="fs-15 p-md">Приветствуем вас, житель дома <span>{{addressVillage}}</span></p>
-    <p class="fs-15 p-md">Необходимо подтвердить ваш номер телефона с помощью SMS кода.</p>
-    <p class="fs-18 p-md col-orange fw-md">Введите ваш номер телефона</p>
+    <p class="fs-15 p-md">Приветствуем Вас, житель дома <span>{{addressVillage}}</span></p>
+    <p class="fs-15 p-md">Необходимо подтвердить Ваш номер телефона с помощью SMS кода.</p>
+    <p class="fs-18 p-md col-orange fw-md">Введите Ваш номер телефона</p>
     <div class="input-container input-container-sm mb-lg">
       <input type="tel" name="phone" data-inputmask="'mask': '+7(999)9999999'" data-mask="" placeholder="+7" ng-model="phone">  
       <script>
@@ -11,7 +11,7 @@
           });
       </script>
     </div>
-    <p class="fs-12 col-gray mb-lg p-md">В течение 2 минут на указанный номер придёт SMS с проверочным кодом. Если ваш номер изменился на новый, укажите его в этом поле</p>
+    <p class="fs-12 col-gray mb-lg p-md">В течение 2 минут на указанный номер придёт SMS с проверочным кодом. Если Ваш номер изменился на новый, укажите его в этом поле</p>
     <div class="button button-main no-mg" ng-click="checkPhone(phone)">Прислать смс</div>
     <!-- <a href="#/register/confirm" class="button button-main no-mg" type="submit">Прислать смс</a> -->
     <a href="#/login" class="link-xl d-b ta-c">Уже есть логин и пароль? <span class="td-u">Войдите</span></a>

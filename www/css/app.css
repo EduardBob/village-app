@@ -429,6 +429,10 @@ body .bg-image.wrapper.offline-wrapper {
   font-size: 14px;
 }
 
+.fs-13 {
+  font-size: 13px;
+}
+
 .fs-12 {
   font-size: 12px;
 }
@@ -658,7 +662,7 @@ header + .main-inner-page {
 }
 
 .news-list .news-item img {
-  width: 180px;
+  width: 150px;
 }
 
 .news-item {
@@ -678,7 +682,7 @@ header + .main-inner-page {
 }
 .news-item img {
   display: block;
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
   width: 100%;
 }
 .news-item p {
@@ -827,6 +831,35 @@ select {
   padding-top: 3px;
   padding-bottom: 0;
   font-size: 18px;
+}
+
+.form-search {
+  position: relative;
+  top: -20px;
+  border-bottom: 1px solid rgba(112, 111, 114, 0.1);
+  overflow: hidden;
+}
+.form-search input[type="text"],
+.form-search input[type="search"] {
+  width: 100%;
+  float: left;
+  height: 40px;
+  padding-right: 50px;
+  padding-left: 20px;
+  font-size: 16px;
+}
+.form-search .button {
+  float: left;
+  width: 50px;
+  height: 40px;
+  margin-left: -50px;
+  line-height: 40px;
+  background: url("../img/icons/icon-search.png") center center no-repeat;
+  background-size: 30px;
+}
+
+.form-search-no-border {
+  margin-bottom: 20px;
 }
 
 .form-order .input-nr-container {
@@ -1067,6 +1100,9 @@ select {
 }
 .panel .meta .date {
   font-style: italic;
+}
+.panel .time {
+  margin-left: 5px;
 }
 .panel .comment {
   margin-top: 5px;
@@ -1341,4 +1377,9 @@ footer {
 .icon-plus {
   background: url("../img/icons/icon-plus.png") center center no-repeat;
   background-size: 15px;
+}
+
+.form-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }

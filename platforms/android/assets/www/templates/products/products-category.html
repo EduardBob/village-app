@@ -1,7 +1,12 @@
 <div ng-controller="ProductsCtrl">
-	<div class="panel-item fw-b"ng-hide="emptyService">
+  <div class="panel-item fw-b"ng-hide="emptyService">
     <span><span class="img-container"><img ng-src="{{basePath}}{{mainImage}}" ng-hide="{{imagePresentMain}}" alt=""></span></span>
     <span class="panel-name" ng-bind="categoryMain.title"></span>
+    <span><span class="icon icon-down"></span></span>
+  </div>
+	<div class="panel-item fw-b"ng-show="emptyService">
+    <span><span class="img-container"></span></span>
+    <span class="panel-name">Результаты поиска</span>
     <span><span class="icon icon-down"></span></span>
   </div>
   <div tagged-infinite-scroll="getMore()">
@@ -11,5 +16,4 @@
       <span class="panel-price"><span ng-bind="product.price"></span><span> руб</span></span>
     </a>
   </div>
-  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
 </div>

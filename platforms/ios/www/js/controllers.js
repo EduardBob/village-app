@@ -3,9 +3,9 @@
 var villageAppControllers = angular.module('villageAppControllers', []);
 
 
-villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService',
-  function($scope, $resource, $location, TransferDataService, localStorageService) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService', 'BasePath',
+  function($scope, $resource, $location, TransferDataService, localStorageService,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -32,9 +32,9 @@ villageAppControllers.controller('RequestCtrl', ['$scope', '$resource', '$locati
       });
     }
   }]);
-villageAppControllers.controller('RequestPartnerCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService',
-  function($scope, $resource, $location, TransferDataService, localStorageService) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('RequestPartnerCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'localStorageService', 'BasePath',
+  function($scope, $resource, $location, TransferDataService, localStorageService,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -62,9 +62,9 @@ villageAppControllers.controller('RequestPartnerCtrl', ['$scope', '$resource', '
     }
   }]);
 
-villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce',
-  function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce) {
-    var building = $resource('http://1centr.com/api/v1/buildings/:buildingCode', {buildingCode: '@buildingCode'});
+villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce', 'BasePath',
+  function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce,  BasePath) {
+    var building = $resource(BasePath.api + 'buildings/:buildingCode', {buildingCode: '@buildingCode'});
     $scope.terms = false;
     
 
@@ -72,12 +72,13 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
         angular.element('.main-container').css('min-height', $(window).height());
         // angular.element('#invite-code').focus();
     });
-    $resource('http://1centr.com/api/v1/settings').get({}, function(data) {
+    $resource(BasePath.api + 'settings').get({}, function(data) {
       GetMeta.setData(data.data);
       $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
     }, function(response) {
       $scope.agreementText = 'Соглашение'
     });
+
     $scope.updateCode = function(code) {
       building.get({buildingCode: code}, function(data) {
         $scope.address = data.data.address;
@@ -99,14 +100,37 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
         }
       });
     }
+    $timeout(function() {
+      angular.element('.form-scroll').css({
+        'max-height' : $(window).height() - 103,
+        'margin-top' : '-20px'
+      });
+    });
+  }]);
+
+villageAppControllers.controller('AgreementCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'localStorageService', 'GetMeta', '$sce', 'BasePath',
+  function($scope, $resource, $location, $timeout, TransferDataService, localStorageService, GetMeta, $sce,  BasePath) {
+
+    $resource(BasePath.api + 'settings').get({}, function(data) {
+      GetMeta.setData(data.data);
+      $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
+    }, function(response) {
+      $scope.agreementText = 'Соглашение'
+    });
+    $timeout(function() {
+      angular.element('.form-scroll').css({
+        'max-height' : $(window).height() - 103,
+        'margin-top' : '-20px'
+      });
+    });
   }]);
 
 
-villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$location', 'TransferDataService',
-  function($scope, $resource, $location, TransferDataService) {
+villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'BasePath',
+  function($scope, $resource, $location, TransferDataService,  BasePath) {
     $scope.addressVillage = TransferDataService.getData('address');
     $scope.buildingId = TransferDataService.getData('building_id');
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -169,11 +193,11 @@ villageAppControllers.controller('PhoneCheckCtrl', ['$scope', '$resource', '$loc
     }
   }]);
 
-villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$location', 'TransferDataService',
-  function($scope, $resource, $location, TransferDataService) {
+villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'BasePath',
+  function($scope, $resource, $location, TransferDataService,  BasePath) {
     $scope.phone = TransferDataService.getData('phone');
     $scope.session = TransferDataService.getData('session');
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -200,9 +224,9 @@ villageAppControllers.controller('SmsCheckCtrl', ['$scope', '$resource', '$locat
     }
   }]);
 
-villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
-  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -241,9 +265,9 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
   }]);
 
 
-villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -305,9 +329,9 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
     };
   }]);
 
-villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -426,7 +450,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
       //   return localStorageService.set(key, val);
       // }
     }
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'}
@@ -479,9 +503,9 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
     }
   }]);
 
-villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
-  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, TransferDataService, tokenHandler, localStorageService, Users,  BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -560,8 +584,8 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
     }
   }]);
 
-villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     // Users.get({urlId: 'articles'}, {}, function(data) {
     //   $scope.allNews = [];
     //   angular.forEach(data.data, function (news) {
@@ -600,7 +624,7 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
     //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
     //   }
     // });
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -670,7 +694,7 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -698,7 +722,7 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
 
 villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -726,7 +750,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         if (response.data.error = 'token_expired') {
           user.save({urlId: 'auth', routeId: 'refresh'}, {}, function(data) {
             localStorageService.set('token', data.data.token);
-            var newTokenUser = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+            var newTokenUser = $resource(BasePath.api + ':urlId/:routeId', {}, {
               get: {
                 method: 'GET',
                 params: {urlId: '@urlId', routeId: '@routeId'},
@@ -839,11 +863,32 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
     } else {
       $location.path('/login');
     }
+    $scope.searchText = function() {
+      $scope.notFound = false;
+      $scope.notEntered = false;
+    }
+    $scope.search = function(text) {
+      if (typeof text != 'undefined' && text.length) {
+        user.get({urlId: 'services', search: text}, {}, function(data) {
+          if (!data.data.length ) {
+            $scope.notFound = true;
+          } else {
+            $location.path('/service/search/' + text);
+          }
+        }, function(response) {
+          if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      } else {
+        $scope.notEntered = true;
+      }
+    }
   }]);
 
 villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -864,8 +909,11 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
     $scope.getMore = function() {
       $scope.page++;
       $scope.fetching = true;
-      $scope.categoryData = user.get({urlId: 'services', category_id: $routeParams.categoryId, page: $scope.page}, function(data) {
+      $scope.categoryData = user.get({urlId: 'services', category_id: $routeParams.categoryId, page: $scope.page, search: $routeParams.searchId}, function(data) {
         $scope.fetching = false;
+        if (typeof $routeParams.searchId != 'undefined' && $routeParams.searchId) {
+          $scope.emptyService = true;
+        }
         angular.forEach(data.data, function (service) {
           if (service.image != null) {
             service.image = service.image.formats.smallThumb;
@@ -893,7 +941,7 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
   function($scope, $resource, $location, $window, $routeParams, $filter, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -934,7 +982,11 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
         TransferDataService.addData('paymentOption', $routeParams.payment_type);
         $scope.paymentOption = $routeParams.payment_type;
-      }
+      } else if (data.data.has_card_payment == 0) {
+          TransferDataService.addData('paymentOption', 'cash');
+          $scope.paymentOption = 'cash';
+          $scope.justCash = true;
+        }
 
       // console.log(localStorageService.get('serviceOrder' + $routeParams.serviceId));
       if (data.data.image != null) {
@@ -1022,7 +1074,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
 
 villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1054,11 +1106,32 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
+    $scope.searchText = function() {
+      $scope.notFound = false;
+      $scope.notEntered = false;
+    }
+    $scope.search = function(text) {
+      if (typeof text != 'undefined' && text.length) {
+        user.get({urlId: 'products', search: text}, {}, function(data) {
+          if (!data.data.length ) {
+            $scope.notFound = true;
+          } else {
+            $location.path('/product/search/' + text);
+          }
+        }, function(response) {
+          if (response.status === 404 || response.status === 403 || response.status === 500) {
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          }
+        });
+      } else {
+        $scope.notEntered = true;
+      }
+    }
   }]);
 
 villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1095,7 +1168,7 @@ villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$lo
 
 villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1116,8 +1189,11 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
     $scope.getMore = function() {
       $scope.page++;
       $scope.fetching = true;
-      $scope.articleData = user.get({urlId: 'products', category_id: $routeParams.categoryId, page: $scope.page}, function(data) {
+      $scope.articleData = user.get({urlId: 'products', category_id: $routeParams.categoryId, page: $scope.page, search: $routeParams.searchId}, function(data) {
         $scope.fetching = false;
+        if (typeof $routeParams.searchId != 'undefined' && $routeParams.searchId) {
+          $scope.emptyService = true;
+        }
         angular.forEach(data.data, function (product, image) {
           product.price = parseFloat(product.price);
           if (product.image != null) {
@@ -1145,7 +1221,7 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
 
 villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1193,6 +1269,10 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
         if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
           TransferDataService.addData('paymentOption', $routeParams.payment_type);
           $scope.paymentOption = $routeParams.payment_type;
+        } else if (data.data.has_card_payment == 0) {
+          TransferDataService.addData('paymentOption', 'cash');
+          $scope.paymentOption = 'cash';
+          $scope.justCash = true;
         }
 
         if (data.data.image != null) {
@@ -1231,18 +1311,26 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           }
         }
         $scope.unit_step = unitStep($scope.productUnit);
+
         
         if (typeof $routeParams.qty != 'undefined') {
           $scope.quantity = $routeParams.qty;
         } else {
           $scope.quantity = $scope.unit_step;
         }
-        
+
+        if (typeof $routeParams.price != 'undefined' && $routeParams.price) {
+          $scope.sumTotal = $routeParams.price;
+        } else {
+          $scope.sumTotal = parseFloat((($scope.productData.price*1)*($scope.quantity*1)).toFixed(2));
+        }
+
         $scope.changePlus = function() {
           if ($scope.productOrdered === true) {
             return false;
           } else {
-            $scope.quantity = ($scope.quantity*1) + ($scope.unit_step*1);
+            $scope.quantity = parseFloat((($scope.quantity*1) + ($scope.unit_step*1)).toFixed(2));
+            $scope.sumTotal = parseFloat((($scope.productData.price*1)*($scope.quantity*1)).toFixed(2));
           }
         }
         
@@ -1250,11 +1338,11 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           if ($scope.productOrdered === true) {
             return false;
           } else if ($scope.quantity > $scope.unit_step) {
-            $scope.quantity = $scope.quantity - $scope.unit_step;
+            $scope.quantity = parseFloat((($scope.quantity*1) - ($scope.unit_step*1)).toFixed(2));
+            $scope.sumTotal = parseFloat((($scope.productData.price*1)*($scope.quantity*1)).toFixed(2));
           }
         }
       }, function(response) {
-        console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -1331,7 +1419,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
 
 villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1369,6 +1457,11 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
           // service.created_at = Date.parse(service.created_at);
           $scope.arr = service.created_at.split(/[- :]/);
           service.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
+
+          if (service.perform_time != null) {
+          $scope.arr_time = service.perform_time.split(/[- :]/);
+          service.perform_time = $scope.arr_time[0] + ':' + $scope.arr_time[1];
+        }
         });
         $scope.services = $scope.services.concat(data.data);
         $scope.basePath = BasePath.domain;
@@ -1383,7 +1476,7 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
 
 villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '$location', '$routeParams', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
   function($scope, $resource, $location, $routeParams, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1420,10 +1513,26 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
           // product.created_at = Date.parse(product.created_at);
           $scope.arr = product.created_at.split(/[- :]/);
           product.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
+        if (product.perform_time != null) {
+          $scope.arr_time = product.perform_time.split(/[- :]/);
+          product.perform_time = $scope.arr_time[0] + ':' + $scope.arr_time[1];
+        }
+
+        $scope.productUnit = product.unit_title;
+        // $scope.unit_step = GetMeta.getData('village::product-unit-step-' + $scope.productUnit);
+        
+        if ($scope.productUnit === 'kg') {
+          product.unitRus = 'кг';
+        } else if ($scope.productUnit === 'bottle') {
+          product.unitRus = 'бут.';
+        } else if ($scope.productUnit === 'piece') {
+          product.unitRus = 'шт.';
+        }
 
         });
         $scope.products = $scope.products.concat(data.data);
         $scope.basePath = BasePath.domain;
+
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
@@ -1433,9 +1542,9 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
     };
   }]);
 
-villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users) {
-    var user = $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},
@@ -1479,8 +1588,8 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
   }]);
 
 
-villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService',
-  function($scope, $location, FooterCustom, TransferDataService, localStorageService) {
+villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService', 'BasePath',
+  function($scope, $location, FooterCustom, TransferDataService, localStorageService, BasePath) {
     $scope.footerBlocks = FooterCustom.query();
     // $scope.nrNews = TransferDataService.getData('nrNews');
     // $scope.newArticles = localStorageService.get('newArticles');
@@ -1569,6 +1678,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case '/request/partner':
         case '/request/sent':
         case '/register':
+        case '/agreement':
         case '/register/phone':
         case '/register/confirm':
         case '/register/welcome':

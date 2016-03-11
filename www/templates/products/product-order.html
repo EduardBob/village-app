@@ -20,7 +20,7 @@
         <span class="icon icon-plus" ng-click="changePlus()"></span>
       </div>
     </div>
-    <p class="col-orange fz-15 p-md mb-md">Самовывоз из магазина «<span ng-bind="shopName"></span>», <span ng-bind="shopAddress"></span></p>
+    <p class="col-orange fz-15 p-md mb-md ta-c"><span>Итоговая сумма: </span><span>{{sumTotal}}</span><span> руб</span></p>
     <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
       <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="productOrdered" min="{{currentDate | date:'yyyy-MM-dd'}}" name="inputDate">
       <div class="panel-item">
@@ -40,10 +40,10 @@
     </div>
     <div class="radio-block" ng-hide="hideBlock">
       <div class="radio-hover" ng-show="productOrdered"></div>
-      <div class="radio-container"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="card" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплатить сейчас</label></div>
+      <div class="radio-container" ng-hide="justCash"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="card" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплатить сейчас</label></div>
       <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="cash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплатить по факту</label></div>
     </div>
-    <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан с вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
+    <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан, с Вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
     <div class="alert alert-padding" ng-show="orderMessageDeclined">Платеж не прошел.<br> Ваш заказ отклонен. <span class="col-orange" ng-click="$back()">Попробуйте еще раз</span></div>
     <button class="button button-main" ng-click="sendData($event, quantity, comment, paymentOption)">Заказать</button>
     <div class="link-xl d-b ta-c col-l-gray fs-12" ng-bind="productBottomText" ng-hide="textHide || hideBlock"></div>

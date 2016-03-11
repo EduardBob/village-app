@@ -177,7 +177,7 @@ var users = angular.module('users', ['LocalStorageModule', 'ngResource']);
 
 users.factory('Users', ['localStorageService', '$resource', 
   function(localStorageService, $resource) {
-    return $resource('http://1centr.com/api/v1/:urlId/:routeId', {}, {
+    return $resource('http://village.fruitware.ru/:urlId/:routeId', {}, {
       get: {
         method: 'GET',
         params: {urlId: '@urlId', routeId: '@routeId'},

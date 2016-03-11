@@ -1,10 +1,20 @@
-<div class="services clearfix" ng-controller="ServicesCategoriesCtrl">
-  <div class="service-block" ng-repeat="service in serviceBlocks">
-  	<a href="#/service/category/{{service.id}}">
-      <span class="img-block">
-        <img ng-src="{{basePath}}{{service.image}}" ng-hide="{{service.imagePresent}}" alt="">
-      </span>
-  		<span class="service-title" ng-bind="service.title"></span>
-		</a>
+<div class="" ng-controller="ServicesCategoriesCtrl">
+  <form class="form form-search form-search-no-border">
+    <div class="input-container">
+      <input type="search" ng-model="textSearch" placeholder="Поиск услуг" ng-change="searchText()">
+      <button class="button" ng-click="search(textSearch)"></button>
+    </div>
+    <p class="p-md pt-md fs-12 col-orange" ng-show="notFound">По Вашему запросу ничего не найдено. Попробуйте еще раз</p>
+    <p class="p-md pt-md fs-12 col-orange" ng-show="notEntered">Введите слово для поиска</p>
+  </form>
+  <div class="services clearfix">
+    <div class="service-block" ng-repeat="service in serviceBlocks">
+    	<a href="#/service/category/{{service.id}}">
+        <span class="img-block">
+          <img ng-src="{{basePath}}{{service.image}}" ng-hide="{{service.imagePresent}}" alt="">
+        </span>
+    		<span class="service-title" ng-bind="service.title"></span>
+  		</a>
+    </div>
   </div>
 </div>

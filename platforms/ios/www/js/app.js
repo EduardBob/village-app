@@ -12,6 +12,7 @@ var villageApp = angular.module('villageApp', [
   'onlineStatusApp',
   'registerCode',
   'users',
+  'ngSanitize',
   'notificationModule',
   'LocalStorageModule',
   'tokenHandlerModule',
@@ -46,6 +47,9 @@ villageApp
         when('/service/category/:categoryId', {
           templateUrl: 'templates/services/services-category.html'
         }).
+        when('/service/search/:searchId', {
+          templateUrl: 'templates/services/services-category.html'
+        }).
         when('/service/:serviceId', {
           templateUrl: 'templates/services/service-order.html'
         }).
@@ -56,6 +60,9 @@ villageApp
           templateUrl: 'templates/products/products-main.html'
         }).
         when('/product/category/:categoryId', {
+          templateUrl: 'templates/products/products-category.html'
+        }).
+        when('/product/search/:searchId', {
           templateUrl: 'templates/products/products-category.html'
         }).
         when('/product', {
@@ -93,6 +100,9 @@ villageApp
         }).
         when('/login', {
           templateUrl: 'templates/login/login.html'
+        }).
+        when('/agreement', {
+          templateUrl: 'templates/login/register/agreement.html'
         }).
         when('/reset', {
           templateUrl: 'templates/login/reset/forgot.html'

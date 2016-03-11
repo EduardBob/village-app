@@ -1,12 +1,12 @@
 <div class="bg-image VerifyCtrl no-p-b" ng-controller="InviteCodeCtrl">
-  <form class="form form-dark">
+  <form class="form form-dark form-scroll">
     <div ng-hide="terms">
-      <p class="fs-18 p-md col-orange fw-md" >Введите номер своего дома</p>
+      <p class="fs-18 p-md col-orange fw-md" >Введите номер для регистрации</p>
       <div class="input-container input-container-sm mb-lg">
         <input type="text" placeholder="" name="building.code" ng-model="inviteCode" required auto-focus>  
       </div>
       <div class="button button-main no-mg" ng-click="updateCode(inviteCode)">Зарегистрироваться</div>
-      <p class="link-xl d-b ta-c">Узнать номер своего дома вы можете в администрации вашего поселка.</p>
+      <p class="link-xl d-b ta-c">Узнать номер для регистрации Вы можете в администрации Вашего поселка.</p>
     </div>
     <div ng-show="terms">
       <p class="p-md fs-15 mb-lg agreement-text" ng-bind-html="agreementText"></p>

@@ -45,6 +45,9 @@ angular.module('headerDirective', [])
             case '/register/welcome':
               title = 'Поздравляем!';
               break;
+            case '/agreement':
+              title = 'Лицензионное соглашение';
+              break;
             case '/request':
               title = 'Заявка';
               break;

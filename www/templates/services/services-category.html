@@ -4,7 +4,11 @@
     <span class="panel-name" ng-bind="categoryMain.title"></span>
     <span><span class="icon icon-down"></span></span>
   </div>
-  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyService"></span>
+  <div class="panel-item fw-b"ng-show="emptyService">
+    <span><span class="img-container"></span></span>
+    <span class="panel-name">Результаты поиска</span>
+    <span><span class="icon icon-down"></span></span>
+  </div>
   <div tagged-infinite-scroll="getMore()">
     <a href="#/service/{{service.id}}" class="panel-item"  ng-repeat="service in serviceList">
       <span><span class="img-container"><img ng-src="{{basePath}}{{service.image}}" ng-hide="{{service.imagePresent}}"></span></span>
