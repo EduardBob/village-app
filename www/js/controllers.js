@@ -1322,11 +1322,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           $scope.quantity = $scope.unit_step;
         }
 
-        if (typeof $routeParams.price != 'undefined' && $routeParams.price) {
-          $scope.sumTotal = $routeParams.price;
-        } else {
-          $scope.sumTotal = parseFloat((($scope.productData.price*1)*($scope.quantity*1)).toFixed(2));
-        }
+        $scope.sumTotal = parseFloat((($scope.productData.price*1)*($scope.quantity*1)).toFixed(2));
 
         $scope.changePlus = function() {
           if ($scope.productOrdered === true) {
@@ -1520,23 +1516,32 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
           // product.created_at = Date.parse(product.created_at);
           $scope.arr = product.created_at.split(/[- :]/);
           product.created_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
-        if (product.perform_time != null) {
-          $scope.arr_time = product.perform_time.split(/[- :]/);
-          product.perform_time = $scope.arr_time[0] + ':' + $scope.arr_time[1];
-        }
+          if (product.perform_time != null) {
+            $scope.arr_time = product.perform_time.split(/[- :]/);
+            product.perform_time = $scope.arr_time[0] + ':' + $scope.arr_time[1];
+          }
 
-        $scope.productUnit = product.unit_title;
-        // $scope.unit_step = GetMeta.getData('village::product-unit-step-' + $scope.productUnit);
-        
-        if ($scope.productUnit === 'kg') {
-          product.unitRus = 'кг';
-        } else if ($scope.productUnit === 'bottle') {
-          product.unitRus = 'бут.';
-        } else if ($scope.productUnit === 'piece') {
-          product.unitRus = 'шт.';
-        }
+          $scope.productUnit = product.unit_title;
+          // $scope.unit_step = GetMeta.getData('village::product-unit-step-' + $scope.productUnit);
+          
+          if ($scope.productUnit === 'kg') {
+            product.unitRus = 'кг';
+          } else if ($scope.productUnit === 'bottle') {
+            product.unitRus = 'бут.';
+          } else if ($scope.productUnit === 'piece') {
+            product.unitRus = 'шт.';
+          }
+
+          function formatNumber(num) {
+            num = Math.round(num * 100)/100; ;
+            return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + " " });
+          }
+
+          product.unit_price = formatNumber(product.unit_price);
+          product.price = formatNumber(product.price);
 
         });
+
         $scope.products = $scope.products.concat(data.data);
         $scope.basePath = BasePath.domain;
 

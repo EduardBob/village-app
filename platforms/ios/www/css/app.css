@@ -1192,9 +1192,15 @@ select {
 .panel .links.done a {
   color: #1456d0;
 }
-.panel .links.rejected span,
-.panel .links.rejected a {
+.panel .links.rejected span {
   color: #FF1919;
+}
+.panel .links.rejected a {
+  display: inline-block;
+  color: #1456d0;
+}
+.panel .links.rejected a:before {
+  display: none;
 }
 
 .alert {

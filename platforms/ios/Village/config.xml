@@ -34,7 +34,7 @@
     <preference name="StatusBarStyle" value="lightcontent" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
-    <name>Консьерж</name>
+    <name>Village</name>
     <description>
         Village
     </description>

@@ -39,6 +39,7 @@
               </div>
               <div ng-switch-when="rejected">
                 <span>отклонено</span><span> "</span><span ng-bind="service.decline_reason"></span><span>"</span>
+                <a href="#/service/{{service.service.data.id}}?payment_type={{service.payment_type}}&comment={{service.comment}}">повторить</a>
               </div>
             </div>
           </div>
@@ -56,10 +57,10 @@
             <span class="meta" ng-bind="product.created_at | date : 'dd-MM-yyyy HH:mm'"></span>
             <span class="title fw-sb" ng-bind="product.product.data.title"></span>
             <span class="title fs-13">
-              <span ng-bind="product.unit_price | number:2 | number"></span>р x 
+              <span ng-bind="product.unit_price"></span>р x 
               <span ng-bind="product.quantity | number:2 | number"></span>
               <span ng-bind="product.unitRus"></span> = 
-              <span ng-bind="product.price | currency:'':00"></span>р
+              <span ng-bind="product.price"></span>р
             </span>
             <!-- <span class="title"><span ng-bind="product.product.data.title"></span> - <span ng-bind="product.price"></span><span> руб</span></span>  -->
             <span class="meta">Заказано на: <span class="date" ng-bind="product.perform_date | date : 'dd-MM-yyyy'"></span><span class="date time" ng-bind="product.perform_time"></span></span>
@@ -85,10 +86,11 @@
                   <span ng-switch-when="not_paid"><span>не оплачено</span></span>
                   <span ng-switch-when="paid">оплачено</span>
                 </span>
-                <a href="#/product/{{product.product.data.id}}?qty={{product.quantity}}&price={{product.price}}&payment_type={{product.payment_type}}&comment={{product.comment}}">повторить</a>
+                <a href="#/product/{{product.product.data.id}}?qty={{product.quantity}}&payment_type={{product.payment_type}}&comment={{product.comment}}">повторить</a>
               </div>
               <div ng-switch-when="rejected">
                 <span>отклонено</span><span> "</span><span ng-bind="product.decline_reason"></span><span>"</span>
+                <a href="#/product/{{product.product.data.id}}?qty={{product.quantity}}&payment_type={{product.payment_type}}&comment={{product.comment}}">повторить</a>
               </div>
             </div>
           </div>

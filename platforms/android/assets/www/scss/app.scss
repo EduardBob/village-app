@@ -1141,9 +1141,15 @@ select {
       }
     }
     &.rejected {
-      span,
-      a {
+      span {
         color: #FF1919;
+      }
+      a {
+        display: inline-block;
+        color: #1456d0;
+        &:before {
+          display: none;
+        }
       }
     }
   }

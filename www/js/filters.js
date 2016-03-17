@@ -6,4 +6,3 @@ angular.module('servicesFilters', []).filter('serviceFilter', function() {
   };
 });
 
-
