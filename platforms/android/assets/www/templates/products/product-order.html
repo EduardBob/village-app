@@ -45,7 +45,10 @@
     </div>
     <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан, с Вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
     <div class="alert alert-padding" ng-show="orderMessageDeclined">Платеж не прошел.<br> Ваш заказ отклонен. <span class="col-orange" ng-click="$back()">Попробуйте еще раз</span></div>
-    <button class="button button-main" ng-click="sendData($event, quantity, comment, paymentOption)">Заказать</button>
+    <div class="button-block">
+      <div class="button-hover" ng-show="waiting"></div>
+      <button class="button button-main" ng-click="sendData($event, quantity, comment, paymentOption)">Заказать</button>
+    </div>
     <div class="link-xl d-b ta-c col-l-gray fs-12" ng-bind="productBottomText" ng-hide="textHide || hideBlock"></div>
   </div>
 </form>

@@ -330,6 +330,18 @@ input[type="radio"]:checked + label:after {
   z-index: 2;
 }
 
+.button-block {
+  position: relative;
+}
+.button-block .button-hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+}
+
 /*common styles*/
 body {
   background: url("../img/screen-bg.jpg") center center no-repeat;

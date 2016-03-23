@@ -939,8 +939,10 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
   }]);
 
 
-villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, $window, $routeParams, $filter, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+
+
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -953,6 +955,29 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
+    $scope.canceler = $q.defer();
+    function getResource(promise) {
+      return $resource(BasePath.api + ':urlId/:routeId', {}, {
+        save: {
+          method: 'POST',
+          params: {urlId: '@urlId', routeId: '@routeId'},
+          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+          timeout: promise
+        }
+      });
+    }
+    // function getResource() {
+    //   var defered = $q.defer();
+    //   return $resource(BasePath.api + ':urlId/:routeId', {}, {
+    //     save: {
+    //       method: 'POST',
+    //       params: {urlId: '@urlId', routeId: '@routeId'},
+    //       headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+    //       timeout: defered.promise
+    //     }
+    //   });
+    // }
     TransferDataService.addData('serviceDate', '');
     TransferDataService.addData('serviceTime', '');
     TransferDataService.addData('service_perform_at', '');
@@ -1033,34 +1058,54 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       TransferDataService.addData('paymentOption', $scope.paymentOption);
     }
     $scope.currentDate = new Date().toISOString().split("T")[0];
+
     $scope.sendData = function($event, comment, paymentOption) {
-      // $scope.perform_at = TransferDataService.getData('service_perform_at');
+      $scope.canceler = $q.defer();
+      var flag = 0;
+      $timeout(function() {
+        flag = 1;
+        $scope.canceler.resolve();
+        $scope.waiting = false;
+      }, 10000);
+      
+
       $scope.perform_date = TransferDataService.getData('serviceDate');
       $scope.perform_time = TransferDataService.getData('serviceTime');
       $scope.service_id = $routeParams.serviceId;
-      // localStorageService.set('serviceOrder' + $scope.service_id, {'comment': $scope.comment});
+      $scope.waiting = true;
+
       if (!$scope.serviceOrderForm.inputDate.$valid) {
        alert('Выбранная дата не может быть меньше текущей даты');
       } else {
-        user.save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
-          $scope.orderMessage = true;
-          $($event.target).css('display','none');
-          $scope.textHide = true;
 
-          $scope.serviceOrdered = true;
-          
-          $scope.dataOrder = data.data;
-          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-            $scope.link = $scope.dataOrder.pay.data.link;
-            $window.open($scope.link, '_system');
+        getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
+          $timeout.cancel();
+          if (!flag) {
+            // $scope.canceler = $q.defer();
+
+            $scope.orderMessage = true;
+            // $scope.waiting = false;
+            $($event.target).css('display','none');
+            $scope.textHide = true;
+
+            $scope.serviceOrdered = true;
+            
+            $scope.dataOrder = data.data;
+            if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+              $scope.link = $scope.dataOrder.pay.data.link;
+              $window.open($scope.link, '_system');
+            }
           }
           // if (TransferDataService.getData('paymentOption') === 'card') {
           //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
           // }
         }, function(response) {
+          $timeout.cancel();
+          $($event.target).css('display','block');
           $scope.changedDate = false;
           $scope.changedTime = false;
           $scope.orderMessage = false;
+          $scope.waiting = false;
           if (response.status === 400) {
             // alert('Введите дату и время заказа');
             alert('Введите дату заказа');
@@ -1073,6 +1118,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
         });
       }
     }
+
   }]);
 
 villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
@@ -1222,8 +1268,8 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
     };
   }]);
 
-villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', '$q', '$timeout', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, $q, $timeout, BasePath, localStorageService, Users) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1236,6 +1282,17 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    $scope.canceler = $q.defer();
+    function getResource(promise) {
+      return $resource(BasePath.api + ':urlId/:routeId', {}, {
+        save: {
+          method: 'POST',
+          params: {urlId: '@urlId', routeId: '@routeId'},
+          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+          timeout: promise
+        }
+      });
+    }
     TransferDataService.addData('unit_title', '');
     TransferDataService.addData('productDate', '');
     TransferDataService.addData('productTime', '');
@@ -1380,34 +1437,50 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
       TransferDataService.addData('paymentOption', $scope.paymentOption);
     }
     $scope.sendData = function($event, quantity, comment, paymentOption) {
-      // $scope.perform_at = TransferDataService.getData('product_perform_at');
+
+      $scope.canceler = $q.defer();
+      var flag = 0;
+      $timeout(function() {
+        flag = 1;
+        $scope.canceler.resolve();
+        $scope.waiting = false;
+      }, 10000);
 
       $scope.perform_date = TransferDataService.getData('productDate');
       $scope.perform_time = TransferDataService.getData('productTime');
       $scope.product_id = $routeParams.productId;
+      $scope.waiting = true;
+
       if (!$scope.productOrderForm.inputDate.$valid) {
        alert('Выбранная дата не может быть меньше текущей даты');
       } else {
-        user.save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'product_id': $scope.product_id, 'payment_type' : paymentOption}, function(data) {
-          $scope.orderMessage = true;
-          $($event.target).css('display','none');
-          $scope.textHide = true;
-          $scope.productOrdered = true;
+        getResource($scope.canceler.promise).save({urlId: 'products', routeId: 'orders'}, {'quantity': quantity, 'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'product_id': $scope.product_id, 'payment_type' : paymentOption}, function(data) {
+          $timeout.cancel();
+          if (!flag) {
+            $scope.orderMessage = true;
+            $scope.waiting = false;
+            $($event.target).css('display','none');
+            $scope.textHide = true;
+            $scope.productOrdered = true;
 
-          $scope.dataOrder = data.data;
+            $scope.dataOrder = data.data;
 
-          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-            $scope.link = $scope.dataOrder.pay.data.link;
-            $window.open($scope.link, '_system');
+            if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+              $scope.link = $scope.dataOrder.pay.data.link;
+              $window.open($scope.link, '_system');
+            }
           }
           // if (TransferDataService.getData('paymentOption') === 'card') {
           //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
           // }
         }, function(response) {
+          $timeout.cancel();
           $scope.changedDate = false;
           $scope.changedTime = false;
           $scope.orderMessage = false;
+          $scope.waiting = false;
           $scope.orderMessageDeclined = false;
+          $($event.target).css('display','block');
           if (response.status === 400) {
             alert('Введите дату заказа');
           } else if (response.status === 404 || response.status === 403 || response.status === 500) {
