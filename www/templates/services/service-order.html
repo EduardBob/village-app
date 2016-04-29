@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="textarea-block">
-      <input type="text" name="" id="" cols="30" rows="10" ng-attr-placeholder="{{serviceData.comment_label}}" ng-model="comment" ng-readonly="serviceOrdered">
+      <input type="text" name="inputComment" id="" cols="30" rows="10" ng-attr-placeholder="{{serviceData.comment_label}}" ng-model="comment" ng-readonly="serviceOrdered" ng-required="commentRequired">
     </div>
     <div class="radio-block" ng-hide="hideBlock">
       <div class="radio-hover" ng-show="serviceOrdered"></div>
@@ -36,7 +36,7 @@
     <div class="alert alert-padding" ng-show="orderMessageDeclined">Платеж не прошел.<br> Ваш заказ отклонен. <span class="col-orange" ng-click="$back()">Попробуйте еще раз</span></div>
     <div class="button-block">
       <div class="button-hover" ng-show="waiting"></div>
-      <button class="button button-main" ng-bind="serviceData.order_button_label" ng-click="sendData($event, comment, paymentOption)"></button>
+      <button class="button button-main" ng-bind="serviceData.order_button_label" ng-click="sendData($event, comment, paymentOption)" ></button>
     </div>
     <span class="link-xl d-b ta-c col-l-gray fs-12 fw-lt" ng-bind="serviceBottomText" ng-hide="textHide || hideBlock"></span>
   </form>

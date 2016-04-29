@@ -1004,6 +1004,10 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
         $scope.hideTime = true;
       }
 
+      if (data.data.type == "sc") {
+        $scope.commentRequired = true;
+      }
+
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
         TransferDataService.addData('paymentOption', $routeParams.payment_type);
         $scope.paymentOption = $routeParams.payment_type;
@@ -1075,7 +1079,13 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       $scope.waiting = true;
 
       if (!$scope.serviceOrderForm.inputDate.$valid) {
-       alert('Выбранная дата не может быть меньше текущей даты');
+        alert('Выбранная дата не может быть меньше текущей даты');
+        $timeout.cancel();
+        $scope.waiting = false;
+      } else if (!$scope.serviceOrderForm.inputComment.$valid) {
+        alert('Для данного заказа все поля обязательны');
+        $timeout.cancel();
+        $scope.waiting = false;
       } else {
 
         getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
