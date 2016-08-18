@@ -19,9 +19,11 @@ var villageApp = angular.module('villageApp', [
   'headerDirective',
   'footerDirective',
   'utils.autofocus',
+  'ngDropdowns',
   'NotificationServiceApp',
   'radioButtonDirective',
   'tagged.directives.infiniteScroll',
+  'infinite-scroll',
   'footerCustom',
   'villageAppControllers'
 ]);
@@ -94,6 +96,9 @@ villageApp
         }).
         when('/profile/password', {
           templateUrl: 'templates/profile/profile-password.html'
+        }).
+        when('/profile/numbers', {
+          templateUrl: 'templates/profile/profile-numbers.html'
         }).
         when('/survey', {
           templateUrl: 'templates/surveys/survey.html'

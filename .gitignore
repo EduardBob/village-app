@@ -2,6 +2,7 @@
 .idea
 # exclude imac
 *.DS_Store
+*.platform.zip
 
 # exclude Markup packages
 www/Gemfile

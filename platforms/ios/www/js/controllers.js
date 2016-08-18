@@ -1006,6 +1006,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
 
       if (data.data.type == "sc") {
         $scope.commentRequired = true;
+        $scope.serviceData.comment_label = '* ' + $scope.serviceData.comment_label;
       }
 
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {

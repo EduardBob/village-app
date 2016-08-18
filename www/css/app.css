@@ -137,6 +137,10 @@ template {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
 b,
 strong {
   font-weight: 500;
@@ -1009,6 +1013,16 @@ select {
 .panel-item.fw-b .panel-name {
   font-weight: 700;
 }
+.panel-item-lg {
+  margin-bottom: 10px;
+}
+.panel-item-lg .icon-right {
+  background: transparent;
+  padding-left: 5px;
+  line-height: 1;
+  font-size: 29px;
+  color: #B8B8BC;
+}
 
 .panels-form .panel-item {
   padding: 15px 5px;
@@ -1017,6 +1031,10 @@ select {
 }
 .panels-form .panel-item .panel-name {
   font-size: 18px;
+}
+.panels-form .panel-item-lg {
+  padding-top: 1px;
+  border-bottom: none;
 }
 
 .product-item {
@@ -1400,4 +1418,75 @@ footer {
 .form-scroll {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.form-table {
+  display: table;
+  width: 100%;
+}
+.form-table-row {
+  display: table-row;
+}
+.form-table-cell {
+  display: table-cell;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+.form-table .small {
+  text-align: left;
+  padding: 10px 10px 10px 0px;
+}
+.form-table .number {
+  padding: 10px 20px 10px 0px;
+  text-align: right;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.form-table .dot {
+  padding: 10px 10px 10px 10px;
+}
+.form-table .dot span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ef5711;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.form-row-meta {
+  display: block;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+.form-row-meta .small {
+  font-size: 16px;
+  font-weight: bold;
+}
+.form-row-meta .number {
+  display: block;
+  margin-top: 5px;
+}
+
+.dropdown-container {
+  margin-top: -40px;
+  margin-bottom: 20px;
+}
+
+.wrap-dd-select {
+  width: 100%;
+  color: #ef5711;
+}
+.wrap-dd-select:after {
+  border-color: #ef5711 transparent;
+}
+.wrap-dd-select .dropdown li a {
+  color: #3c3d41;
+}
+.wrap-dd-select .dropdown li:hover a {
+  background: transparent;
+}
+.wrap-dd-select .dropdown li.allCategories a {
+  font-weight: bold;
 }
