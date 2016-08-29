@@ -628,11 +628,21 @@ body .bg-image {
   color: #fff;
 }
 
-.agreement-text {
+.agreement-text,
+.news-text {
   a {
     display: inline-block;
     word-wrap: break-word;
     text-decoration: underline;
+  }
+  b,
+  strong {
+    font-weight: bold;
+  }
+}
+.news-text {
+  a {
+    color: $orange;
   }
 }
 
@@ -789,7 +799,8 @@ select {
     input[type="text"],
     input[type="tel"],
     input[type="password"],
-    input[type="email"] {
+    input[type="email"],
+    input[type="number"] {
       float: left;
       width: auto;
       height: 37px;
@@ -804,7 +815,8 @@ select {
   input[type="text"],
   input[type="tel"],
   input[type="email"],
-  input[type="password"] {
+  input[type="password"],
+  input[type="number"] {
     &::-webkit-input-placeholder { color: #fff; line-height: 33px; padding-top:0px; padding-bottom: 0; font-size: 18px;}
     &:-moz-placeholder { color: #fff; padding-top:0px; padding-bottom: 0; font-size: 18px;}
     &::-moz-placeholder { color: #fff; padding-top:0; padding-bottom: 0; font-size: 18px;}
@@ -971,7 +983,7 @@ select {
       font-size: 18px;
     }
     &-lg {
-      padding-top: 1px;
+      padding-top: 5px;
       border-bottom: none;
     }
   }
@@ -1036,6 +1048,9 @@ select {
         color: $orange;
       }
     }
+  }
+  &.mb-sm {
+    margin-bottom: 20px;
   }
 }
 
@@ -1214,6 +1229,9 @@ footer {
 	padding: 13px 5px 13px 0;
 	text-align: center;
   position: relative;
+  &:nth-child(3) {
+    padding-left: 7px;
+  }
 	span {
 		display: block;
 		font-weight: 500;
@@ -1267,6 +1285,10 @@ footer {
       background: url('../img/icons/icon-profile-a.png') center center no-repeat;
       background-size: 20px;
     }
+    .icon-house {
+      background: url('../img/icons/icon-house-a.png') center center no-repeat;
+      background-size: 24px;
+    }
   }
 }
 .icon-shop {
@@ -1288,6 +1310,10 @@ footer {
 .icon-profile {
   background: url('../img/icons/icon-profile.png') center center no-repeat;
   background-size: 20px;
+}
+.icon-house {
+  background: url('../img/icons/icon-house.png') center center no-repeat;
+  background-size: 24px;
 }
 
 .icon-phone,
@@ -1389,6 +1415,7 @@ footer {
   display: block;
   padding: 10px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  word-break: break-word;
   .small {
     font-size: 16px;
     font-weight: bold;
@@ -1426,6 +1453,63 @@ footer {
         }
       }
     }
+  }
+}
+
+.smart {
+  .img-container {
+    text-align: center;
+    img {
+      display: inline-block;
+      max-width: 200px;
+    }
+  }
+}
+
+.smart-table {
+  width: 100%;
+  border-collapse: collapse;
+  td {
+    padding: 10px 5px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    &:first-child {
+      padding-left: 20px;
+    }
+    &:last-child {
+      padding-right: 20px;
+      text-align: right;
+      > span {
+        display: block;
+      }
+    }
+  }
+  .icon {
+    display: block;
+    width: 20px;
+    img {
+      display: inline-block;
+      max-width: 100%;
+    }
+  }
+  .td-lg {
+    width: 100%;
+  }
+  .meta {
+    font-size: 11px;
+    opacity: 0.5;
+  }
+  .status {
+    font-size: 12px;
+  }
+}
+
+.order-text {
+  b {
+    font-weight: bold;
+  }
+  a {
+    color: $orange;
   }
 }
 

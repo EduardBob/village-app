@@ -5,8 +5,8 @@
 *.platform.zip
 
 # exclude Markup packages
-www/Gemfile
-www/Gemfile.lock
-www/node_modules
-www/.sass-cache/
+Gemfile
+Gemfile.lock
+node_modules
+.sass-cache/
 .idea

@@ -25,7 +25,7 @@
         <param name="android-package" value="nl.xservices.plugins.LaunchMyApp" />
     </feature>
     <allow-intent href="market:*" />
-    <name>Village</name>
+    <name>Консьерж</name>
     <description>
         Village
     </description>

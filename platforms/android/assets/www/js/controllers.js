@@ -1153,8 +1153,8 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
   }]);
 
 
-villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$sce', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $sce, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
 
 
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
@@ -1201,7 +1201,9 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       $scope.servicePaymentInfo = data.data.building.data.village.data.service_payment_info;
       $scope.serviceBottomText = data.data.building.data.village.data.service_bottom_text;
     });
+    alert('aaaa');
     user.get({urlId: 'services', routeId: $routeParams.serviceId}, {}, function(data) {
+      alert('ЧТо за хуйня?')
       $scope.serviceData = data.data;
       if (data.data.price == 0) {
         $scope.hideBlock = true;
@@ -1221,6 +1223,11 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       if (data.data.type == "sc") {
         $scope.commentRequired = true;
         $scope.serviceData.comment_label = '* ' + $scope.serviceData.comment_label;
+      }
+      alert($scope.serviceData.text.length);
+
+      if ($scope.serviceData.text.length) {
+        $scope.serviceData.text = $sce.trustAsHtml($scope.serviceData.text);
       }
 
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
@@ -1897,6 +1904,53 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
     });
   }]);
 
+villageAppControllers.controller('SmartCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+    // $scope.noCurrentSurvey = true;
+    // user.get({urlId: 'surveys', routeId: 'current'}, {}, function(data) {
+    //   // $scope.noCurrentSurvey = false;
+    //   $scope.surveyData = data.data;
+    //   $scope.surveyId = data.data.id;
+    //   // $scope.surveyData.ends_at = Date.parse($scope.surveyData.ends_at);
+    //   $scope.arr = $scope.surveyData.ends_at.split(/[- :]/);
+    //   $scope.surveyData.ends_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2]);
+    //   if (data.data.my_vote) {
+    //     $scope.selectedValue = {
+    //       value: data.data.my_vote.data.choice
+    //     };
+    //   }
+    //   $scope.radioChange = function(value) {
+    //     $scope.choice = value;
+    //     user.save({urlId: 'surveys', routeId: $scope.surveyId}, {'choice': $scope.choice}, function(data) {
+
+    //     }, function(response) {
+    //       console.log(response);
+    //     });
+    //   }
+    // }, function(response) {
+    //   console.log(response);
+    //   if (response.status === 404) {
+    //     $scope.noCurrentSurvey = true;
+    //   } else if (response.status === 403 || response.status === 500) {
+    //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+    //   }
+    // });
+
+
+  }]);
+
 
 villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService', 'BasePath',
   function($scope, $location, FooterCustom, TransferDataService, localStorageService, BasePath) {
@@ -1917,7 +1971,14 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     //   return TransferDataService.getData('nrNews');
     // }
     $scope.isActive = function(route) {
-      return route === $location.path().split('/', 2)[1];
+      var r = $location.path().split('/', 2)[1];
+      // if (r === 'products' || r === 'product') {
+      //   return route === 'services';
+      // } else {
+      //   return route === r;
+      // }
+
+      return route === r;
     }
     $scope.routeFooter = function() {
       return $location.path().split('/', 2)[1];
@@ -1932,6 +1993,7 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
         case 'survey':
         case 'products':
         case 'product':
+        case 'smart':
           return true;
       }
     }
@@ -1993,6 +2055,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case '/register/phone':
         case '/register/confirm':
         case '/register/welcome':
+        case '/smart':
         case '/offline':
           return true;
       }
@@ -2007,6 +2070,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case 'products':
         case 'product':
         case 'survey':
+        case 'smart':
           return true;
       }
     }

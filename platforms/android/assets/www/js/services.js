@@ -45,14 +45,14 @@
 
 var basePath = angular.module('basePath', []);
 
-  basePath.constant('BasePath', {
-    'domain' : 'http://village.fruitware.ru/',
-    'api' : 'http://village.fruitware.ru/api/v1/'
-  });
   // basePath.constant('BasePath', {
-  //   'domain' : 'http://1centr.com/',
-  //   'api' : 'http://1centr.com/api/v1/'
+  //   'domain' : 'http://village.fruitware.ru/',
+  //   'api' : 'http://village.fruitware.ru/api/v1/'
   // });
+  basePath.constant('BasePath', {
+    'domain' : 'http://1centr.com/',
+    'api' : 'http://1centr.com/api/v1/'
+  });
 
   // basePath
   //   .constant('domain', 'http://village.fruitware.ru/'),

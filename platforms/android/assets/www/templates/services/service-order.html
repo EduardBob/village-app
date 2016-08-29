@@ -9,7 +9,8 @@
       </span>
       <span class=" d-b fs-12 fw-lt mb-md" ng-bind="servicePaymentInfo" ng-hide="hideBlock"></span>
     </div>
-    <p class="fs-15 p-md mb-md fw-lt ta-c" ng-bind="serviceData.text"</p>
+    <p>sa;dkfjh;sakdjhflaskjdhf </p>
+    <p class="fs-15 p-md mb-md fw-lt ta-c" ng-bind-html="serviceData.text"</p>
     <div class="input-date" ng-class="changedDate ? 'input-date is-chosen' : 'input-date'">
       <input type="date" ng-model="date" ng-change="changeDate()" ng-readonly="serviceOrdered" min="{{currentDate | date:'yyyy-MM-dd'}}" name="inputDate">
       <div class="panel-item">

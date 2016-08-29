@@ -799,7 +799,8 @@ select {
 .form-dark .input-container input[type="text"],
 .form-dark .input-container input[type="tel"],
 .form-dark .input-container input[type="password"],
-.form-dark .input-container input[type="email"] {
+.form-dark .input-container input[type="email"],
+.form-dark .input-container input[type="number"] {
   float: left;
   width: auto;
   height: 37px;
@@ -813,7 +814,8 @@ select {
 .form-dark input[type="text"]::-webkit-input-placeholder,
 .form-dark input[type="tel"]::-webkit-input-placeholder,
 .form-dark input[type="email"]::-webkit-input-placeholder,
-.form-dark input[type="password"]::-webkit-input-placeholder {
+.form-dark input[type="password"]::-webkit-input-placeholder,
+.form-dark input[type="number"]::-webkit-input-placeholder {
   color: #fff;
   line-height: 33px;
   padding-top: 0px;
@@ -823,7 +825,8 @@ select {
 .form-dark input[type="text"]:-moz-placeholder,
 .form-dark input[type="tel"]:-moz-placeholder,
 .form-dark input[type="email"]:-moz-placeholder,
-.form-dark input[type="password"]:-moz-placeholder {
+.form-dark input[type="password"]:-moz-placeholder,
+.form-dark input[type="number"]:-moz-placeholder {
   color: #fff;
   padding-top: 0px;
   padding-bottom: 0;
@@ -832,7 +835,8 @@ select {
 .form-dark input[type="text"]::-moz-placeholder,
 .form-dark input[type="tel"]::-moz-placeholder,
 .form-dark input[type="email"]::-moz-placeholder,
-.form-dark input[type="password"]::-moz-placeholder {
+.form-dark input[type="password"]::-moz-placeholder,
+.form-dark input[type="number"]::-moz-placeholder {
   color: #fff;
   padding-top: 0;
   padding-bottom: 0;
@@ -841,7 +845,8 @@ select {
 .form-dark input[type="text"]:-ms-input-placeholder,
 .form-dark input[type="tel"]:-ms-input-placeholder,
 .form-dark input[type="email"]:-ms-input-placeholder,
-.form-dark input[type="password"]:-ms-input-placeholder {
+.form-dark input[type="password"]:-ms-input-placeholder,
+.form-dark input[type="number"]:-ms-input-placeholder {
   color: #fff;
   line-height: 1em;
   padding-top: 3px;
@@ -1033,7 +1038,7 @@ select {
   font-size: 18px;
 }
 .panels-form .panel-item-lg {
-  padding-top: 1px;
+  padding-top: 5px;
   border-bottom: none;
 }
 
@@ -1097,6 +1102,9 @@ select {
 .tabs-container .tabs .tab-item.active {
   font-weight: 700;
   color: #ef5711;
+}
+.tabs-container.mb-sm {
+  margin-bottom: 20px;
 }
 
 .panel {
@@ -1266,6 +1274,9 @@ footer {
   text-align: center;
   position: relative;
 }
+.footer-block:nth-child(3) {
+  padding-left: 7px;
+}
 .footer-block span {
   display: block;
   font-weight: 500;
@@ -1324,6 +1335,10 @@ footer {
   background: url("../img/icons/icon-profile-a.png") center center no-repeat;
   background-size: 20px;
 }
+.footer-block.active .icon-house {
+  background: url("../img/icons/icon-house-a.png") center center no-repeat;
+  background-size: 24px;
+}
 
 .icon-shop {
   background: url("../img/icons/icon-shop.png") center center no-repeat;
@@ -1348,6 +1363,11 @@ footer {
 .icon-profile {
   background: url("../img/icons/icon-profile.png") center center no-repeat;
   background-size: 20px;
+}
+
+.icon-house {
+  background: url("../img/icons/icon-house.png") center center no-repeat;
+  background-size: 24px;
 }
 
 .icon-phone,
@@ -1459,6 +1479,7 @@ footer {
   display: block;
   padding: 10px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  word-break: break-word;
 }
 .form-row-meta .small {
   font-size: 16px;
@@ -1489,4 +1510,50 @@ footer {
 }
 .wrap-dd-select .dropdown li.allCategories a {
   font-weight: bold;
+}
+
+.smart .img-container {
+  text-align: center;
+}
+.smart .img-container img {
+  display: inline-block;
+  max-width: 200px;
+}
+
+.smart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.smart-table td {
+  padding: 10px 5px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+.smart-table td:first-child {
+  padding-left: 20px;
+}
+.smart-table td:last-child {
+  padding-right: 20px;
+  text-align: right;
+}
+.smart-table td:last-child > span {
+  display: block;
+}
+.smart-table .icon {
+  display: block;
+  width: 20px;
+}
+.smart-table .icon img {
+  display: inline-block;
+  max-width: 100%;
+}
+.smart-table .td-lg {
+  width: 100%;
+}
+.smart-table .meta {
+  font-size: 11px;
+  opacity: 0.5;
+}
+.smart-table .status {
+  font-size: 12px;
 }

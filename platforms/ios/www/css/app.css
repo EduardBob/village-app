@@ -137,6 +137,10 @@ template {
   display: none;
 }
 
+.hidden {
+  display: none;
+}
+
 b,
 strong {
   font-weight: 500;
@@ -633,10 +637,21 @@ body .bg-image.wrapper.offline-wrapper {
   color: #fff;
 }
 
-.agreement-text a {
+.agreement-text a,
+.news-text a {
   display: inline-block;
   word-wrap: break-word;
   text-decoration: underline;
+}
+.agreement-text b,
+.agreement-text strong,
+.news-text b,
+.news-text strong {
+  font-weight: bold;
+}
+
+.news-text a {
+  color: #ef5711;
 }
 
 /* Form pages */
@@ -795,7 +810,8 @@ select {
 .form-dark .input-container input[type="text"],
 .form-dark .input-container input[type="tel"],
 .form-dark .input-container input[type="password"],
-.form-dark .input-container input[type="email"] {
+.form-dark .input-container input[type="email"],
+.form-dark .input-container input[type="number"] {
   float: left;
   width: auto;
   height: 37px;
@@ -809,7 +825,8 @@ select {
 .form-dark input[type="text"]::-webkit-input-placeholder,
 .form-dark input[type="tel"]::-webkit-input-placeholder,
 .form-dark input[type="email"]::-webkit-input-placeholder,
-.form-dark input[type="password"]::-webkit-input-placeholder {
+.form-dark input[type="password"]::-webkit-input-placeholder,
+.form-dark input[type="number"]::-webkit-input-placeholder {
   color: #fff;
   line-height: 33px;
   padding-top: 0px;
@@ -819,7 +836,8 @@ select {
 .form-dark input[type="text"]:-moz-placeholder,
 .form-dark input[type="tel"]:-moz-placeholder,
 .form-dark input[type="email"]:-moz-placeholder,
-.form-dark input[type="password"]:-moz-placeholder {
+.form-dark input[type="password"]:-moz-placeholder,
+.form-dark input[type="number"]:-moz-placeholder {
   color: #fff;
   padding-top: 0px;
   padding-bottom: 0;
@@ -828,7 +846,8 @@ select {
 .form-dark input[type="text"]::-moz-placeholder,
 .form-dark input[type="tel"]::-moz-placeholder,
 .form-dark input[type="email"]::-moz-placeholder,
-.form-dark input[type="password"]::-moz-placeholder {
+.form-dark input[type="password"]::-moz-placeholder,
+.form-dark input[type="number"]::-moz-placeholder {
   color: #fff;
   padding-top: 0;
   padding-bottom: 0;
@@ -837,7 +856,8 @@ select {
 .form-dark input[type="text"]:-ms-input-placeholder,
 .form-dark input[type="tel"]:-ms-input-placeholder,
 .form-dark input[type="email"]:-ms-input-placeholder,
-.form-dark input[type="password"]:-ms-input-placeholder {
+.form-dark input[type="password"]:-ms-input-placeholder,
+.form-dark input[type="number"]:-ms-input-placeholder {
   color: #fff;
   line-height: 1em;
   padding-top: 3px;
@@ -1009,6 +1029,16 @@ select {
 .panel-item.fw-b .panel-name {
   font-weight: 700;
 }
+.panel-item-lg {
+  margin-bottom: 10px;
+}
+.panel-item-lg .icon-right {
+  background: transparent;
+  padding-left: 5px;
+  line-height: 1;
+  font-size: 29px;
+  color: #B8B8BC;
+}
 
 .panels-form .panel-item {
   padding: 15px 5px;
@@ -1017,6 +1047,10 @@ select {
 }
 .panels-form .panel-item .panel-name {
   font-size: 18px;
+}
+.panels-form .panel-item-lg {
+  padding-top: 5px;
+  border-bottom: none;
 }
 
 .product-item {
@@ -1079,6 +1113,9 @@ select {
 .tabs-container .tabs .tab-item.active {
   font-weight: 700;
   color: #ef5711;
+}
+.tabs-container.mb-sm {
+  margin-bottom: 20px;
 }
 
 .panel {
@@ -1248,6 +1285,9 @@ footer {
   text-align: center;
   position: relative;
 }
+.footer-block:nth-child(3) {
+  padding-left: 7px;
+}
 .footer-block span {
   display: block;
   font-weight: 500;
@@ -1306,6 +1346,10 @@ footer {
   background: url("../img/icons/icon-profile-a.png") center center no-repeat;
   background-size: 20px;
 }
+.footer-block.active .icon-house {
+  background: url("../img/icons/icon-house-a.png") center center no-repeat;
+  background-size: 24px;
+}
 
 .icon-shop {
   background: url("../img/icons/icon-shop.png") center center no-repeat;
@@ -1330,6 +1374,11 @@ footer {
 .icon-profile {
   background: url("../img/icons/icon-profile.png") center center no-repeat;
   background-size: 20px;
+}
+
+.icon-house {
+  background: url("../img/icons/icon-house.png") center center no-repeat;
+  background-size: 24px;
 }
 
 .icon-phone,
@@ -1400,4 +1449,129 @@ footer {
 .form-scroll {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.form-table {
+  display: table;
+  width: 100%;
+}
+.form-table-row {
+  display: table-row;
+}
+.form-table-cell {
+  display: table-cell;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+.form-table .small {
+  text-align: left;
+  padding: 10px 10px 10px 0px;
+}
+.form-table .number {
+  padding: 10px 20px 10px 0px;
+  text-align: right;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.form-table .dot {
+  padding: 10px 10px 10px 10px;
+}
+.form-table .dot span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #ef5711;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.form-row-meta {
+  display: block;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  word-break: break-word;
+}
+.form-row-meta .small {
+  font-size: 16px;
+  font-weight: bold;
+}
+.form-row-meta .number {
+  display: block;
+  margin-top: 5px;
+}
+
+.dropdown-container {
+  margin-top: -40px;
+  margin-bottom: 20px;
+}
+
+.wrap-dd-select {
+  width: 100%;
+  color: #ef5711;
+}
+.wrap-dd-select:after {
+  border-color: #ef5711 transparent;
+}
+.wrap-dd-select .dropdown li a {
+  color: #3c3d41;
+}
+.wrap-dd-select .dropdown li:hover a {
+  background: transparent;
+}
+.wrap-dd-select .dropdown li.allCategories a {
+  font-weight: bold;
+}
+
+.smart .img-container {
+  text-align: center;
+}
+.smart .img-container img {
+  display: inline-block;
+  max-width: 200px;
+}
+
+.smart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.smart-table td {
+  padding: 10px 5px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+.smart-table td:first-child {
+  padding-left: 20px;
+}
+.smart-table td:last-child {
+  padding-right: 20px;
+  text-align: right;
+}
+.smart-table td:last-child > span {
+  display: block;
+}
+.smart-table .icon {
+  display: block;
+  width: 20px;
+}
+.smart-table .icon img {
+  display: inline-block;
+  max-width: 100%;
+}
+.smart-table .td-lg {
+  width: 100%;
+}
+.smart-table .meta {
+  font-size: 11px;
+  opacity: 0.5;
+}
+.smart-table .status {
+  font-size: 12px;
+}
+
+.order-text b {
+  font-weight: bold;
+}
+.order-text a {
+  color: #ef5711;
 }

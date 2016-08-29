@@ -10,10 +10,9 @@
     "path1": "newsitem",
     "newArticle": "true"
   },
-  {"icon": "shop",
-    "title": "Магазин",
-    "path": "products",
-    "path1": "product"
+  {"icon": "house",
+    "title": "Мой дом",
+    "path": "smart"
   },
   {"icon": "question",
     "title": "Опрос",

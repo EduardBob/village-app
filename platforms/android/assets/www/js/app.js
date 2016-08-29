@@ -22,6 +22,7 @@ var villageApp = angular.module('villageApp', [
   'ngDropdowns',
   'NotificationServiceApp',
   'radioButtonDirective',
+  'resizeCont',
   'tagged.directives.infiniteScroll',
   'infinite-scroll',
   'footerCustom',
@@ -138,6 +139,9 @@ villageApp
         }).
         when('/register/welcome', {
           templateUrl: 'templates/login/register/welcome.html'
+        }).
+        when('/smart', {
+          templateUrl: 'templates/smart/smart.html'
         }).
         otherwise({
           redirectTo: '/services'

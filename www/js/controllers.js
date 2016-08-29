@@ -79,6 +79,7 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
       $scope.agreementText = 'Соглашение'
     });
 
+
     $scope.updateCode = function(code) {
       building.get({buildingCode: code}, function(data) {
         $scope.address = data.data.address;
@@ -117,6 +118,7 @@ villageAppControllers.controller('AgreementCtrl', ['$scope', '$resource', '$loca
     }, function(response) {
       $scope.agreementText = 'Соглашение'
     });
+
     $timeout(function() {
       angular.element('.form-scroll').css({
         'max-height' : $(window).height() - 103,
@@ -736,6 +738,17 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
           } else {
             news.imagePresent = true;
           }
+
+          if (news.short.indexOf('^^') > 0) {
+            var a = news.short.split("^^")[1],
+                b = a.split('|'),
+                itemName = b[0],
+                item = b[1],
+                itemId = b[2];
+            var c = '^^' + a + '^^';
+            var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+            news.short = news.short.replace(c, d);
+          }
           // $scope.add(news, news.category_title);
         });
         $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
@@ -920,6 +933,20 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    // $scope.article = {};
+    // $scope.article.text = "<p>В одном из населённых пунктов Самарской области автомобилист %поворачивал|15% налево и столкнулся с машиной, ехавшей по обочине. Как сообщает &laquo;Российская газета&raquo;, инспекторы ГИБДД назвали виновными обоих водителей: одного, так как двигался по обочине, второго, поскольку не уступил помехе справа. Верховный суд, рассмотрев дело, постановил: водитель, движущийся по обочине, не имел преимущественного права движения, а у водителя другого автомобиля при повороте налево на прилегающую территорию вне перекрестка отсутствовала обязанность уступить дорогу движущемуся по обочине транспортному средству. Проще говоря, машины на обочине вообще не должно было быть, соответственно, и уступать дорогу некому. Таким образом, из постановления Верховного суда России можно сделать вывод, что дорогу автомобилям, которые движутся по обочине, можно не уступать &mdash; поскольку езда по обочине запрещена как таковая, то при любом столкновении будет виноват &laquo;обочечник&raquo;.</p>"
+      
+    // if ($scope.article.text.indexOf('%') > 0) {
+    //   var a = $scope.article.text.split("%")[1],
+    //       b = a.split('|'),
+    //       itemName = b[0],
+    //       item = b[1],
+    //       itemId = b[2];
+    //   var c = '%' + a + '%';
+    //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+    //   $scope.article.text = $scope.article.text.replace(c, d);
+    // }
+
     $scope.articleData = user.get({urlId: 'articles', routeId: $routeParams.articleId}, function(data) {
       $scope.article = data.data;
       // $scope.article.published_at = Date.parse($scope.article.published_at);
@@ -930,6 +957,18 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
       } else {
         $scope.imagePresentMain = true;
       }
+
+      if ($scope.article.text.indexOf('^^') > 0) {
+        var a = $scope.article.text.split("^^")[1],
+            b = a.split('|'),
+            itemName = b[0],
+            item = b[1],
+            itemId = b[2];
+        var c = '^^' + a + '^^';
+        var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+        $scope.article.text = $scope.article.text.replace(c, d);
+      }
+
       $scope.basePath = BasePath.domain;
     });
   }]);
@@ -1153,8 +1192,8 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
   }]);
 
 
-villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$sce', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
+  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $sce, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
 
 
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
@@ -1221,6 +1260,10 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       if (data.data.type == "sc") {
         $scope.commentRequired = true;
         $scope.serviceData.comment_label = '* ' + $scope.serviceData.comment_label;
+      }
+
+      if ($scope.serviceData.text.length) {
+        $scope.serviceData.text = $sce.trustAsHtml($scope.serviceData.text);
       }
 
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
@@ -1897,6 +1940,53 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
     });
   }]);
 
+villageAppControllers.controller('SmartCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+    // $scope.noCurrentSurvey = true;
+    // user.get({urlId: 'surveys', routeId: 'current'}, {}, function(data) {
+    //   // $scope.noCurrentSurvey = false;
+    //   $scope.surveyData = data.data;
+    //   $scope.surveyId = data.data.id;
+    //   // $scope.surveyData.ends_at = Date.parse($scope.surveyData.ends_at);
+    //   $scope.arr = $scope.surveyData.ends_at.split(/[- :]/);
+    //   $scope.surveyData.ends_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2]);
+    //   if (data.data.my_vote) {
+    //     $scope.selectedValue = {
+    //       value: data.data.my_vote.data.choice
+    //     };
+    //   }
+    //   $scope.radioChange = function(value) {
+    //     $scope.choice = value;
+    //     user.save({urlId: 'surveys', routeId: $scope.surveyId}, {'choice': $scope.choice}, function(data) {
+
+    //     }, function(response) {
+    //       console.log(response);
+    //     });
+    //   }
+    // }, function(response) {
+    //   console.log(response);
+    //   if (response.status === 404) {
+    //     $scope.noCurrentSurvey = true;
+    //   } else if (response.status === 403 || response.status === 500) {
+    //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+    //   }
+    // });
+
+
+  }]);
+
 
 villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService', 'BasePath',
   function($scope, $location, FooterCustom, TransferDataService, localStorageService, BasePath) {
@@ -1917,7 +2007,14 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     //   return TransferDataService.getData('nrNews');
     // }
     $scope.isActive = function(route) {
-      return route === $location.path().split('/', 2)[1];
+      var r = $location.path().split('/', 2)[1];
+      if (r === 'products' || r === 'product') {
+        return route === 'services';
+      } else {
+        return route === r;
+      }
+
+      // return route === r;
     }
     $scope.routeFooter = function() {
       return $location.path().split('/', 2)[1];
@@ -1932,6 +2029,7 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
         case 'survey':
         case 'products':
         case 'product':
+        case 'smart':
           return true;
       }
     }
@@ -1993,6 +2091,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case '/register/phone':
         case '/register/confirm':
         case '/register/welcome':
+        case '/smart':
         case '/offline':
           return true;
       }
@@ -2007,6 +2106,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case 'products':
         case 'product':
         case 'survey':
+        case 'smart':
           return true;
       }
     }

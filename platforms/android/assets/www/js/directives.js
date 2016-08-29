@@ -28,7 +28,7 @@ angular.module('headerDirective', [])
           }
         }
         $scope.arrowHidden = function(path) {
-          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/survey') {
+          if (path === '/services' || path === '/products' || path === '/news' || path === '/profile' || path === '/survey' || path === '/smart') {
             return true;
           }
         }
@@ -74,6 +74,9 @@ angular.module('headerDirective', [])
               break;
             case 'service':
               title = 'услуги';
+              break;
+            case '/smart':
+              title = 'Умный дом';
               break;
             case 'products':
             case '/products':
@@ -148,3 +151,24 @@ angular.module('utils.autofocus', [])
       }
     }
   }]);
+angular.module('resizeCont', [])
+  .directive('resize', function ($window, $timeout) {
+  return function (scope, element) {
+    $timeout(function() {
+      var w = angular.element($window),
+          wH = w.height(),
+          wW = w.width();
+          
+      scope.styleMain = function () {
+        // alert($window.navigator.userAgent.indexOf('iPhone'));
+        var ua = $window.navigator.userAgent,
+            ios = ua.indexOf('iPhone') || ua.indexOf('iPod') || ua.indexOf('iPad'),
+            wHM;
+        wHM = (ios > 0) ? (wH - 20) : wH
+        return {
+          'min-height' : wHM
+        }
+      };
+    }, 0)
+  }
+});

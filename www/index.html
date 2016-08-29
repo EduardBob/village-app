@@ -33,8 +33,8 @@
   <body ng-controller="PathCtrl" ng-class="{dark : addClass(routeMain()), ispadding: isPadding(routeUser())}" smooth-scroll>
 
   <div class="fixed"></div>
-  <div class="wrapper" ng-hide="offlineShow">
-    <div class="main-container" id="test">
+  <div class="wrapper" ng-hide="offlineShow" ng-style="styleMain()" resize>
+    <div class="main-container" id="test" ng-style="styleMain()" resize>
       <header-inner></header-inner>
       <div class="main-inner-page">
         <!-- <div ui-view></div> -->
@@ -70,7 +70,7 @@
     <script src="js/services.js"></script>
     <script src="js/directives.js"></script>
     <script src="js/lib/taggedInfiniteScroll.js"></script>
-    <script src="js/lib/scripts.js"></script>
+    <!-- <script src="js/lib/scripts.js"></script> -->
     <script type="text/javascript">
       app.initialize();
     </script>

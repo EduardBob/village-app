@@ -1,0 +1,57 @@
+<div class="bg-image VerifyCtrl no-p-b" ng-controller="SmartCtrl">
+  <div ng-hide="showScreen">
+    <div class="form form-dark smart" ng-hide="formShow">
+      <div class="img-container">
+        <img src="img/z-wave.png" alt="">
+      </div>
+      <p class="pt-md mb-lg p-md ta-c">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+      <a href="mailto:webmaster@example.com?Subject=Хочу%20Умный%20Дом" class="link-md-t d-b tt-u fs-14 td-u ta-c fw-b mb-lg">Хочу Умный Дом</a>
+      <button class="button button-main" ng-click="formShow=!formShow">Войти</button>
+    </div>
+
+    <form class="form form-dark" ng-show="formShow">
+      <p class="fs-16 p-md mb-lg">Lorem Ipsum is simply dummy text of the printing</p>
+      <p class="fs-18 p-md col-orange fw-md">Логин</p>
+      <div class="input-container input-container-sm mb-lg">
+        <input type="text" placeholder="" ng-model="username">  
+      </div>
+      <p class="fs-18 p-md col-orange fw-md">Пароль</p>
+      <div class="input-container input-container-sm mb-lg">
+        <input type="number" placeholder="" ng-model="id">  
+      </div>
+      <p class="fs-18 p-md col-orange fw-md">IP</p>
+      <div class="input-container input-container-sm mb-lg">
+        <input type="text" placeholder="" ng-model="api">  
+      </div>
+      <div class="alert alert-success" ng-show="nameSuccess" ng-bind="nameSuccess"></div>
+      <!-- <button class="button button-main no-mg" ng-click="changePass(password, new_password, new_password_confirmation)">Отправить</button> -->
+      <button class="button button-main no-mg" ng-click="showScreen=!showScreen">Отправить</button>
+    </form>
+  </div>
+  <div ng-show="showScreen">
+    <table class="smart-table">
+      <tbody>
+        <tr>
+          <td><span class="icon"><img src="img/smart/light.png" alt=""></span></td>
+          <td class="td-lg"><span class="name">Люстра на кухне</span></td>
+          <td><span class="meta">21/07 18:32</span><span class="status">выключено</span></td>
+        </tr>
+        <tr>
+          <td><span class="icon"><img src="img/smart/heating.png" alt=""></span></td>
+          <td class="td-lg"><span class="name">Кондиционер в детской</span></td>
+          <td><span class="meta">21/07 18:32</span><span class="status">выключено</span></td>
+        </tr>
+        <tr>
+          <td><span class="icon"><img src="img/smart/key.png" alt=""></span></td>
+          <td class="td-lg"><span class="name">Входная дверь</span></td>
+          <td><span class="meta">21/07 18:32</span><span class="status">открыта</span></td>
+        </tr>
+        <tr>
+          <td><span class="icon"><img src="img/smart/plug.png" alt=""></span></td>
+          <td class="td-lg"><span class="name">Розетка в коридоре</span></td>
+          <td><span class="meta">21/07 18:32</span><span class="status">в порядке</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
