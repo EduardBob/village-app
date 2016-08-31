@@ -329,6 +329,30 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       tokenHandler.set("none");
       $location.path('/login');
     };
+
+    if (localStorageService.get('push')) {
+      $scope.checkEmail = localStorageService.get('push');
+    } else {
+      $scope.checkEmail = false;
+    }
+
+    $scope.$watch('checkEmail', function() {
+      localStorageService.set('push', $scope.checkEmail);
+    }, true); 
+    
+    $scope.changeNotification = function(checkEmail) {
+      $timeout.cancel( timer );
+      var timer = $timeout(
+        function() {
+          user.save({urlId: 'me', routeId: 'has_mail_notifications'}, {'has_mail_notifications' : checkEmail}, function(data) {
+          }, function(response) {
+            console.log(response);
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          });
+        }, 500);
+      
+    }
+
   }]);
 
 villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',

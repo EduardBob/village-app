@@ -79,6 +79,7 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
       $scope.agreementText = 'Соглашение'
     });
 
+
     $scope.updateCode = function(code) {
       building.get({buildingCode: code}, function(data) {
         $scope.address = data.data.address;
@@ -117,6 +118,7 @@ villageAppControllers.controller('AgreementCtrl', ['$scope', '$resource', '$loca
     }, function(response) {
       $scope.agreementText = 'Соглашение'
     });
+
     $timeout(function() {
       angular.element('.form-scroll').css({
         'max-height' : $(window).height() - 103,
@@ -327,6 +329,30 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       tokenHandler.set("none");
       $location.path('/login');
     };
+
+    if (localStorageService.get('push')) {
+      $scope.checkEmail = localStorageService.get('push');
+    } else {
+      $scope.checkEmail = false;
+    }
+
+    $scope.$watch('checkEmail', function() {
+      localStorageService.set('push', $scope.checkEmail);
+    }, true); 
+    
+    $scope.changeNotification = function(checkEmail) {
+      $timeout.cancel( timer );
+      var timer = $timeout(
+        function() {
+          user.save({urlId: 'me', routeId: 'has_mail_notifications'}, {'has_mail_notifications' : checkEmail}, function(data) {
+          }, function(response) {
+            console.log(response);
+            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          });
+        }, 500);
+      
+    }
+
   }]);
 
 villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
@@ -736,6 +762,17 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
           } else {
             news.imagePresent = true;
           }
+
+          if (news.short.indexOf('^^') > 0) {
+            var a = news.short.split("^^")[1],
+                b = a.split('|'),
+                itemName = b[0],
+                item = b[1],
+                itemId = b[2];
+            var c = '^^' + a + '^^';
+            var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+            news.short = news.short.replace(c, d);
+          }
           // $scope.add(news, news.category_title);
         });
         $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
@@ -920,6 +957,20 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+    // $scope.article = {};
+    // $scope.article.text = "<p>В одном из населённых пунктов Самарской области автомобилист %поворачивал|15% налево и столкнулся с машиной, ехавшей по обочине. Как сообщает &laquo;Российская газета&raquo;, инспекторы ГИБДД назвали виновными обоих водителей: одного, так как двигался по обочине, второго, поскольку не уступил помехе справа. Верховный суд, рассмотрев дело, постановил: водитель, движущийся по обочине, не имел преимущественного права движения, а у водителя другого автомобиля при повороте налево на прилегающую территорию вне перекрестка отсутствовала обязанность уступить дорогу движущемуся по обочине транспортному средству. Проще говоря, машины на обочине вообще не должно было быть, соответственно, и уступать дорогу некому. Таким образом, из постановления Верховного суда России можно сделать вывод, что дорогу автомобилям, которые движутся по обочине, можно не уступать &mdash; поскольку езда по обочине запрещена как таковая, то при любом столкновении будет виноват &laquo;обочечник&raquo;.</p>"
+      
+    // if ($scope.article.text.indexOf('%') > 0) {
+    //   var a = $scope.article.text.split("%")[1],
+    //       b = a.split('|'),
+    //       itemName = b[0],
+    //       item = b[1],
+    //       itemId = b[2];
+    //   var c = '%' + a + '%';
+    //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+    //   $scope.article.text = $scope.article.text.replace(c, d);
+    // }
+
     $scope.articleData = user.get({urlId: 'articles', routeId: $routeParams.articleId}, function(data) {
       $scope.article = data.data;
       // $scope.article.published_at = Date.parse($scope.article.published_at);
@@ -930,12 +981,24 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
       } else {
         $scope.imagePresentMain = true;
       }
+
+      if ($scope.article.text.indexOf('^^') > 0) {
+        var a = $scope.article.text.split("^^")[1],
+            b = a.split('|'),
+            itemName = b[0],
+            item = b[1],
+            itemId = b[2];
+        var c = '^^' + a + '^^';
+        var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+        $scope.article.text = $scope.article.text.replace(c, d);
+      }
+
       $scope.basePath = BasePath.domain;
     });
   }]);
 
-villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', '$timeout', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$cordovaPushV5',
+  function($scope, $resource, $location, $timeout, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $cordovaPushV5) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -948,6 +1011,81 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
+    $scope.registerId = function() {
+      alert('aaa');
+
+      if (!localStorageService.get('tokendevice')) {
+        var ua = $window.navigator.userAgent,
+            ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+        var type = ios ? "ios" : "gcm";
+
+        var options = {
+          android: {
+            senderID: "1055017294786"
+          },
+          ios: {
+            alert: "true",
+            badge: "true",
+            sound: "true"
+          },
+          windows: {}
+        };
+        
+        // initialize
+        $cordovaPushV5.initialize(options).then(function() {
+          // alert('bbb');
+          // start listening for new notifications
+          $cordovaPushV5.onNotification();
+          // start listening for errors
+          $cordovaPushV5.onError();
+
+          
+          // register to get registrationId
+          $cordovaPushV5.register().then(function(data) {
+            // alert(data);
+
+            localStorageService.set('tokendevice', data);
+
+            alert(data);
+            alert(type);
+            
+            // var url = BasePath.api + 'device.json';
+            // $http.put(url, {type: type, token: data})
+            // .success(function(response){
+            //   // alert(JSON.stringify(response));
+            // })
+            // .error(function(response){
+            //   alert(JSON.stringify(response));
+            // });
+            // `data.registrationId` save it somewhere;
+          }, function(error) {
+            alert(error);
+          })
+        });
+        
+        // triggered every time notification received
+        $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
+          // alert('PUSH');
+          // data.message,
+          // data.title,
+          // data.count,
+          // data.sound,
+          // data.image,
+          // data.additionalData
+        });
+
+        // triggered every time error occurs
+        $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
+          alert(e.message);
+          // e.message
+        });
+      }
+    }
+
+    
+
     if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
       user.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
         $scope.serviceBlocks = data.data;
@@ -959,6 +1097,12 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
           }
         })
         $scope.basePath = BasePath.domain;
+
+        $timeout(function() {
+          alert('bbb');
+          angular.element('#register').triggerHandler('click');
+        }, 100);
+
       }, function(response) {
         console.log(response);
         if (response.data.error = 'token_expired') {
@@ -1075,7 +1219,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         }
       });
     } else {
-      $location.path('/login');
+      // $location.path('/login');
     }
     $scope.searchText = function() {
       $scope.notFound = false;
@@ -1201,9 +1345,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       $scope.servicePaymentInfo = data.data.building.data.village.data.service_payment_info;
       $scope.serviceBottomText = data.data.building.data.village.data.service_bottom_text;
     });
-    alert('aaaa');
     user.get({urlId: 'services', routeId: $routeParams.serviceId}, {}, function(data) {
-      alert('ЧТо за хуйня?')
       $scope.serviceData = data.data;
       if (data.data.price == 0) {
         $scope.hideBlock = true;
@@ -1224,7 +1366,6 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
         $scope.commentRequired = true;
         $scope.serviceData.comment_label = '* ' + $scope.serviceData.comment_label;
       }
-      alert($scope.serviceData.text.length);
 
       if ($scope.serviceData.text.length) {
         $scope.serviceData.text = $sce.trustAsHtml($scope.serviceData.text);
@@ -1972,13 +2113,13 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     // }
     $scope.isActive = function(route) {
       var r = $location.path().split('/', 2)[1];
-      // if (r === 'products' || r === 'product') {
-      //   return route === 'services';
-      // } else {
-      //   return route === r;
-      // }
+      if (r === 'products' || r === 'product') {
+        return route === 'services';
+      } else {
+        return route === r;
+      }
 
-      return route === r;
+      // return route === r;
     }
     $scope.routeFooter = function() {
       return $location.path().split('/', 2)[1];

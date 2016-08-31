@@ -4,81 +4,34 @@
         "uninstalled": []
     },
     "config_munge": {
-        "files": {
-            "res/xml/config.xml": {
-                "parents": {
-                    "/*": [
-                        {
-                            "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"InAppBrowser\"><param name=\"android-package\" value=\"org.apache.cordova.inappbrowser.InAppBrowser\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"NetworkStatus\"><param name=\"android-package\" value=\"org.apache.cordova.networkinformation.NetworkManager\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"StatusBar\"><param name=\"android-package\" value=\"org.apache.cordova.statusbar.StatusBar\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"Whitelist\"><param name=\"android-package\" value=\"org.apache.cordova.whitelist.WhitelistPlugin\" /><param name=\"onload\" value=\"true\" /></feature>",
-                            "count": 1
-                        },
-                        {
-                            "xml": "<feature name=\"LaunchMyApp\"><param name=\"android-package\" value=\"nl.xservices.plugins.LaunchMyApp\" /></feature>",
-                            "count": 1
-                        }
-                    ]
-                }
-            },
-            "AndroidManifest.xml": {
-                "parents": {
-                    "/*": [
-                        {
-                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
-                            "count": 1
-                        }
-                    ],
-                    "/manifest/application/activity": [
-                        {
-                            "xml": "<intent-filter><data android:scheme=\"village\" /><action android:name=\"android.intent.action.VIEW\" /><category android:name=\"android.intent.category.DEFAULT\" /><category android:name=\"android.intent.category.BROWSABLE\" /></intent-filter>",
-                            "count": 1
-                        }
-                    ]
-                }
-            }
-        }
+        "files": {}
     },
     "installed_plugins": {
-        "cordova-plugin-device": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
-        "cordova-plugin-dialogs": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
-        "cordova-plugin-inappbrowser": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
-        "cordova-plugin-network-information": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
-        "cordova-plugin-statusbar": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
-        "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "ru.fruitware.village"
-        },
         "cordova-plugin-customurlscheme": {
             "URL_SCHEME": "village",
-            "PACKAGE_NAME": "ru.fruitware.village"
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-network-information": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "phonegap-plugin-push": {
+            "SENDER_ID": "1055017294786",
+            "PACKAGE_NAME": "ru.concierge.app"
         }
     },
     "dependent_plugins": {}

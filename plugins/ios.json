@@ -95,6 +95,10 @@
         "cordova-plugin-customurlscheme": {
             "URL_SCHEME": "village",
             "PACKAGE_NAME": "ru.fruitware.village"
+        },
+        "phonegap-plugin-push": {
+            "SENDER_ID": "1055017294786",
+            "PACKAGE_NAME": "ru.concierge.app"
         }
     },
     "dependent_plugins": {}

@@ -57,5 +57,15 @@
         "variables": {
             "URL_SCHEME": "village"
         }
+    },
+    "phonegap-plugin-push": {
+        "source": {
+            "type": "registry",
+            "id": "phonegap-plugin-push"
+        },
+        "is_top_level": true,
+        "variables": {
+            "SENDER_ID": "1055017294786"
+        }
     }
 }

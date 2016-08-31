@@ -4,6 +4,7 @@
 
 var villageApp = angular.module('villageApp', [
   'ngRoute',
+  'ngCordova',
   'ui.router',
   'route-segment',
   'view-segment',
