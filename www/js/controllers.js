@@ -267,8 +267,8 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
   }]);
 
 
-villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
+villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', '$http', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
+  function($scope, $resource, $location, $timeout, $http, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -327,7 +327,22 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       TransferDataService.resetData();
       localStorageService.set('token', 'none');
       tokenHandler.set("none");
-      $location.path('/login');
+      if (localStorageService.get('tokendevice')) {
+        var url = BasePath.api + 'me/device.json',
+            type = localStorageService.get('devicetype'),
+            data = localStorageService.get('tokendevice');
+        $http.delete(url, {type: type, token: data})
+        .success(function(response){
+          $location.path('/login');
+          // alert(JSON.stringify(response));
+        })
+        .error(function(response){
+          $location.path('/login');
+          // alert(JSON.stringify(response));
+        });
+
+      }
+      // $location.path('/login');
     };
 
     if (localStorageService.get('push')) {
@@ -1046,18 +1061,19 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
             // alert(data);
 
             localStorageService.set('tokendevice', data);
+            localStorageService.set('devicetype', type);
 
             alert(data);
             alert(type);
             
-            // var url = BasePath.api + 'device.json';
-            // $http.put(url, {type: type, token: data})
-            // .success(function(response){
-            //   // alert(JSON.stringify(response));
-            // })
-            // .error(function(response){
-            //   alert(JSON.stringify(response));
-            // });
+            var url = BasePath.api + 'me/device.json';
+            $http.put(url, {type: type, token: data})
+            .success(function(response){
+              // alert(JSON.stringify(response));
+            })
+            .error(function(response){
+              // alert(JSON.stringify(response));
+            });
             // `data.registrationId` save it somewhere;
           }, function(error) {
             alert(error);
@@ -1079,6 +1095,18 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
           alert(e.message);
           // e.message
+        });
+      } else {
+        var url = BasePath.api + 'me/device.json',
+            type = localStorageService.get('devicetype'),
+            data = localStorageService.get('tokendevice');
+            
+        $http.put(url, {type: type, token: data})
+        .success(function(response){
+          // alert(JSON.stringify(response));
+        })
+        .error(function(response){
+          // alert(JSON.stringify(response));
         });
       }
     }
