@@ -324,25 +324,34 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       }
     });
     $scope.userLogout = function() {
-      TransferDataService.resetData();
-      localStorageService.set('token', 'none');
-      tokenHandler.set("none");
+      
       if (localStorageService.get('tokendevice')) {
-        var url = BasePath.api + 'me/device.json',
-            type = localStorageService.get('devicetype'),
-            data = localStorageService.get('tokendevice');
-        $http.delete(url, {type: type, token: data})
-        .success(function(response){
+
+        var tokenDevice = localStorageService.get('tokendevice');
+
+        var req = {
+           method: 'POST',
+           url: BasePath.api + 'me/device-delete',
+           headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+           data: {token: tokenDevice}
+          }
+
+        $http(req).then(function(){
+          TransferDataService.resetData();
+          localStorageService.set('token', 'none');
+          tokenHandler.set("none");
           $location.path('/login');
-          // alert(JSON.stringify(response));
-        })
-        .error(function(response){
-          $location.path('/login');
-          // alert(JSON.stringify(response));
+        }, function(){
+
         });
 
+      } else {
+        TransferDataService.resetData();
+        localStorageService.set('token', 'none');
+        tokenHandler.set("none");
+        $location.path('/login');
       }
-      // $location.path('/login');
+      
     };
 
     if (localStorageService.get('push')) {
@@ -356,10 +365,13 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
     }, true); 
     
     $scope.changeNotification = function(checkEmail) {
+      var stat = checkEmail ? 1 : 0;
+      console.log(stat);
       $timeout.cancel( timer );
       var timer = $timeout(
         function() {
-          user.save({urlId: 'me', routeId: 'has_mail_notifications'}, {'has_mail_notifications' : checkEmail}, function(data) {
+          user.save({urlId: 'me', routeId: 'mail-notifications'}, {'has_mail_notifications' : stat}, function(data) {
+            alert('ok');
           }, function(response) {
             console.log(response);
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
@@ -484,8 +496,8 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
   }]);
 
 
-villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath', '$http',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath, $http) {
+villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath', '$http', '$sce',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath, $http, $sce) {
     if(localStorageService.isSupported) {
       // function submit(key, val) {
       //   return localStorageService.set(key, val);
@@ -533,8 +545,8 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
 
   }]);
 
-villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $http, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
     if(localStorageService.isSupported) {
       // function submit(key, val) {
       //   return localStorageService.set(key, val);
@@ -577,8 +589,28 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
         tokenHandler.set(data.data.token);
         // window.localStorage['token'] = data.data.token;
         localStorageService.set('token', data.data.token);
+        if (localStorageService.get('tokendevice')) {
+          var type = localStorageService.get('devicetype'),
+            tokenDevice = localStorageService.get('tokendevice');
+
+          var req = {
+             method: 'POST',
+             url: BasePath.api + 'me/device',
+             headers: { 'Authorization': 'Bearer ' + data.data.token },
+             data: {type: type, token: tokenDevice}
+            }
+
+          $http(req).then(function(){
+            $location.path('/services');
+          }, function(response){
+
+          });
+        } else {
+          $location.path('/services');
+        }
+        
         // console.log(localStorageService.get('token'));
-        $location.path('/services');
+        
       }, function(response) {
         console.log(response);
         if (response.status === 401 || response.status === 400) {
@@ -1063,20 +1095,25 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
             localStorageService.set('tokendevice', data);
             localStorageService.set('devicetype', type);
 
-            alert(data);
-            alert(type);
-            
-            var url = BasePath.api + 'me/device.json';
-            $http.put(url, {type: type, token: data})
-            .success(function(response){
-              // alert(JSON.stringify(response));
-            })
-            .error(function(response){
-              // alert(JSON.stringify(response));
+            // alert(data);
+            // alert(type);
+
+            var req = {
+               method: 'POST',
+               url: BasePath.api + 'me/device',
+               headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+               data: {type: type, token: data}
+              }
+
+            $http(req).then(function(){
+              
+            }, function(response){
+              // alert(response.status);
+              //  alert(JSON.stringify(response));
             });
             // `data.registrationId` save it somewhere;
           }, function(error) {
-            alert(error);
+            // alert(error);
           })
         });
         
@@ -1095,18 +1132,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
           alert(e.message);
           // e.message
-        });
-      } else {
-        var url = BasePath.api + 'me/device.json',
-            type = localStorageService.get('devicetype'),
-            data = localStorageService.get('tokendevice');
-            
-        $http.put(url, {type: type, token: data})
-        .success(function(response){
-          // alert(JSON.stringify(response));
-        })
-        .error(function(response){
-          // alert(JSON.stringify(response));
         });
       }
     }

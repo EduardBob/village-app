@@ -281,49 +281,73 @@ input {
   input[type="checkbox"] {
     + label {
       position: relative;
-      padding: 5px 70px 5px 15px;
+      padding: 5px 50px 5px 15px;
       @include transition(color 0.3s);
-      &:before,
-      &:after {
+      &:before {
         content: "";
         display: block;
         position: absolute;
-        @include transition(transform 0.3s, background 0.3s, border-color 0.3s);
-      }
-      &:after {
         right: 10px;
-        top: -2px;
-        width: 57px;
-        height: 34px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.15);
-        @include border-radius(19px);
-        z-index: 1;
-      }
-      &:before {
-        right: 12px;
-        top: 0px;
-        width: 30px;
-        height: 30px;
-        background: #fff;
-        @include border-radius(30px);
-        @include box-shadow(-2px 2px 5px 1px rgba(0,0,0,0.2));
-        z-index: 2;
-        @include transform(translate3d(-23px, 0, 0));
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #B8B8BC;
+        @include border-radius(4px);
       }
     }
     &:checked {
       + label {
-        &:after {
-          background: rgba(255, 255, 255, 0.85);
-          border-color: rgba(255, 255, 255, 0.55);
-        }
         &:before {
-          margin-left: 0;
-          @include transform(translate3d(0, 0, 0));
+          background: url('../img/icons/i-tick.png') center center no-repeat;
+          background-size: 13px;
         }
       }
     }
+    // + label {
+    //   position: relative;
+    //   padding: 5px 70px 5px 15px;
+    //   @include transition(color 0.3s);
+    //   &:before,
+    //   &:after {
+    //     content: "";
+    //     display: block;
+    //     position: absolute;
+    //     @include transition(transform 0.3s, background 0.3s, border-color 0.3s);
+    //   }
+    //   &:after {
+    //     right: 10px;
+    //     top: -2px;
+    //     width: 57px;
+    //     height: 34px;
+    //     border: 2px solid rgba(255, 255, 255, 0.25);
+    //     background: rgba(255, 255, 255, 0.15);
+    //     @include border-radius(19px);
+    //     z-index: 1;
+    //   }
+    //   &:before {
+    //     right: 12px;
+    //     top: 0px;
+    //     width: 30px;
+    //     height: 30px;
+    //     background: #fff;
+    //     @include border-radius(30px);
+    //     @include box-shadow(-2px 2px 5px 1px rgba(0,0,0,0.2));
+    //     z-index: 2;
+    //     @include transform(translate3d(-23px, 0, 0));
+    //   }
+    // }
+    // &:checked {
+    //   + label {
+    //     &:after {
+    //       background: rgba(255, 255, 255, 0.85);
+    //       border-color: rgba(255, 255, 255, 0.55);
+    //     }
+    //     &:before {
+    //       margin-left: 0;
+    //       @include transform(translate3d(0, 0, 0));
+    //     }
+    //   }
+    // }
   }
 }
 
@@ -1438,11 +1462,20 @@ footer {
   word-break: break-word;
   .small {
     font-size: 16px;
-    font-weight: bold;
   }
   .number {
     display: block;
     margin-top: 5px;
+  }
+  .small,
+  .number {
+    b,
+    strong {
+      font-weight: 700;
+    }
+    a {
+      text-decoration: underline;
+    }
   }
 }
 .dropdown-container {
