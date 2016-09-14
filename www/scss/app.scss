@@ -673,9 +673,16 @@ body .bg-image {
 }
 
 .agreement-text,
-.news-text {
+.news-text,
+.doc-text,
+.order-text {
+  img {
+    max-width: 100%;
+    height: auto !important;
+  }
+  word-break: break-word;
   a {
-    display: inline-block;
+    // display: inline-block;
     word-wrap: break-word;
     text-decoration: underline;
   }
@@ -683,8 +690,14 @@ body .bg-image {
   strong {
     font-weight: bold;
   }
+  ul,
+  ol {
+    text-align: left;
+  }
+
 }
-.news-text {
+.news-text,
+.doc-text {
   a {
     color: $orange;
   }
@@ -755,10 +768,14 @@ header {
     font-weight: 500;
     color: $orange;
   }
-  img {
+  > img {
     display: block;
     margin: 0 auto 20px;
     width: 100%;
+  }
+  img {
+    max-width: 100%;
+    height: auto !important;
   }
   p {
     font-size: 15px;
@@ -767,6 +784,7 @@ header {
 }
 .read-more {
   display: block;
+  margin-top: 10px;
   padding-bottom: 10px;
   color: $orange;
   font-style: italic;
@@ -1275,6 +1293,9 @@ footer {
   position: relative;
   &:nth-child(3) {
     padding-left: 7px;
+    @media only screen and (max-width: 400px) {
+      padding-left: 5px;
+    }
   }
 	span {
 		display: block;
@@ -1558,13 +1579,77 @@ footer {
 }
 
 .order-text {
-  b {
+  margin-bottom: 10px;
+  b,
+  strong {
     font-weight: bold;
   }
   a {
     color: $orange;
   }
 }
+
+.document {
+  padding: 20px;
+  &-row {
+    display: block;
+    margin-bottom: 20px;
+    overflow: hidden;
+    .file-icon {
+      margin: 0;
+      width: 42px;
+      height: 54px;
+      &:after {
+        padding-left: 0;
+        padding-right: 0;
+        text-align: center;
+      }
+    }
+    &-img {
+      display: block;
+      float: left;
+      width: 42px;
+    }
+    &-info {
+      display: block;
+      margin-left: 55px;
+      .name {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: $orange;
+        font-weight: 500;
+      }
+      .meta {
+        font-size: 14px;
+      }
+    }
+  }
+}
+.img-doc {
+  width: 100%;
+  max-width: 415px;
+  margin: 20px auto;
+  text-align: center;
+  img {
+    display: inline-block;
+    max-width: 100%;
+    border: 1px solid #d0d0d0;
+  }
+}
+.doc-text {
+  a {
+    color: $orange;
+  }
+  strong,
+  b {
+    font-weight: 700;
+  }
+}
+.button-doc {
+  margin-top: 40px;
+}
+
 
 
 

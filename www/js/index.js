@@ -69,7 +69,7 @@ var app = {
         
 
         app.handleExternalURLs();
-        // app.showAlert();
+        app.showAlert();
 
     },
     // deviceready Event Handler

@@ -7,13 +7,13 @@
     	</div>
 	</div>
 	<input type="text" ng-model="search.category_id" class="category-input hidden">
-	<!-- <div tagged-infinite-scroll="getMore()"> -->
-	<div infinite-scroll="getMore(catIdNew)" infinite-scroll-distance='2' infinite-scroll-listen-for-event="list:loadmore" infinite-scroll-disabled='fetching'>
-	  <a href="#/newsitem/{{news.id}}" class="news-item" ng-repeat="news in newsBlocks track by news.id">
+	<div tagged-infinite-scroll="getMore(catIdNew)">
+	<!-- <div infinite-scroll="getMore(catIdNew)" infinite-scroll-distance='2' infinite-scroll-listen-for-event="list:loadmore" infinite-scroll-disabled='fetching'> -->
+	  <a href="#/newsitem/{{news.id}}" class="news-item" ng-repeat="news in newsBlocks track by $index">
 	    <span class="meta" ng-bind="news.published_at | date : 'dd-MM-yyyy'"></span>
 	    <h3 class="news-title" ng-bind="news.title"></h3>
 	    <img ng-src="{{basePath}}{{news.image}}" alt="" ng-hide="{{news.imagePresent}}">
-	    <div class="news-text" ng-bind-html="news.short"></div>
+	    <div class="news-text" ng-bind-html="news.textNew"></div>
 	    <span class="read-more">Читать далее</span>
 	  </a>
 	  <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyServiceText" style="padding-left: 27px;"></span>

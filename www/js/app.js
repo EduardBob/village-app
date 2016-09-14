@@ -102,6 +102,12 @@ villageApp
         when('/profile/numbers', {
           templateUrl: 'templates/profile/profile-numbers.html'
         }).
+        when('/profile/documents', {
+          templateUrl: 'templates/profile/profile-documents.html'
+        }).
+        when('/document/:docId', {
+          templateUrl: 'templates/profile/profile-document.html'
+        }).
         when('/survey', {
           templateUrl: 'templates/surveys/survey.html'
         }).
@@ -148,3 +154,5 @@ villageApp
           redirectTo: '/services'
         });
     }]);
+
+window.stripScript = function (a) {return a.replace(/<script[^>]*>.*?<\/script>/gi,'')}

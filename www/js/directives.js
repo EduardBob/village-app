@@ -18,6 +18,8 @@ angular.module('headerDirective', [])
             return 'service';
           } else if ($location.path().split('/', 2)[1] === 'product') {
             return 'products';
+          } else if ($location.path().split('/', 2)[1] === 'document') {
+            return 'document';
           } else {
             return $location.path();
           }
@@ -65,6 +67,10 @@ angular.module('headerDirective', [])
             case '/profile/phone':
             case '/profile/numbers':
               title = 'Мой профиль';
+              break;
+            case '/profile/documents':
+            case 'document':
+              title = 'Мои документы';
               break;
             case '/profile/confirm':
               title = 'ПОДТВЕРДИТЕ НОВЫЙ НОМЕР';
