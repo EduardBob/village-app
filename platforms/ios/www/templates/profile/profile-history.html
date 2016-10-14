@@ -1,9 +1,12 @@
-<div class="tabs-container" ng-init="tab = 1">
+<div class="tabs-container" ng-controller="HistoryTabCtrl">
   <div class="tabs">
-    <div class="tab-item active" ng-click="tab = 1" ng-class="{'active': tab == 1}">Услуги</div>
-    <div class="tab-item" ng-click="tab = 2" ng-class="{'active': tab == 2}">Магазин</div>
+    <!-- <div class="tab-item active" ng-click="tab = 1" ng-class="{'active': tab == 1}">Услуги</div> -->
+    <!-- <div class="tab-item" ng-click="tab = 2" ng-class="{'active': tab == 2}">Магазин</div> -->
+    <div class="tab-item" ng-click="selectTab(1)" ng-class="{'active': isTab(1)}">Услуги</div>
+    <div class="tab-item" ng-click="selectTab(2)" ng-class="{'active': isTab(2)}">Магазин</div>
   </div>
-  <div class="tabs-content" ng-show="tab == 1" ng-controller="OrdersServicesCtrl">
+  <!-- <div class="tabs-content" ng-show="tab == 1" ng-controller="OrdersServicesCtrl"> -->
+  <div class="tabs-content" ng-show="isTab(1)" ng-controller="OrdersServicesCtrl">
     <div class="content" tagged-infinite-scroll="getMoreServices()">
       <p class="fw-b p-md">История заказов</p>
       <div class="panels-block">
@@ -47,7 +50,8 @@
       </div>
     </div>
   </div>
-  <div class="tabs-content" ng-show="tab == 2" ng-controller="OrdersProductsCtrl">
+  <div class="tabs-content" ng-show="isTab(2)" ng-controller="OrdersProductsCtrl">
+  <!-- <div class="tabs-content" ng-show="tab == 2" ng-controller="OrdersProductsCtrl"> -->
     <div class="content" tagged-infinite-scroll="getMoreProducts()">
       <p class="fw-b p-md">История заказов</p>
       <div class="panels-block">

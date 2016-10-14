@@ -281,49 +281,73 @@ input {
   input[type="checkbox"] {
     + label {
       position: relative;
-      padding: 5px 70px 5px 15px;
+      padding: 5px 50px 5px 15px;
       @include transition(color 0.3s);
-      &:before,
-      &:after {
+      &:before {
         content: "";
         display: block;
         position: absolute;
-        @include transition(transform 0.3s, background 0.3s, border-color 0.3s);
-      }
-      &:after {
         right: 10px;
-        top: -2px;
-        width: 57px;
-        height: 34px;
-        border: 2px solid rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.15);
-        @include border-radius(19px);
-        z-index: 1;
-      }
-      &:before {
-        right: 12px;
-        top: 0px;
-        width: 30px;
-        height: 30px;
-        background: #fff;
-        @include border-radius(30px);
-        @include box-shadow(-2px 2px 5px 1px rgba(0,0,0,0.2));
-        z-index: 2;
-        @include transform(translate3d(-23px, 0, 0));
+        top: 3px;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #B8B8BC;
+        @include border-radius(4px);
       }
     }
     &:checked {
       + label {
-        &:after {
-          background: rgba(255, 255, 255, 0.85);
-          border-color: rgba(255, 255, 255, 0.55);
-        }
         &:before {
-          margin-left: 0;
-          @include transform(translate3d(0, 0, 0));
+          background: url('../img/icons/i-tick.png') center center no-repeat;
+          background-size: 13px;
         }
       }
     }
+    // + label {
+    //   position: relative;
+    //   padding: 5px 70px 5px 15px;
+    //   @include transition(color 0.3s);
+    //   &:before,
+    //   &:after {
+    //     content: "";
+    //     display: block;
+    //     position: absolute;
+    //     @include transition(transform 0.3s, background 0.3s, border-color 0.3s);
+    //   }
+    //   &:after {
+    //     right: 10px;
+    //     top: -2px;
+    //     width: 57px;
+    //     height: 34px;
+    //     border: 2px solid rgba(255, 255, 255, 0.25);
+    //     background: rgba(255, 255, 255, 0.15);
+    //     @include border-radius(19px);
+    //     z-index: 1;
+    //   }
+    //   &:before {
+    //     right: 12px;
+    //     top: 0px;
+    //     width: 30px;
+    //     height: 30px;
+    //     background: #fff;
+    //     @include border-radius(30px);
+    //     @include box-shadow(-2px 2px 5px 1px rgba(0,0,0,0.2));
+    //     z-index: 2;
+    //     @include transform(translate3d(-23px, 0, 0));
+    //   }
+    // }
+    // &:checked {
+    //   + label {
+    //     &:after {
+    //       background: rgba(255, 255, 255, 0.85);
+    //       border-color: rgba(255, 255, 255, 0.55);
+    //     }
+    //     &:before {
+    //       margin-left: 0;
+    //       @include transform(translate3d(0, 0, 0));
+    //     }
+    //   }
+    // }
   }
 }
 
@@ -649,9 +673,16 @@ body .bg-image {
 }
 
 .agreement-text,
-.news-text {
+.news-text,
+.doc-text,
+.order-text {
+  img {
+    max-width: 100%;
+    height: auto !important;
+  }
+  word-break: break-word;
   a {
-    display: inline-block;
+    // display: inline-block;
     word-wrap: break-word;
     text-decoration: underline;
   }
@@ -659,8 +690,14 @@ body .bg-image {
   strong {
     font-weight: bold;
   }
+  ul,
+  ol {
+    text-align: left;
+  }
+
 }
-.news-text {
+.news-text,
+.doc-text {
   a {
     color: $orange;
   }
@@ -731,10 +768,14 @@ header {
     font-weight: 500;
     color: $orange;
   }
-  img {
+  > img {
     display: block;
     margin: 0 auto 20px;
     width: 100%;
+  }
+  img {
+    max-width: 100%;
+    height: auto !important;
   }
   p {
     font-size: 15px;
@@ -743,6 +784,7 @@ header {
 }
 .read-more {
   display: block;
+  margin-top: 10px;
   padding-bottom: 10px;
   color: $orange;
   font-style: italic;
@@ -1251,6 +1293,9 @@ footer {
   position: relative;
   &:nth-child(3) {
     padding-left: 7px;
+    @media only screen and (max-width: 400px) {
+      padding-left: 5px;
+    }
   }
 	span {
 		display: block;
@@ -1438,11 +1483,20 @@ footer {
   word-break: break-word;
   .small {
     font-size: 16px;
-    font-weight: bold;
   }
   .number {
     display: block;
     margin-top: 5px;
+  }
+  .small,
+  .number {
+    b,
+    strong {
+      font-weight: 700;
+    }
+    a {
+      text-decoration: underline;
+    }
   }
 }
 .dropdown-container {
@@ -1525,13 +1579,114 @@ footer {
 }
 
 .order-text {
-  b {
+  margin-bottom: 10px;
+  b,
+  strong {
     font-weight: bold;
   }
   a {
     color: $orange;
   }
 }
+
+.document {
+  padding: 20px;
+  &-row {
+    display: block;
+    margin-bottom: 20px;
+    overflow: hidden;
+    .file-icon {
+      margin: 0;
+      width: 42px;
+      height: 54px;
+      &:after {
+        padding-left: 0;
+        padding-right: 0;
+        text-align: center;
+      }
+    }
+    &-img {
+      display: block;
+      float: left;
+      width: 42px;
+    }
+    &-info {
+      display: block;
+      margin-left: 55px;
+      .name {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 16px;
+        color: $orange;
+        font-weight: 500;
+      }
+      .meta {
+        font-size: 14px;
+      }
+    }
+  }
+}
+.img-doc {
+  width: 100%;
+  max-width: 415px;
+  margin: 20px auto;
+  text-align: center;
+  img {
+    display: inline-block;
+    max-width: 100%;
+    border: 1px solid #d0d0d0;
+  }
+}
+.doc-text {
+  a {
+    color: $orange;
+  }
+  strong,
+  b {
+    font-weight: 700;
+  }
+}
+.button-doc {
+  margin-top: 40px;
+}
+
+.spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.4);
+  z-index: 100;
+  .sp {
+    display: block;
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -16px;
+    margin-top: -16px;
+    border: 4px rgba($orange,0.25) solid;
+    border-top: 4px rgba($orange,1) solid;
+    border-radius: 50%;
+    -webkit-animation: spCircRot .6s infinite linear;
+    animation: spCircRot .6s infinite linear;
+  }
+  &-dark {
+    top: 56px;
+    background: rgba(255,255,255,0.9);
+  }
+}
+@-webkit-keyframes spCircRot {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(359deg); }
+}
+@keyframes spCircRot {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(359deg); }
+}
+
 
 
 

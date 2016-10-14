@@ -7,6 +7,10 @@
         <span class="panel-name">Важные номера</span>
         <span><span class="icon icon-right">&#9990;</span></span>
       </a>
+      <a href="#/profile/documents" class="panel-item panel-item-lg">
+        <span class="panel-name">Документы</span>
+        <span><span class="icon icon-right">&#9997;</span></span>
+      </a>
       <a href="#/profile/history" class="panel-item fw-b">
         <span class="panel-name">История моих заказов</span>
         <span><span class="icon icon-right"></span></span>
@@ -28,7 +32,7 @@
         <span><span class="icon icon-right"></span></span>
       </a>
       <div class="panel-item checkbox-container">
-        <input type="checkbox" id="email" ng-model="checkEmail" name="checkEmail" ng-click="changeNotification()">
+        <input type="checkbox" id="email" ng-model="checkEmail" name="checkEmail" ng-click="changeNotification(checkEmail)">
         <label for="email" class="panel-name">Оповещать по E-mail</label>
       </div>
     </div>

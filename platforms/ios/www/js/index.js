@@ -63,6 +63,10 @@ var app = {
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
 
+        document.addEventListener('deviceready', function() {
+            
+        }, false);
+
         if (!window.device) {
             window.device = { platform: 'Browser' };
         }
@@ -78,6 +82,7 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+
     },
     showAlert: function() {
         // if (navigator.notification) { // Override default HTML alert with native dialog
@@ -113,6 +118,45 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
+        var newToken = localStorage.getItem('tokendevice');
+        var push = PushNotification.init({
+            android: {
+                senderID: "1055017294786"
+            },
+            ios: {
+                alert: "true",
+                badge: "true",
+                sound: "true"
+            },
+            windows: {}
+        });
+
+        push.on('registration', function(data) {
+            localStorage.setItem('test', 'YES');
+            if (newToken != data) {
+                localStorage.setItem('tokendeviceNew', data);
+            } else {
+                localStorage.setItem('tokendevice', data);
+            }
+            // data.registrationId
+        });
+
+        push.on('notification', function(data) {
+            localStorage.setItem('pushLink', data.additionalData.url);
+            if (typeof data.additionalData.type != 'undefined') {
+              localStorage.setItem('pushType', data.additionalData.type);
+            }
+            // data.message,
+            // data.title,
+            // data.count,
+            // data.sound,
+            // data.image,
+            // data.additionalData
+        });
+
+        push.on('error', function(e) {
+            // e.message
+        });
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');

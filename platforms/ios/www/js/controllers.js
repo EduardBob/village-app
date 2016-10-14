@@ -74,7 +74,13 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
     });
     $resource(BasePath.api + 'settings').get({}, function(data) {
       GetMeta.setData(data.data);
-      $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
+      $scope.agreementTextOld = GetMeta.getData('village::village-agreement-condition');
+
+      if ($scope.agreementTextOld.indexOf('src="/assets/') > 0) {
+        var d = 'src="' + BasePath.domain + '/assets/';
+        $scope.agreementTextOld = $scope.agreementTextOld.replace('src="/assets/', d);
+      }
+      $scope.agreementText = $sce.trustAsHtml(stripScript($scope.agreementTextOld));
     }, function(response) {
       $scope.agreementText = 'Соглашение'
     });
@@ -114,7 +120,13 @@ villageAppControllers.controller('AgreementCtrl', ['$scope', '$resource', '$loca
 
     $resource(BasePath.api + 'settings').get({}, function(data) {
       GetMeta.setData(data.data);
-      $scope.agreementText = $sce.trustAsHtml(GetMeta.getData('village::village-agreement-condition'));
+      $scope.agreementTextOld = GetMeta.getData('village::village-agreement-condition');
+
+      if ($scope.agreementTextOld.indexOf('src="/assets/') > 0) {
+        var d = 'src="' + BasePath.domain + '/assets/';
+        $scope.agreementTextOld = $scope.agreementTextOld.replace('src="/assets/', d);
+      }
+      $scope.agreementText = $sce.trustAsHtml(stripScript($scope.agreementTextOld));
     }, function(response) {
       $scope.agreementText = 'Соглашение'
     });
@@ -267,8 +279,8 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
   }]);
 
 
-villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
+villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', '$http', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
+  function($scope, $resource, $location, $timeout, $http, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -299,6 +311,7 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       $scope.villageName = data.data.building.data.village.data.name;
       localStorageService.set('villageName', $scope.villageName);
       $scope.address = data.data.building.data.address;
+      $scope.checkEmail = data.data.has_mail_notifications;
       if (data.data.email != null) {
         $scope.email = data.data.email;
       } else {
@@ -324,27 +337,55 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       }
     });
     $scope.userLogout = function() {
-      TransferDataService.resetData();
-      localStorageService.set('token', 'none');
-      tokenHandler.set("none");
-      $location.path('/login');
+      
+      if (localStorageService.get('tokendevice')) {
+
+        var tokenDevice = localStorageService.get('tokendevice');
+
+        var req = {
+           method: 'POST',
+           url: BasePath.api + 'me/device-delete',
+           headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+           data: {token: tokenDevice}
+          }
+
+        $http(req).then(function(){
+          TransferDataService.resetData();
+          localStorageService.set('token', 'none');
+          localStorageService.set('tokendevice', '');
+          tokenHandler.set("none");
+          $location.path('/login');
+        }, function(){
+
+        });
+
+      } else {
+        TransferDataService.resetData();
+        localStorageService.set('token', 'none');
+        localStorageService.set('tokendevice', '');
+        tokenHandler.set("none");
+        $location.path('/login');
+      }
+      
     };
 
-    if (localStorageService.get('push')) {
-      $scope.checkEmail = localStorageService.get('push');
-    } else {
-      $scope.checkEmail = false;
-    }
+    // if (localStorageService.get('push')) {
+    //   $scope.checkEmail = localStorageService.get('push');
+    // } else {
+    //   $scope.checkEmail = false;
+    // }
 
-    $scope.$watch('checkEmail', function() {
-      localStorageService.set('push', $scope.checkEmail);
-    }, true); 
+    // $scope.$watch('checkEmail', function() {
+    //   localStorageService.set('push', $scope.checkEmail);
+    // }, true); 
     
     $scope.changeNotification = function(checkEmail) {
+      var stat = checkEmail ? 1 : 0;
+      // console.log(stat);
       $timeout.cancel( timer );
       var timer = $timeout(
         function() {
-          user.save({urlId: 'me', routeId: 'has_mail_notifications'}, {'has_mail_notifications' : checkEmail}, function(data) {
+          user.save({urlId: 'me', routeId: 'mail-notifications'}, {'has_mail_notifications' : stat}, function(data) {
           }, function(response) {
             console.log(response);
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
@@ -398,7 +439,8 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         console.log(response);
         if (response.status === 400) {
           $scope.nameSuccess = false;
-          alert(response.data.error.message.email);
+          alert(response.data.error.message.email[0]);
+          // alert(response.data.error.message.email);
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -469,8 +511,8 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
   }]);
 
 
-villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath', '$http',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath, $http) {
+villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath', '$http', '$sce',
+  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath, $http, $sce) {
     if(localStorageService.isSupported) {
       // function submit(key, val) {
       //   return localStorageService.set(key, val);
@@ -508,6 +550,22 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
       
       if ($scope.contacts.length) {
         $scope.noNumbers = false;
+        angular.forEach($scope.contacts, function (contact) {
+
+          if (contact.title.indexOf('src="/assets/') > 0) {
+            var d = 'src="' + BasePath.domain + '/assets/';
+            contact.title = contact.title.replace('src="/assets/', d);
+          }
+          contact.title = $sce.trustAsHtml(stripScript(contact.title));
+
+
+          if (contact.phone.indexOf('src="/assets/') > 0) {
+            var d = 'src="' + BasePath.domain + '/assets/';
+            contact.phone = contact.phone.replace('src="/assets/', d);
+          }
+          contact.phone = $sce.trustAsHtml(stripScript(contact.phone));
+
+        });
       } else {
         $scope.noNumbers = true;
       }
@@ -518,8 +576,174 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
 
   }]);
 
-villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
-  function($scope, $resource, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+
+villageAppControllers.controller('ProfileDocumentsCtrl', ['$scope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams',
+  function($scope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams) {
+
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+
+    $scope.catIdNew = $routeParams.category_id;
+    $scope.catTitleNew = $routeParams.category_title;
+
+    if (typeof $scope.catIdNew != 'undefined' && $scope.catIdNew != 'allCategories') {
+      $scope.ddSelectSelected = {'title': $scope.catTitleNew, 'id' : $scope.catIdNew};
+    } else {
+      $scope.ddSelectSelected = {'title': "Все категории", 'id' : 'allCategories'};
+    }
+
+    user.get({urlId: 'documents', routeId: 'categories'}, {}, function(data) {
+      $scope.arr3 = data.data;
+      $scope.ddSelectOptions = $scope.arr3;
+      $scope.mainCat = {'title': "Все категории", 'id' : 'allCategories'};
+      $scope.ddSelectOptions.push($scope.mainCat);
+
+    }, function(response) {
+      console.log(response);
+      if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      }
+    });
+
+    $scope.filterNews = function(selected) {
+      $location.url($location.path() + '/?category_id=' + selected.id + '&category_title=' + selected.title);
+    }
+
+    $scope.page = 0;
+    $scope.docBlocks = [];
+    $scope.fetching = false;
+
+    // Fetch more items
+    $scope.getMore = function(catId) {
+      if ($scope.fetching) return;
+      $scope.page++;
+      $scope.fetching = true;
+
+      if (catId == 'allCategories') {
+        catId = '';
+      }
+      
+      user.get({urlId: 'documents', category_id: catId, page: $scope.page}, {}, function(data) {
+
+        $scope.fetching = false;
+        angular.forEach(data.data, function (doc) {
+          $scope.arr = doc.published_at.split(/[- :]/);
+          doc.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
+          if (doc.file) {
+            doc.docFormat = doc.file.formats.extension;
+          } else {
+            doc.docFormat = 'txt';
+          }
+        });
+
+        $scope.docBlocks = $scope.docBlocks.concat(data.data);
+        $scope.basePath = BasePath.domain;
+        if ($scope.page == 1 && data.data.length < 1) {
+          $scope.emptyService = true;
+          $scope.emptyServiceText = "В данной категории документов нет"
+        }
+      }, function(response) {
+        console.log(response);
+        if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    };
+
+    
+  }]);
+
+
+
+villageAppControllers.controller('DocumentCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$sce', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$cordovaSocialSharing',
+  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $sce, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $cordovaSocialSharing) {
+
+
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+
+    user.get({urlId: 'documents', routeId: $routeParams.docId}, {}, function(data) {
+      $scope.docItem = data.data;
+
+      if ($scope.docItem.text.indexOf('%%') > 0) {
+        var regex = /%%/gi,
+            match, 
+            indices = [];
+        $scope.textNew = $scope.docItem.text;
+        while ((match = regex.exec($scope.docItem.text)) != null) {
+          indices.push(match.index);
+        }
+        for (var i = 1, len = indices.length; i < len; i+=2) {
+          var a = $scope.docItem.text.split("%%")[i],
+            b = a.split('^'),
+            itemName = b[0],
+            item = b[1],
+            itemId = b[2];
+          var c = '%%' + a + '%%';
+          var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+          $scope.textNew = $scope.textNew.replace(c, d);
+        }
+      } else {
+        $scope.textNew = $scope.docItem.text;
+      }
+
+      if ($scope.textNew.indexOf('src="/assets/') > 0) {
+        var d = 'src="' + BasePath.domain + '/assets/';
+        $scope.textNew = $scope.textNew.replace('src="/assets/', d);
+      }
+
+      $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
+
+      if ($scope.docItem.file) {
+        $scope.docLink = BasePath.domain + $scope.docItem.file.formats.original;
+      }
+      
+      $scope.basePath = BasePath.domain; 
+    }, function(response) {
+      if (response.status === 404) {
+        alert('Этот документ был удален');
+        $location.path('/profile/documents');
+      }
+      if (esponse.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      }
+    });
+
+    $scope.share = function() {
+      $cordovaSocialSharing
+      .share($scope.docLink) // Share via native share sheet
+      // .share(message, subject, file, link) // Share via native share sheet
+      .then(function(result) {
+        // Success!
+      }, function(err) {
+        // An error occured. Show a message to the user
+      });
+    }
+
+  }]);
+
+villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $resource, $http, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
     if(localStorageService.isSupported) {
       // function submit(key, val) {
       //   return localStorageService.set(key, val);
@@ -538,6 +762,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
     // $timeout(function() {
     //     angular.element('.main-container').css('min-height', $(window).height());
     // });
+
     if (localStorageService.get('villageName') != null) {
       $scope.siteName = localStorageService.get('villageName');
     } else if (localStorageService.get('invitecode') != null) {
@@ -562,10 +787,29 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$location'
         tokenHandler.set(data.data.token);
         // window.localStorage['token'] = data.data.token;
         localStorageService.set('token', data.data.token);
+        if (localStorageService.get('tokendevice')) {
+          var type = localStorageService.get('devicetype'),
+            tokenDevice = localStorageService.get('tokendevice');
+
+          var req = {
+             method: 'POST',
+             url: BasePath.api + 'me/device',
+             headers: { 'Authorization': 'Bearer ' + data.data.token },
+             data: {type: type, token: tokenDevice}
+            }
+
+          $http(req).then(function(){
+            $location.path('/services');
+          }, function(response){
+
+          });
+        } else {
+          $location.path('/services');
+        }
+        
         // console.log(localStorageService.get('token'));
-        $location.path('/services');
+        
       }, function(response) {
-        console.log(response);
         if (response.status === 401 || response.status === 400) {
           alert('Неверный телефон или пароль');
         } else if (response.status === 403) {
@@ -659,8 +903,8 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
     }
   }]);
 
-villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams',
-  function($scope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams) {
+villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams', '$sce',
+  function($scope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams, $sce) {
     // Users.get({urlId: 'articles'}, {}, function(data) {
     //   $scope.allNews = [];
     //   angular.forEach(data.data, function (news) {
@@ -734,106 +978,6 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       }
     });
 
-    $scope.page = 0;
-    $scope.newsBlocks = [];
-    $scope.fetching = false;
-
-    // Fetch more items
-    $scope.getMore = function(catId) {
-      if ($scope.fetching) return;
-      $scope.page++;
-      $scope.fetching = true;
-
-      if (catId == 'allCategories') {
-        catId = '';
-      }
-      
-      user.get({urlId: 'articles', category_id: catId, page: $scope.page}, {}, function(data) {
-
-        $scope.fetching = false;
-        angular.forEach(data.data, function (news) {
-          // news.published_at = Date.parse(news.published_at);
-          $scope.arr = news.published_at.split(/[- :]/);
-          news.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
-        });
-        angular.forEach(data.data, function(news) {
-          if (news.image != null) {
-            news.image = news.image.formats.bigThumb;
-          } else {
-            news.imagePresent = true;
-          }
-
-          if (news.short.indexOf('^^') > 0) {
-            var a = news.short.split("^^")[1],
-                b = a.split('|'),
-                itemName = b[0],
-                item = b[1],
-                itemId = b[2];
-            var c = '^^' + a + '^^';
-            var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
-            news.short = news.short.replace(c, d);
-          }
-          // $scope.add(news, news.category_title);
-        });
-        $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
-        $scope.basePath = BasePath.domain;
-
-
-        if ($scope.page == 1 && data.data.length < 1) {
-          $scope.emptyService = true;
-          $scope.emptyServiceText = "В данной категории новостей нет"
-        }
-      }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        }
-      });
-    };
-
-    // var url = 'http://village:8888/json/test.json';
-    // $http.get(url).success( function(data) {
-    //   console.log(data.data);
-    //   // user.get({urlId: 'articles', page: $scope.page}, {}, function(data) {
-    //     $scope.newsBlocks = data.data;
-    //     angular.forEach(data.data, function (news) {
-    //       // news.published_at = Date.parse(news.published_at);
-    //       $scope.arr = news.published_at.split(/[- :]/);
-    //       news.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
-    //     });
-    //     angular.forEach(data.data, function(news) {
-    //       if (news.image != null) {
-    //         news.image = news.image.formats.bigThumb;
-    //       } else {
-    //         news.imagePresent = true;
-    //       }
-    //       $scope.add(news, news.category_title);
-    //       // $scope.arr.push({ value: news.category_id, news.category_title});
-    //     });
-    //     // $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
-    //     // $scope.basePath = BasePath.domain;
-    //   }).then(function() {
-
-    //   });
-
-    // $scope.arr2 = [];
-
-    // $scope.add = function(news, name) {
-    //   var id = $scope.arr2.length + 1;
-    //   var found = $scope.arr2.some(function (el) {
-    //     return el.text === name;
-    //   });
-    //   if (!found) {
-    //       $scope.arr2.push({ value: news.category_id, text: name});
-    //   }
-    // }
-
-    // $scope.ddSelectOptions = $scope.arr2;
-
-    // $scope.ddSelectSelected = {'text': "Все категории", 'value' : 'allCategories'};
-
-    // $scope.ddSelectOptions.push($scope.ddSelectSelected);
-
     $scope.catIdNew = $routeParams.category_id;
     $scope.catTitleNew = $routeParams.category_title;
 
@@ -855,96 +999,94 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
-    
-    // $scope.filterNews = function(selected) {
-    //   if (selected.id == 'allCategories') {
-    //     $('.category-input').val('');
-    //   } else {
-    //     $('.category-input').val(selected.id);
-    //   }
-
-    //   angular.element($('.category-input')).triggerHandler('change');
-    // }
 
     $scope.filterNews = function(selected) {
       $location.url($location.path() + '/?category_id=' + selected.id + '&category_title=' + selected.title);
     }
 
-    // $scope.filterNews = function(selected) {
-    //   $scope.page = 0;
-    //   $scope.newsBlocks = [];
-    //   $scope.fetching = false;
-    //   $scope.$emit('list:loadmore');
-    //   alert(selected.id);
+    $scope.page = 0;
+    $scope.newsBlocks = [];
+    $scope.fetching = false;
 
-    //   if (selected.id == 'allCategories') {
-    //     $scope.getMore = function() {
-    //       if ($scope.fetching) return;
-    //       $scope.page++;
-    //       $scope.fetching = true;
-          
-    //       user.get({urlId: 'articles', page: $scope.page}, {}, function(data) {
-    //         $scope.fetching = false;
-    //         angular.forEach(data.data, function (news) {
-    //           // news.published_at = Date.parse(news.published_at);
-    //           $scope.arr = news.published_at.split(/[- :]/);
-    //           news.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
-    //         });
-    //         angular.forEach(data.data, function(news) {
-    //           if (news.image != null) {
-    //             news.image = news.image.formats.bigThumb;
-    //           } else {
-    //             news.imagePresent = true;
-    //           }
-    //           // $scope.add(news, news.category_title);
-    //         });
-    //         $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
-    //         $scope.basePath = BasePath.domain;
-    //       }, function(response) {
-    //         if (response.status === 404 || response.status === 403 || response.status === 500) {
-    //           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-    //         }
-    //       });
-    //     };
-    //   } else {
-    //     $scope.getMore = function() {
-    //       if ($scope.fetching) return;
-    //       $scope.page++;
-    //       $scope.fetching = true;
-          
-    //       user.get({urlId: 'articles', category_id: selected.id, page: $scope.page}, {}, function(data) {
-    //         alert('a');
-    //         $scope.fetching = false;
-    //         angular.forEach(data.data, function (news) {
-    //           // news.published_at = Date.parse(news.published_at);
-    //           $scope.arr = news.published_at.split(/[- :]/);
-    //           news.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
-    //         });
-    //         angular.forEach(data.data, function(news) {
-    //           if (news.image != null) {
-    //             news.image = news.image.formats.bigThumb;
-    //           } else {
-    //             news.imagePresent = true;
-    //           }
-    //           // $scope.add(news, news.category_title);
-    //         });
-    //         $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
-    //         $scope.basePath = BasePath.domain;
-    //       }, function(response) {
-    //         if (response.status === 404 || response.status === 403 || response.status === 500) {
-    //           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-    //         }
-    //       });
-    //     };
-    //   }
+    // Fetch more items
+    $scope.getMore = function(catId) {
+      if ($scope.fetching) return;
+      $scope.page++;
+      $scope.fetching = true;
+
+      if (catId == 'allCategories') {
+        catId = '';
+      }
       
-    // }
+      user.get({urlId: 'articles', category_id: catId, page: $scope.page}, {}, function(data) {
+
+        $scope.fetching = false;
+        angular.forEach(data.data, function (news) {
+          // news.published_at = Date.parse(news.published_at);
+          $scope.arr = news.published_at.split(/[- :]/);
+          news.published_at = new Date($scope.arr[0], $scope.arr[1]-1, $scope.arr[2], $scope.arr[3], $scope.arr[4], $scope.arr[5]);
+
+          if (news.image != null) {
+            news.image = news.image.formats.bigThumb;
+          } else {
+            news.imagePresent = true;
+          }
+
+          if (news.short.indexOf('%%') > 0) {
+            var regex = /%%/gi,
+                match, 
+                indices = [];
+                news.textNew = news.short;
+            while ((match = regex.exec(news.text)) != null) {
+              indices.push(match.index);
+            }
+            for (var i = 1, len = indices.length; i < len; i+=2) {
+              var a = news.text.split("%%")[i],
+                b = a.split('^'),
+                itemName = b[0],
+                item = b[1],
+                itemId = b[2];
+              var c = '%%' + a + '%%';
+              var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+              news.textNew = news.textNew.replace(c, d);
+            }
+          } else {
+            news.textNew = news.short;
+          }
+
+          // if (news.short.indexOf('%%') > 0) {
+          //   var a = news.short.split("%%")[1],
+          //       b = a.split('^'),
+          //       itemName = b[0],
+          //       item = b[1],
+          //       itemId = b[2];
+          //   var c = '%%' + a + '%%';
+          //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+          //   news.short = news.short.replace(c, d);
+          // }
+          // $scope.add(news, news.category_title);
+        });
+
+        $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
+        $scope.basePath = BasePath.domain;
+        if ($scope.page == 1 && data.data.length < 1) {
+          $scope.emptyService = true;
+          $scope.emptyServiceText = "В данной категории новостей нет"
+        }
+      }, function(response) {
+        console.log(response);
+        if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
+      });
+    };
+
     
   }]);
 
 
-villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$sce', 
+  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $sce) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -962,7 +1104,7 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
       
     // if ($scope.article.text.indexOf('%') > 0) {
     //   var a = $scope.article.text.split("%")[1],
-    //       b = a.split('|'),
+    //       b = a.split('^'),
     //       itemName = b[0],
     //       item = b[1],
     //       itemId = b[2];
@@ -970,6 +1112,8 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
     //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
     //   $scope.article.text = $scope.article.text.replace(c, d);
     // }
+
+    localStorageService.set('newArticles', false);
 
     $scope.articleData = user.get({urlId: 'articles', routeId: $routeParams.articleId}, function(data) {
       $scope.article = data.data;
@@ -981,24 +1125,40 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
       } else {
         $scope.imagePresentMain = true;
       }
-
-      if ($scope.article.text.indexOf('^^') > 0) {
-        var a = $scope.article.text.split("^^")[1],
-            b = a.split('|'),
+      if ($scope.article.text.indexOf('%%') > 0) {
+        var regex = /%%/gi,
+            match, 
+            indices = [];
+        $scope.textNew = $scope.article.text;
+        while ((match = regex.exec($scope.article.text)) != null) {
+          indices.push(match.index);
+        }
+        for (var i = 1, len = indices.length; i < len; i+=2) {
+          var a = $scope.article.text.split("%%")[i],
+            b = a.split('^'),
             itemName = b[0],
             item = b[1],
             itemId = b[2];
-        var c = '^^' + a + '^^';
-        var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
-        $scope.article.text = $scope.article.text.replace(c, d);
+          var c = '%%' + a + '%%';
+          var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
+          $scope.textNew = $scope.textNew.replace(c, d);
+        }
+      } else {
+        $scope.textNew = $scope.article.text;
       }
 
+      if ($scope.textNew.indexOf('src="/assets/') > 0) {
+        var d = 'src="' + BasePath.domain + '/assets/';
+        $scope.textNew = $scope.textNew.replace('src="/assets/', d);
+      }
+
+      $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
       $scope.basePath = BasePath.domain;
     });
   }]);
 
-villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScope', '$resource', '$location', '$timeout', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$cordovaPushV5',
+  function($scope, $rootScope, $resource, $location, $timeout, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $cordovaPushV5) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1011,8 +1171,144 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
+    $scope.loading = true;
+
+    $scope.registerId = function() {
+
+
+      alert(localStorage.getItem('test'));
+
+      if (localStorage.getItem('tokendeviceNew') != localStorage.getItem('tokendevice')) {
+        var newToken = localStorage.getItem('tokendeviceNew');
+        var ua = $window.navigator.userAgent,
+            ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+        var type = ios ? "ios" : "gcm";
+
+        var req = {
+           method: 'POST',
+           url: BasePath.api + 'me/device',
+           headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+           data: {type: type, token: newToken}
+          }
+
+        $http(req).then(function(){
+          localStorage.setItem('tokendevice', newToken);
+        }, function(response){
+          // alert(response.status);
+           // alert(JSON.stringify(response));
+        });
+      }
+      var pushLink = localStorage.getItem('pushLink');
+      var pushType = localStorage.getItem('pushType');
+
+      if (pushLink) {
+        if (pushType) {
+          localStorage.setItem('pushLink', '');
+          localStorage.setItem('pushType', '');
+          $location.path(pushLink).search({show: pushType});
+        } else {
+          localStorage.setItem('pushLink', '');
+          $location.path(pushLink);
+        }
+      }
+
+      // alert('run');
+
+      // var newToken = localStorageService.get('tokendevice');
+      // var ua = $window.navigator.userAgent,
+      //     ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+      // var type = ios ? "ios" : "gcm";
+
+      // var options = {
+      //   android: {
+      //     senderID: "1055017294786"
+      //   },
+      //   ios: {
+      //     alert: "true",
+      //     badge: "true",
+      //     sound: "true"
+      //   },
+      //   windows: {}
+      // };
+      
+      // // initialize
+      // $cordovaPushV5.initialize(options).then(function() {
+      //   alert('init');
+      //   // start listening for new notifications
+      //   $cordovaPushV5.onNotification();
+      //   // start listening for errors
+      //   $cordovaPushV5.onError();
+
+        
+      //   // register to get registrationId
+      //   $cordovaPushV5.register().then(function(data) {
+      //     alert('register');
+
+      //     if (newToken != data) {
+      //       var req = {
+      //          method: 'POST',
+      //          url: BasePath.api + 'me/device',
+      //          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+      //          data: {type: type, token: data}
+      //         }
+
+      //       $http(req).then(function(){
+      //         alert('ok');
+      //         $scope.loading = false;
+      //         localStorageService.set('tokendevice', data);
+      //         localStorageService.set('devicetype', type);
+      //       }, function(response){
+      //         // alert(response.status);
+      //          // alert(JSON.stringify(response));
+      //       });
+      //     } else {
+      //       $scope.loading = false;
+      //     }
+      //     // `data.registrationId` save it somewhere;
+      //   }, function(error) {
+      //     // alert(error);
+      //   })
+      // });
+      
+      // // triggered every time notification received
+      // $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
+      //   // alert(data.additionalData.url);
+      //   // localStorageService.set('aaaa', data.additionalData.url);
+      //   if (typeof data.additionalData.url != 'undefined') {
+      //     alert('isurl');
+      //     if (typeof data.additionalData.type != 'undefined') {
+      //       alert('istype');
+      //       $location.path(data.additionalData.url).search({show: data.additionalData.type});
+      //     } else {
+      //       $location.path(data.additionalData.url);
+      //     }
+      //   }
+      //   // alert(JSON.stringify(data));
+      //   // data.message,
+      //   // data.title,
+      //   // data.count,
+      //   // data.sound,
+      //   // data.image,
+      //   // data.additionalData
+      // });
+
+      // // triggered every time error occurs
+      // $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
+      //   alert(e.message);
+      //   // e.message
+      // });
+    }
+
     if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
       user.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+
+        $timeout(function() {
+          angular.element('#register').triggerHandler('click');
+        }, 100);
+
         $scope.serviceBlocks = data.data;
         angular.forEach($scope.serviceBlocks, function(service) {
           if (service.image != null) {
@@ -1022,6 +1318,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
           }
         })
         $scope.basePath = BasePath.domain;
+
       }, function(response) {
         console.log(response);
         if (response.data.error = 'token_expired') {
@@ -1040,6 +1337,11 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
               }
             });
             newTokenUser.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+
+              $timeout(function() {
+                angular.element('#register').triggerHandler('click');
+              }, 100);
+              
               $scope.serviceBlocks = data.data;
               angular.forEach($scope.serviceBlocks, function(service) {
                 if (service.image != null) {
@@ -1049,6 +1351,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
                 }
               })
               $scope.basePath = BasePath.domain;
+
             });
             $scope.allNews = [];
             if (localStorageService.get('oldNews') != null) {
@@ -1182,6 +1485,7 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
     $scope.serviceList = [];
     $scope.fetching = false;
 
+
     // Fetch more items
     $scope.getMore = function() {
       $scope.page++;
@@ -1287,7 +1591,11 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       }
 
       if ($scope.serviceData.text.length) {
-        $scope.serviceData.text = $sce.trustAsHtml($scope.serviceData.text);
+          if ($scope.serviceData.text.indexOf('src="/assets/') > 0) {
+            var d = 'src="' + BasePath.domain + '/assets/';
+            $scope.serviceData.text = $scope.serviceData.text.replace('src="/assets/', d);
+          }
+          $scope.serviceData.text = $sce.trustAsHtml(stripScript($scope.serviceData.text));
       }
 
       if (typeof $routeParams.payment_type != 'undefined' && $routeParams.payment_type) {
@@ -1560,8 +1868,8 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
     };
   }]);
 
-villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', '$q', '$timeout', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, $q, $timeout, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', 'TransferDataService', 'TokenHandler', '$filter', '$q', '$timeout', 'BasePath', 'localStorageService', 'Users', '$sce',
+  function($scope, $resource, $location, $window, $routeParams, TransferDataService, tokenHandler, $filter, $q, $timeout, BasePath, localStorageService, Users, $sce) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1602,6 +1910,14 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
       $scope.productUnitStepPiece = $scope.dataVillage.product_unit_step_piece;
       user.get({urlId: 'products', routeId: $routeParams.productId}, {}, function(data) {
         $scope.productData = data.data;
+        if ($scope.productData.text.length) {
+
+          if ($scope.productData.text.indexOf('src="/assets/') > 0) {
+            var d = 'src="' + BasePath.domain + '/assets/';
+            $scope.productData.text = $scope.productData.text.replace('src="/assets/', d);
+          }
+          $scope.productData.text = $sce.trustAsHtml(stripScript($scope.productData.text));
+        }
         
         if (data.data.price == 0) {
           $scope.hideBlock = true;
@@ -1799,6 +2115,7 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
     $scope.page = 0;
     $scope.services = [];
     $scope.fetching = false;
@@ -1917,6 +2234,25 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
         }
       });
     };
+  }]);
+
+villageAppControllers.controller('HistoryTabCtrl', ['$scope', '$resource', '$location', '$routeParams', 'localStorageService',
+  function($scope, $resource, $location, $routeParams, localStorageService) {
+
+    console.log($routeParams.show);
+    if ($routeParams.show == 'product') {
+      $scope.tab = 2;
+    } else {
+      $scope.tab = 1;
+    }
+
+    $scope.selectTab = function(passInTab) {
+      $scope.tab = passInTab;
+    }
+
+    $scope.isTab = function(chosenTab) {
+      return $scope.tab === chosenTab;
+    }
   }]);
 
 villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
@@ -2054,6 +2390,7 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
         case 'products':
         case 'product':
         case 'smart':
+        case 'document':
           return true;
       }
     }
@@ -2085,8 +2422,8 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     }
   }]);
 
-villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location', 'onlineStatus',
-  function($scope, $timeout, $location, onlineStatus) {
+villageAppControllers.controller('PathCtrl', ['$scope', '$routeParams', '$timeout', '$location', 'onlineStatus',
+  function($scope, $routeParams, $timeout, $location, onlineStatus) {
     $scope.routeMain = function() {
       return $location.path();
       // return route === $location.path().split('/', 2)[1];
@@ -2127,6 +2464,10 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location',
         case 'service':
         case 'news':
         case 'newsitem':
+        case 'products':
+        case 'documents':
+        case 'document':
+        case 'numbers':
         case 'products':
         case 'product':
         case 'survey':

@@ -1,0 +1,25 @@
+<div class="no-p-b" ng-controller="ProfileDocumentsCtrl">
+  <div class="">
+  	<div class="dropdown-container">
+		<div dropdown-select="ddSelectOptions"
+	        dropdown-model="ddSelectSelected"
+	        dropdown-item-label="title"
+	        dropdown-onchange="filterNews(selected)" >
+    	</div>
+	</div>
+	<input type="text" ng-model="search.category_id" class="category-input hidden">
+    <div class="document" tagged-infinite-scroll="getMore(catIdNew)">
+    	<a href="#/document/{{doc.id}}" class="document-row" ng-repeat="doc in docBlocks track by $index">
+    		<span class="document-row-img">
+          <span class="file-icon file-icon-lg" data-type="{{doc.docFormat}}"></span>
+    			<!-- <span ng-bind="doc.file.formats.extension">pdf</span> -->
+    		</span>
+    		<span class="document-row-info">
+    			<span class="name" ng-bind="doc.title">Документ об общем образовании</span>
+    			<span class="meta" ng-bind="doc.published_at | date : 'dd-MM-yyyy'">31.03.16</span>
+    		</span>
+		  </a>
+          <span class="alert empty-message" ng-show="emptyService" ng-bind="emptyServiceText"></span>
+    </div>
+  </div>
+</div>

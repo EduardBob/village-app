@@ -1,0 +1,11 @@
+<div class="no-p-b" ng-controller="DocumentCtrl">
+  <div class="p-md">
+  		<p class="fs-18 col-orange fw-b mb-lg" ng-bind="docItem.title">Документ, который должен называться ТАК</p>
+  		<p class="fs-16 doc-text" ng-bind-html="textNew">Документ, который должен называться ТАКДокумент, который должен называться ТАКДокумент, который должен называться ТАКДокумент, который должен называться ТАК</p>
+  		<div class="img-doc" ng-if="docItem.file.formats.bigThumb">
+  			<img src="{{basePath}}{{docItem.file.formats.bigThumb}}" alt="">
+  		</div>
+  		<div class="button button-main button-doc" ng-if="docItem.file" ng-click="share()">Отправить</div>
+    </div>
+  </div>
+</div>

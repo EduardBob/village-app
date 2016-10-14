@@ -3,8 +3,8 @@
     <p class="link-xl d-b ta-c fs-16" ng-if="noNumbers">Данные о важных номерах в Вашем поселке появятся чуть позже</p>
     <div ng-if="!noNumbers">
       <a ng-href="tel:{{contact.phone}}" class="form-row-meta" ng-repeat="contact in contacts track by $index">
-        <span class="small" ng-bind="contact.title"></span>
-        <span class="number" ng-bind="contact.phone"></span>
+        <span class="small" ng-bind-html="contact.title"></span>
+        <span class="number" ng-bind-html="contact.phone"></span>
       </a>
     </div>
   </div>

@@ -32,6 +32,73 @@ var villageApp = angular.module('villageApp', [
 
 
 villageApp
+
+  // .run(function($http, $cordovaPushV5, $rootScope, localStorageService) {
+  //   // alert(JSON.stringify($cordovaPushV5));
+  //     alert('run');
+  //     var newToken = localStorageService.get('tokendevice');
+
+  //     var options = {
+  //       android: {
+  //         senderID: "1055017294786"
+  //       },
+  //       ios: {
+  //         alert: "true",
+  //         badge: "true",
+  //         sound: "true"
+  //       },
+  //       windows: {}
+  //     };
+      
+  //     // initialize
+  //     $cordovaPushV5.initialize(options).then(function() {
+  //       alert('init');
+  //       // start listening for new notifications
+  //       $cordovaPushV5.onNotification();
+  //       // start listening for errors
+  //       $cordovaPushV5.onError();
+
+        
+  //       // register to get registrationId
+  //       $cordovaPushV5.register().then(function(data) {
+
+  //         if (newToken != data) {
+  //           localStorageService.set('tokendeviceNew', data);
+  //         } else {
+  //           localStorageService.set('tokendevice', data);
+  //         }
+  //         // `data.registrationId` save it somewhere;
+  //       }, function(error) {
+  //         // alert(error);
+  //       })
+  //     }, function(error) {
+  //       alert(error);
+  //     });
+      
+  //     // triggered every time notification received
+  //     $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
+  //       // alert(data.url);
+  //       localStorageService.set('pushLink', data.additionalData.url);
+  //       if (typeof data.additionalData.type != 'undefined') {
+  //         localStorageService.set('pushType', data.additionalData.type);
+  //       }
+  //       // alert(JSON.stringify(data));
+  //       // data.message,
+  //       // data.title,
+  //       // data.count,
+  //       // data.sound,
+  //       // data.image,
+  //       // data.additionalData
+  //     });
+
+  //     // triggered every time error occurs
+  //     $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
+  //       alert(e.message);
+  //       // e.message
+  //     });
+    
+  // })
+
   .config(['localStorageServiceProvider', function(localStorageServiceProvider){
     localStorageServiceProvider.setPrefix('village');
   }])
@@ -102,6 +169,12 @@ villageApp
         when('/profile/numbers', {
           templateUrl: 'templates/profile/profile-numbers.html'
         }).
+        when('/profile/documents', {
+          templateUrl: 'templates/profile/profile-documents.html'
+        }).
+        when('/document/:docId', {
+          templateUrl: 'templates/profile/profile-document.html'
+        }).
         when('/survey', {
           templateUrl: 'templates/surveys/survey.html'
         }).
@@ -148,3 +221,5 @@ villageApp
           redirectTo: '/services'
         });
     }]);
+
+window.stripScript = function (a) {return a.replace(/<script[^>]*>.*?<\/script>/gi,'')}

@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="ru.concierge.app" version="1.2.1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+<!-- <widget id="ru.concierge.app" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>Консьерж</name> -->
+<widget id="com.1centr" version="1.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>Village</name>
     <description>
         Village
@@ -28,6 +30,7 @@
     <preference name="fullscreen" value="false" />
     <preference name="StatusBarOverlaysWebView" value="false" />
     <preference name="StatusBarBackgroundColor" value="#484852" />
+    <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="KeyboardDisplayRequiresUserAction" value="false" />
     <gap:plugin name="org.apache.cordova.battery-status" />
     <gap:plugin name="org.apache.cordova.camera" />
@@ -47,7 +50,6 @@
     <gap:plugin name="org.apache.cordova.media" />
     <gap:plugin name="org.apache.cordova.network-information" />
     <gap:plugin name="org.apache.cordova.splashscreen" />
-    <gap:plugin name="org.apache.cordova.statusbar" />
     <gap:plugin name="org.apache.cordova.vibration" />
     <gap:plugin name="cordova-plugin-customurlscheme" source="npm">
       <param name="URL_SCHEME" value="mycoolapp" />
@@ -83,7 +85,7 @@
     <gap:splash gap:platform="ios" height="768" src="www/res/screen/ios/screen-ipad-landscape.png" width="1024" />
     <gap:splash gap:platform="winphone" src="www/res/screen/windows-phone/screen-portrait.jpg" />
     <access origin="*" />
-    <plugin name="cordova-plugin-whitelist" version="1" />
+    <!-- <plugin name="cordova-plugin-whitelist" version="1" /> -->
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
@@ -93,6 +95,9 @@
     <platform name="android">
         <allow-intent href="market:*" />
     </platform>
+    <feature name="StatusBar">
+        <param name="ios-package" value="CDVStatusBar" onload="true" />
+    </feature>
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />

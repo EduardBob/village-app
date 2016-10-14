@@ -352,6 +352,9 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
         $http(req).then(function(){
           TransferDataService.resetData();
           localStorageService.set('token', 'none');
+          localStorage.removeItem('tokendevice');
+          localStorage.removeItem('tokendeviceNew');
+          localStorageService.set('tokendevice', '');
           tokenHandler.set("none");
           $location.path('/login');
         }, function(){
@@ -361,6 +364,7 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       } else {
         TransferDataService.resetData();
         localStorageService.set('token', 'none');
+        localStorageService.set('tokendevice', '');
         tokenHandler.set("none");
         $location.path('/login');
       }
@@ -760,6 +764,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
     // $timeout(function() {
     //     angular.element('.main-container').css('min-height', $(window).height());
     // });
+
     if (localStorageService.get('villageName') != null) {
       $scope.siteName = localStorageService.get('villageName');
     } else if (localStorageService.get('invitecode') != null) {
@@ -1070,7 +1075,6 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
           $scope.emptyService = true;
           $scope.emptyServiceText = "В данной категории новостей нет"
         }
-        console.log($scope.page);
       }, function(response) {
         console.log(response);
         if (response.status === 404 || response.status === 403 || response.status === 500) {
@@ -1110,6 +1114,8 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
     //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
     //   $scope.article.text = $scope.article.text.replace(c, d);
     // }
+
+    localStorageService.set('newArticles', false);
 
     $scope.articleData = user.get({urlId: 'articles', routeId: $routeParams.articleId}, function(data) {
       $scope.article = data.data;
@@ -1153,8 +1159,8 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
     });
   }]);
 
-villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource', '$location', '$timeout', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$cordovaPushV5',
-  function($scope, $resource, $location, $timeout, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $cordovaPushV5) {
+villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScope', '$resource', '$location', '$timeout', '$window', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$cordovaPushV5',
+  function($scope, $rootScope, $resource, $location, $timeout, $window, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $cordovaPushV5) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -1168,87 +1174,141 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
       }
     });
 
+    $scope.loading = true;
+
     $scope.registerId = function() {
 
-      if (!localStorageService.get('tokendevice')) {
+      if (localStorage.getItem('tokendeviceNew') != localStorage.getItem('tokendevice')) {
+        var newToken = localStorage.getItem('tokendeviceNew');
         var ua = $window.navigator.userAgent,
             ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
 
         var type = ios ? "ios" : "gcm";
 
-        var options = {
-          android: {
-            senderID: "1055017294786"
-          },
-          ios: {
-            alert: "true",
-            badge: "true",
-            sound: "true"
-          },
-          windows: {}
-        };
-        
-        // initialize
-        $cordovaPushV5.initialize(options).then(function() {
-          // alert('bbb');
-          // start listening for new notifications
-          $cordovaPushV5.onNotification();
-          // start listening for errors
-          $cordovaPushV5.onError();
+        var req = {
+           method: 'POST',
+           url: BasePath.api + 'me/device',
+           headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+           data: {type: type, token: newToken}
+          }
 
-          
-          // register to get registrationId
-          $cordovaPushV5.register().then(function(data) {
-            // alert(data);
-
-            localStorageService.set('tokendevice', data);
-            localStorageService.set('devicetype', type);
-
-            // alert(data);
-            // alert(type);
-
-            var req = {
-               method: 'POST',
-               url: BasePath.api + 'me/device',
-               headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
-               data: {type: type, token: data}
-              }
-
-            $http(req).then(function(){
-              
-            }, function(response){
-              // alert(response.status);
-              //  alert(JSON.stringify(response));
-            });
-            // `data.registrationId` save it somewhere;
-          }, function(error) {
-            // alert(error);
-          })
-        });
-        
-        // triggered every time notification received
-        $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
-          // alert('PUSH');
-          // data.message,
-          // data.title,
-          // data.count,
-          // data.sound,
-          // data.image,
-          // data.additionalData
-        });
-
-        // triggered every time error occurs
-        $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
-          alert(e.message);
-          // e.message
+        $http(req).then(function(){
+          localStorage.setItem('tokendevice', newToken);
+          localStorageService.set('tokendevice', newToken);
+        }, function(response){
+          // alert(response.status);
+           // alert(JSON.stringify(response));
         });
       }
-    }
+      var pushLink = localStorage.getItem('pushLink');
+      var pushType = localStorage.getItem('pushType');
 
-    
+      if (pushLink) {
+        if (pushType) {
+          localStorage.setItem('pushLink', '');
+          localStorage.setItem('pushType', '');
+          $location.path(pushLink).search({show: pushType});
+        } else {
+          localStorage.setItem('pushLink', '');
+          $location.path(pushLink);
+        }
+      }
+
+      // alert('run');
+
+      // var newToken = localStorageService.get('tokendevice');
+      // var ua = $window.navigator.userAgent,
+      //     ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+      // var type = ios ? "ios" : "gcm";
+
+      // var options = {
+      //   android: {
+      //     senderID: "1055017294786"
+      //   },
+      //   ios: {
+      //     alert: "true",
+      //     badge: "true",
+      //     sound: "true"
+      //   },
+      //   windows: {}
+      // };
+      
+      // // initialize
+      // $cordovaPushV5.initialize(options).then(function() {
+      //   alert('init');
+      //   // start listening for new notifications
+      //   $cordovaPushV5.onNotification();
+      //   // start listening for errors
+      //   $cordovaPushV5.onError();
+
+        
+      //   // register to get registrationId
+      //   $cordovaPushV5.register().then(function(data) {
+      //     alert('register');
+
+      //     if (newToken != data) {
+      //       var req = {
+      //          method: 'POST',
+      //          url: BasePath.api + 'me/device',
+      //          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+      //          data: {type: type, token: data}
+      //         }
+
+      //       $http(req).then(function(){
+      //         alert('ok');
+      //         $scope.loading = false;
+      //         localStorageService.set('tokendevice', data);
+      //         localStorageService.set('devicetype', type);
+      //       }, function(response){
+      //         // alert(response.status);
+      //          // alert(JSON.stringify(response));
+      //       });
+      //     } else {
+      //       $scope.loading = false;
+      //     }
+      //     // `data.registrationId` save it somewhere;
+      //   }, function(error) {
+      //     // alert(error);
+      //   })
+      // });
+      
+      // // triggered every time notification received
+      // $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
+      //   // alert(data.additionalData.url);
+      //   // localStorageService.set('aaaa', data.additionalData.url);
+      //   if (typeof data.additionalData.url != 'undefined') {
+      //     alert('isurl');
+      //     if (typeof data.additionalData.type != 'undefined') {
+      //       alert('istype');
+      //       $location.path(data.additionalData.url).search({show: data.additionalData.type});
+      //     } else {
+      //       $location.path(data.additionalData.url);
+      //     }
+      //   }
+      //   // alert(JSON.stringify(data));
+      //   // data.message,
+      //   // data.title,
+      //   // data.count,
+      //   // data.sound,
+      //   // data.image,
+      //   // data.additionalData
+      // });
+
+      // // triggered every time error occurs
+      // $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
+      //   alert(e.message);
+      //   // e.message
+      // });
+    }
 
     if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
       user.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+
+        $timeout(function() {
+          angular.element('#register').triggerHandler('click');
+        }, 100);
+
         $scope.serviceBlocks = data.data;
         angular.forEach($scope.serviceBlocks, function(service) {
           if (service.image != null) {
@@ -1258,10 +1318,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
           }
         })
         $scope.basePath = BasePath.domain;
-
-        $timeout(function() {
-          angular.element('#register').triggerHandler('click');
-        }, 100);
 
       }, function(response) {
         console.log(response);
@@ -1281,6 +1337,11 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
               }
             });
             newTokenUser.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
+
+              $timeout(function() {
+                angular.element('#register').triggerHandler('click');
+              }, 100);
+              
               $scope.serviceBlocks = data.data;
               angular.forEach($scope.serviceBlocks, function(service) {
                 if (service.image != null) {
@@ -1290,6 +1351,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$resource
                 }
               })
               $scope.basePath = BasePath.domain;
+
             });
             $scope.allNews = [];
             if (localStorageService.get('oldNews') != null) {
@@ -1422,6 +1484,7 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
     $scope.page = 0;
     $scope.serviceList = [];
     $scope.fetching = false;
+
 
     // Fetch more items
     $scope.getMore = function() {
@@ -2052,6 +2115,7 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
     $scope.page = 0;
     $scope.services = [];
     $scope.fetching = false;
@@ -2170,6 +2234,25 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
         }
       });
     };
+  }]);
+
+villageAppControllers.controller('HistoryTabCtrl', ['$scope', '$resource', '$location', '$routeParams', 'localStorageService',
+  function($scope, $resource, $location, $routeParams, localStorageService) {
+
+    console.log($routeParams.show);
+    if ($routeParams.show == 'product') {
+      $scope.tab = 2;
+    } else {
+      $scope.tab = 1;
+    }
+
+    $scope.selectTab = function(passInTab) {
+      $scope.tab = passInTab;
+    }
+
+    $scope.isTab = function(chosenTab) {
+      return $scope.tab === chosenTab;
+    }
   }]);
 
 villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
@@ -2339,8 +2422,8 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     }
   }]);
 
-villageAppControllers.controller('PathCtrl', ['$scope', '$timeout', '$location', 'onlineStatus',
-  function($scope, $timeout, $location, onlineStatus) {
+villageAppControllers.controller('PathCtrl', ['$scope', '$routeParams', '$timeout', '$location', 'onlineStatus',
+  function($scope, $routeParams, $timeout, $location, onlineStatus) {
     $scope.routeMain = function() {
       return $location.path();
       // return route === $location.path().split('/', 2)[1];
