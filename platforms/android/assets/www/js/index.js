@@ -63,6 +63,10 @@ var app = {
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
 
+        document.addEventListener('deviceready', function() {
+            
+        }, false);
+
         if (!window.device) {
             window.device = { platform: 'Browser' };
         }
@@ -78,6 +82,7 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+
     },
     showAlert: function() {
         // if (navigator.notification) { // Override default HTML alert with native dialog
@@ -113,6 +118,56 @@ var app = {
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
+        var newToken = localStorage.getItem('tokendevice');
+        var push = PushNotification.init({
+            android: {
+                senderID: "1055017294786"
+            },
+            ios: {
+                alert: "true",
+                badge: "true",
+                sound: "true"
+            },
+            windows: {}
+        });
+
+        push.on('registration', function(data) {
+            if (newToken != data.registrationId) {
+                localStorage.setItem('tokendeviceNew', data.registrationId);
+            } else {
+                localStorage.setItem('tokendevice', data.registrationId);
+            }
+            // data.registrationId
+        });
+
+        push.on('notification', function(data) {
+            alert(JSON.stringify(data));
+            var url = data.additionalData.category;
+            localStorage.setItem('foreground', data.additionalData.foreground);
+            localStorage.setItem('coldstart', data.additionalData.coldstart);
+            localStorage.setItem('message', data.message);
+
+            if (url.indexOf('?type=') > 0) {
+                var pushType = url.split('?type=')[1],
+                    pushLink = url.split('?type=')[0];
+                localStorage.setItem('pushLink', pushLink);
+                localStorage.setItem('pushType', pushType);
+            } else {
+                localStorage.setItem('pushLink', url);
+            }
+            // window.location.replace(url);
+            // window.location = host + url;
+            // data.message,
+            // data.title,
+            // data.count,
+            // data.sound,
+            // data.image,
+            // data.additionalData
+        });
+
+        push.on('error', function(e) {
+            // e.message
+        });
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');

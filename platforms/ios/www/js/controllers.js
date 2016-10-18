@@ -352,6 +352,8 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
         $http(req).then(function(){
           TransferDataService.resetData();
           localStorageService.set('token', 'none');
+          localStorage.removeItem('tokendevice');
+          // localStorage.removeItem('tokendeviceNew');
           localStorageService.set('tokendevice', '');
           tokenHandler.set("none");
           $location.path('/login');
@@ -362,6 +364,8 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       } else {
         TransferDataService.resetData();
         localStorageService.set('token', 'none');
+        localStorage.removeItem('tokendevice');
+        // localStorage.removeItem('tokendeviceNew');
         localStorageService.set('tokendevice', '');
         tokenHandler.set("none");
         $location.path('/login');
@@ -546,26 +550,31 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
     //   });
 
     user.get({urlId: 'me'}, {}, function(data) {
-      $scope.contacts = data.data.building.data.village.data.important_contacts;
+      $scope.contactsOld = data.data.building.data.village.data.important_contacts;
       
-      if ($scope.contacts.length) {
+      if ($scope.contactsOld.length) {
         $scope.noNumbers = false;
-        angular.forEach($scope.contacts, function (contact) {
+        if ($scope.contactsOld.indexOf('src="/assets/') > 0) {
+          var d = 'src="' + BasePath.domain + '/assets/';
+          $scope.contactsOld = $scope.contactsOld.replace('src="/assets/', d);
+        }
+        $scope.contacts = $sce.trustAsHtml(stripScript($scope.contactsOld));
+        // angular.forEach($scope.contacts, function (contact) {
 
-          if (contact.title.indexOf('src="/assets/') > 0) {
-            var d = 'src="' + BasePath.domain + '/assets/';
-            contact.title = contact.title.replace('src="/assets/', d);
-          }
-          contact.title = $sce.trustAsHtml(stripScript(contact.title));
+        //   if (contact.title.indexOf('src="/assets/') > 0) {
+        //     var d = 'src="' + BasePath.domain + '/assets/';
+        //     contact.title = contact.title.replace('src="/assets/', d);
+        //   }
+        //   contact.title = $sce.trustAsHtml(stripScript(contact.title));
 
 
-          if (contact.phone.indexOf('src="/assets/') > 0) {
-            var d = 'src="' + BasePath.domain + '/assets/';
-            contact.phone = contact.phone.replace('src="/assets/', d);
-          }
-          contact.phone = $sce.trustAsHtml(stripScript(contact.phone));
+        //   if (contact.phone.indexOf('src="/assets/') > 0) {
+        //     var d = 'src="' + BasePath.domain + '/assets/';
+        //     contact.phone = contact.phone.replace('src="/assets/', d);
+        //   }
+        //   contact.phone = $sce.trustAsHtml(stripScript(contact.phone));
 
-        });
+        // });
       } else {
         $scope.noNumbers = true;
       }
@@ -742,8 +751,8 @@ villageAppControllers.controller('DocumentCtrl', ['$scope', '$resource', '$locat
 
   }]);
 
-villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
-  function($scope, $resource, $http, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$location', '$timeout', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath', '$window',
+  function($scope, $resource, $http, $location, $timeout, TransferDataService, tokenHandler, localStorageService, Users, BasePath, $window) {
     if(localStorageService.isSupported) {
       // function submit(key, val) {
       //   return localStorageService.set(key, val);
@@ -787,25 +796,50 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
         tokenHandler.set(data.data.token);
         // window.localStorage['token'] = data.data.token;
         localStorageService.set('token', data.data.token);
-        if (localStorageService.get('tokendevice')) {
-          var type = localStorageService.get('devicetype'),
-            tokenDevice = localStorageService.get('tokendevice');
+        if (localStorage.getItem('tokendeviceNew') != localStorage.getItem('tokendevice')) {
+          var newToken = localStorage.getItem('tokendeviceNew');
+          var ua = $window.navigator.userAgent,
+              ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+          var type = ios ? "ios" : "gcm";
 
           var req = {
              method: 'POST',
              url: BasePath.api + 'me/device',
-             headers: { 'Authorization': 'Bearer ' + data.data.token },
-             data: {type: type, token: tokenDevice}
+             headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
+             data: {type: type, token: newToken}
             }
 
           $http(req).then(function(){
+            localStorage.setItem('tokendevice', newToken);
+            localStorageService.set('tokendevice', newToken);
+            localStorageService.set('devicetype', type);
             $location.path('/services');
           }, function(response){
-
+            // alert(response.status);
+             // alert(JSON.stringify(response));
           });
         } else {
           $location.path('/services');
         }
+        // if (localStorageService.get('tokendevice')) {
+        //   var type = localStorageService.get('devicetype'),
+        //     tokenDevice = localStorageService.get('tokendevice');
+        //   var req = {
+        //      method: 'POST',
+        //      url: BasePath.api + 'me/device',
+        //      headers: { 'Authorization': 'Bearer ' + data.data.token },
+        //      data: {type: type, token: tokenDevice}
+        //     }
+
+        //   $http(req).then(function(){
+        //     $location.path('/services');
+        //   }, function(response){
+
+        //   });
+        // } else {
+        //   $location.path('/services');
+        // }
         
         // console.log(localStorageService.get('token'));
         
@@ -1099,6 +1133,8 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
+
+
     // $scope.article = {};
     // $scope.article.text = "<p>В одном из населённых пунктов Самарской области автомобилист %поворачивал|15% налево и столкнулся с машиной, ехавшей по обочине. Как сообщает &laquo;Российская газета&raquo;, инспекторы ГИБДД назвали виновными обоих водителей: одного, так как двигался по обочине, второго, поскольку не уступил помехе справа. Верховный суд, рассмотрев дело, постановил: водитель, движущийся по обочине, не имел преимущественного права движения, а у водителя другого автомобиля при повороте налево на прилегающую территорию вне перекрестка отсутствовала обязанность уступить дорогу движущемуся по обочине транспортному средству. Проще говоря, машины на обочине вообще не должно было быть, соответственно, и уступать дорогу некому. Таким образом, из постановления Верховного суда России можно сделать вывод, что дорогу автомобилям, которые движутся по обочине, можно не уступать &mdash; поскольку езда по обочине запрещена как таковая, то при любом столкновении будет виноват &laquo;обочечник&raquo;.</p>"
       
@@ -1154,6 +1190,8 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
 
       $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
       $scope.basePath = BasePath.domain;
+    }, function(response) {
+      // alert(JSON.stringify(response));
     });
   }]);
 
@@ -1171,13 +1209,14 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
-
-    $scope.loading = true;
+    if (localStorage.getItem('tokendeviceNew') != localStorage.getItem('tokendevice')) {
+      $scope.loading = true;
+    } else {
+      $scope.loading = false;
+    }
+    // $scope.loading = true;
 
     $scope.registerId = function() {
-
-
-      alert(localStorage.getItem('test'));
 
       if (localStorage.getItem('tokendeviceNew') != localStorage.getItem('tokendevice')) {
         var newToken = localStorage.getItem('tokendeviceNew');
@@ -1195,23 +1234,42 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
 
         $http(req).then(function(){
           localStorage.setItem('tokendevice', newToken);
+          localStorageService.set('tokendevice', newToken);
+          localStorageService.set('devicetype', type);
+          $scope.loading = false;
         }, function(response){
           // alert(response.status);
            // alert(JSON.stringify(response));
         });
+      } else {
+        $scope.loading = false;
       }
+
+      localStorage.setItem('temp', 'temp');
+      var temp = localStorage.getItem('temp');
+      localStorage.removeItem('temp');
+
       var pushLink = localStorage.getItem('pushLink');
       var pushType = localStorage.getItem('pushType');
 
-      if (pushLink) {
-        if (pushType) {
-          localStorage.setItem('pushLink', '');
-          localStorage.setItem('pushType', '');
+      pushLink = localStorage.getItem('pushLink');
+      pushType = localStorage.getItem('pushType');
+
+      pushLink = localStorage.getItem('pushLink');
+      pushType = localStorage.getItem('pushType');
+
+      if (typeof pushLink != 'undefined' && pushLink != null) {
+        // $location.path('/survey');
+        if (typeof pushType != 'undefined' && pushType != null) {
           $location.path(pushLink).search({show: pushType});
         } else {
-          localStorage.setItem('pushLink', '');
           $location.path(pushLink);
         }
+        localStorage.removeItem('pushLink');
+        localStorage.removeItem('pushType');
+        localStorage.removeItem('foreground');
+        localStorage.removeItem('message');
+        localStorage.removeItem('coldstart');
       }
 
       // alert('run');
@@ -1305,10 +1363,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
     if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
       user.get({urlId: 'services', routeId: 'categories'}, {}, function(data) {
 
-        $timeout(function() {
-          angular.element('#register').triggerHandler('click');
-        }, 100);
-
         $scope.serviceBlocks = data.data;
         angular.forEach($scope.serviceBlocks, function(service) {
           if (service.image != null) {
@@ -1318,6 +1372,9 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
           }
         })
         $scope.basePath = BasePath.domain;
+        $timeout(function() {
+          angular.element('#register').triggerHandler('click');
+        }, 100);
 
       }, function(response) {
         console.log(response);
@@ -2239,7 +2296,6 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
 villageAppControllers.controller('HistoryTabCtrl', ['$scope', '$resource', '$location', '$routeParams', 'localStorageService',
   function($scope, $resource, $location, $routeParams, localStorageService) {
 
-    console.log($routeParams.show);
     if ($routeParams.show == 'product') {
       $scope.tab = 2;
     } else {
@@ -2422,8 +2478,8 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     }
   }]);
 
-villageAppControllers.controller('PathCtrl', ['$scope', '$routeParams', '$timeout', '$location', 'onlineStatus',
-  function($scope, $routeParams, $timeout, $location, onlineStatus) {
+villageAppControllers.controller('PathCtrl', ['$scope', '$sce', '$routeParams', '$timeout', '$location', 'onlineStatus', 'localStorageService', '$interval',
+  function($scope, $sce, $routeParams, $timeout, $location, onlineStatus, localStorageService, $interval) {
     $scope.routeMain = function() {
       return $location.path();
       // return route === $location.path().split('/', 2)[1];
@@ -2485,5 +2541,108 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$routeParams', '$timeou
     $scope.$watch('onlineStatus.isOnline()', function(online) {
         $scope.offlineShow = online ? false : true;
     });
+
+    // $scope.$on('linkChanged', function(event, data) { 
+    //     // do things with the new counter
+    //     alert(data);
+    //     // var url = data;
+    //     // if (url.indexOf('?type=') > 0) {
+    //     //     var pushType = url.split('?type=')[1],
+    //     //         pushLink = url.split('?type=')[0];
+    //     //     // localStorage.removeItem('pushLink');
+    //     //     $location.path(pushLink).search({show: pushType});
+    //     // } else {
+    //     //     // localStorage.removeItem('pushLink');
+    //     //     $location.path(url);
+    //     // }
+    // });
+
+    // localStorage.setItem('pushLink', '/survey');
+    // localStorage.setItem('foreground', true);
+    // localStorage.setItem('pushType', 'product');
+    // localStorage.setItem('message', 'рпворыпвао\n\"ljhdfjak\"');
+    // $scope.message = 'рпворыпвао\n\"ljhdfjak\"'
+    localStorage.setItem('temp2', 'temp');
+    var temp = localStorage.getItem('temp2');
+    localStorage.removeItem('temp2');
+
+    var pushLink = localStorage.getItem('pushLink');
+
+    $interval(callAtInterval, 100);
+
+    function callAtInterval() {
+      var newLink = localStorage.getItem('pushLink');
+      if (newLink !== pushLink && newLink != null && typeof newLink != 'undefined' && localStorage.getItem('coldstart') == 'false') {
+        
+        // alert('NEW link' + newLink);
+        // pushLink = newLink;
+        // localStorage.removeItem('pushLink');
+        // localStorage.removeItem('pushType');
+        // localStorage.removeItem('foreground');
+        // localStorage.removeItem('message');
+        // localStorage.removeItem('coldstart');
+
+        if (localStorage.getItem('foreground') == 'true') {
+          $scope.pushReceived = true;
+          $scope.message = localStorage.getItem('message');
+          pushLink = newLink;
+        } else if (localStorage.getItem('foreground') == 'false') {
+          var newLink = localStorage.getItem('pushLink');
+          var pushType = localStorage.getItem('pushType');
+          if (typeof pushType != 'undefined' && pushType != null) {
+            $location.path(newLink).search({show: pushType});
+          } else {
+            $location.path(newLink);
+          }
+          localStorage.removeItem('pushLink');
+          localStorage.removeItem('pushType');
+          localStorage.removeItem('foreground');
+          localStorage.removeItem('message');
+          localStorage.removeItem('coldstart');
+          pushLink = null;
+        }
+      };
+    }
+
+    $scope.pushOk = function() {
+      $scope.pushReceived = false;
+      var newLink = localStorage.getItem('pushLink');
+      var pushType = localStorage.getItem('pushType');
+      if (typeof pushType != 'undefined' && pushType != null) {
+        $location.path(newLink).search({show: pushType});
+      } else {
+        $location.path(newLink);
+      }
+      localStorage.removeItem('pushLink');
+      localStorage.removeItem('pushType');
+      localStorage.removeItem('foreground');
+      localStorage.removeItem('message');
+      localStorage.removeItem('coldstart');
+      pushLink = null;
+    }
+
+    $scope.pushCancel = function() {
+      $scope.pushReceived = false;
+      localStorage.removeItem('pushLink');
+      localStorage.removeItem('pushType');
+      localStorage.removeItem('foreground');
+      localStorage.removeItem('message');
+      localStorage.removeItem('coldstart');
+      pushLink = null;
+    }
+
+    // $scope.$watch(function () { 
+    //   return localStorageService.get('pushLink'); 
+    // }, function(newVal, oldVal) {
+    //   console.log(newVal);
+    //   console.log(oldVal);
+    //   // localStorage.removeItem('pushLink');
+    //   //  if(oldVal!==newVal && newVal !== undefined && newVal != null){
+    //   //   localStorage.removeItem('pushLink');
+    //   //   localStorage.removeItem('pushType');
+    //   //   $location.path('/survey');
+    //   // }
+    // })
+
   }]);
 

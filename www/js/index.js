@@ -133,18 +133,30 @@ var app = {
 
         push.on('registration', function(data) {
             if (newToken != data.registrationId) {
-                localStorage.setItem('tokendeviceNew', data);
+                localStorage.setItem('tokendeviceNew', data.registrationId);
             } else {
-                localStorage.setItem('tokendevice', data);
+                localStorage.setItem('tokendevice', data.registrationId);
             }
             // data.registrationId
         });
 
         push.on('notification', function(data) {
-            localStorage.setItem('pushLink', data.additionalData.url);
-            if (typeof data.additionalData.type != 'undefined') {
-              localStorage.setItem('pushType', data.additionalData.type);
+            alert(JSON.stringify(data));
+            var url = data.additionalData.category;
+            localStorage.setItem('foreground', data.additionalData.foreground);
+            localStorage.setItem('coldstart', data.additionalData.coldstart);
+            localStorage.setItem('message', data.message);
+
+            if (url.indexOf('?type=') > 0) {
+                var pushType = url.split('?type=')[1],
+                    pushLink = url.split('?type=')[0];
+                localStorage.setItem('pushLink', pushLink);
+                localStorage.setItem('pushType', pushType);
+            } else {
+                localStorage.setItem('pushLink', url);
             }
+            // window.location.replace(url);
+            // window.location = host + url;
             // data.message,
             // data.title,
             // data.count,

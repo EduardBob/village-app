@@ -671,6 +671,23 @@ body .bg-image {
   font-size: 15px;
   color: #fff;
 }
+.button-accept,
+.button-cancel {
+  display: block;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 16px;
+  line-height: 35px;
+  font-weight: 500;
+  color: #fff;
+}
+.button-accept {
+  background: $btn-orange;
+}
+.button-cancel {
+  background: #999;
+}
 
 .agreement-text,
 .news-text,
@@ -1685,6 +1702,84 @@ footer {
 @keyframes spCircRot {
   from { transform: rotate(0deg); }
   to { transform: rotate(359deg); }
+}
+
+.popup-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0,0,0, 0.4);
+  z-index: 99;
+  overflow-y: auto; 
+  -webkit-overflow-scrolling: touch;
+  // &.ng-scope {
+  //   display: block;
+  // }
+}
+.ng-scope {
+  .popup-overlay {
+    display: block;
+  }
+}
+
+.popup {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -150px;
+  @include transform(translateY(-50%));
+  // position: relative;
+  // width: 96%;
+  width: 300px;
+  // margin: 9% auto 9%;
+  padding: 20px;
+  background: #fff;
+  @include border-radius(6px);
+  h4 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+  }
+  p {
+    display: block;
+    font-size: 16px;
+    white-space: pre-wrap;
+  }
+  .btns-block {
+    margin-top: 20px;
+    overflow: hidden;
+    .button {
+      float: left;
+      display: block;
+      width: 49%;
+      margin-left: 2%;
+      &:first-child {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+.icon-close {
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1;
+  line-height: 50px;
+  &:hover {
+    color: $orange;
+    @include transition(color 0.3s);
+  }
 }
 
 

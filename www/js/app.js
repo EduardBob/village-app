@@ -33,6 +33,19 @@ var villageApp = angular.module('villageApp', [
 
 villageApp
 
+  // .run(['$rootScope', function($rootScope) {
+  // // you might need to inject you storage module here
+  //     if (window.addEventListener) {
+  //       window.addEventListener("storage", handler, false);
+  //     } else {
+  //       window.attachEvent("onstorage", handler);
+  //     };
+
+  //     function handler() {
+  //       $rootScope.$broadcast('linkChanged', localStorage.getItem('pushLink'));
+  //     }
+  // }])
+
   // .run(function($http, $cordovaPushV5, $rootScope, localStorageService) {
   //   // alert(JSON.stringify($cordovaPushV5));
   //     alert('run');

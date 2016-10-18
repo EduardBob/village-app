@@ -44,6 +44,15 @@
     </div>
     <footer-inner></footer-inner>
   </div>
+  <div class="popup-overlay" ng-show="pushReceived">
+    <div class="popup">
+        <p class="" ng-bind-html="message"></p>
+        <div class="btns-block">
+          <span class="button button-accept" ng-click="pushOk()">Перейти</span>
+          <span class="button button-cancel" ng-click="pushCancel()">Отменить</span>
+        </div>
+    </div>
+  </div>
   <div class="bg-image no-p-b wrapper" ng-show="offlineShow" ng-class="{'offline-wrapper' : offlineShow === true}">
     <p class="col-orange fs-18 fw-md p-md mb-md">Соединение с интернетом отсутствует.</p>
     <p class="p-md fs-15">Когда связь восстановится, вы сможете продолжить работу.</p>
@@ -75,6 +84,20 @@
     <!-- <script src="js/lib/scripts.js"></script> -->
     <script type="text/javascript">
       app.initialize();
+    </script>
+    <script type="text/javascript">
+        angular.element(document).ready(function () {
+          if (window.cordova) {
+            console.log("Running in Cordova, will bootstrap AngularJS once 'deviceready' event fires.");
+            document.addEventListener('deviceready', function () {
+              console.log("Deviceready event has fired, bootstrapping AngularJS.");
+              angular.bootstrap(document.body, ['villageApp']);
+            }, false);
+          } else {
+            console.log("Running in browser, bootstrapping AngularJS now.");
+            angular.bootstrap(document.body, ['villageApp']);
+          }
+        });
     </script>
   </body>
 </html>

@@ -44,6 +44,15 @@
     </div>
     <footer-inner></footer-inner>
   </div>
+  <div class="popup-overlay" ng-show="pushReceived">
+    <div class="popup">
+        <p class="" ng-bind-html="message"></p>
+        <div class="btns-block">
+          <span class="button button-accept" ng-click="pushOk()">Перейти</span>
+          <span class="button button-cancel" ng-click="pushCancel()">Отменить</span>
+        </div>
+    </div>
+  </div>
   <div class="bg-image no-p-b wrapper" ng-show="offlineShow" ng-class="{'offline-wrapper' : offlineShow === true}">
     <p class="col-orange fs-18 fw-md p-md mb-md">Соединение с интернетом отсутствует.</p>
     <p class="p-md fs-15">Когда связь восстановится, вы сможете продолжить работу.</p>
@@ -76,5 +85,52 @@
     <script type="text/javascript">
       app.initialize();
     </script>
+    <script type="text/javascript">
+        angular.element(document).ready(function () {
+          if (window.cordova) {
+            alert("Running in Cordova, will bootstrap AngularJS once 'deviceready' event fires.");
+            document.addEventListener('deviceready', function () {
+              angular.bootstrap(document.body, ['villageApp']);
+              alert("Deviceready event has fired, bootstrapping AngularJS.");
+            }, false);
+          } else {
+            console.log("Running in browser, bootstrapping AngularJS now.");
+            angular.bootstrap(document.body, ['villageApp']);
+          }
+        });
+    </script>
+<!--     <script type="text/javascript">
+        document.addEventListener('deviceready', function onDeviceReady() {
+            angular.bootstrap(document, ['villageApp']);
+        }, false);
+
+        var villageApp = angular.module('villageApp', [
+          'ngRoute',
+          'ngCordova',
+          'ui.router',
+          'route-segment',
+          'view-segment',
+          'basePath',
+          'getMeta',
+          'onlineStatusApp',
+          'registerCode',
+          'users',
+          'ngSanitize',
+          'notificationModule',
+          'LocalStorageModule',
+          'tokenHandlerModule',
+          'headerDirective',
+          'footerDirective',
+          'utils.autofocus',
+          'ngDropdowns',
+          'NotificationServiceApp',
+          'radioButtonDirective',
+          'resizeCont',
+          'tagged.directives.infiniteScroll',
+          'infinite-scroll',
+          'footerCustom',
+          'villageAppControllers'
+        ]);
+    </script> -->
   </body>
 </html>
