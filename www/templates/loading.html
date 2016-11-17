@@ -1,0 +1,9 @@
+<div ng-controller="LoadingCtrl">
+	<p ng-if="loadingMessage" class="ta-c col-white fs-18 fw-md p-md mb-md">Произошла неизвестная ошибка. Пожалуйста, перегрузите приложение.</p>
+<!-- 	<div class="bg-image no-p-b">
+	    <p class="col-orange fs-18 fw-md p-md mb-md">Соединение с интернетом отсутствует.</p>
+	    <p class="p-md fs-15">Когда связь восстановится, Вы сможете продолжить работу.</p>
+	</div> -->
+	<div class="spinner" ng-if="!loading"><span class="sp"></span><p class="sp-text ta-c col-white fs-18 fw-md p-md mb-md">Восстанавливаем соединение с сервером</p></div>
+</div>
+

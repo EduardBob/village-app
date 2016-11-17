@@ -141,19 +141,26 @@ var app = {
         });
 
         push.on('notification', function(data) {
-            alert(JSON.stringify(data));
+            // alert(JSON.stringify(data));
+            sessionStorage.removeItem('foreground');
+            sessionStorage.removeItem('coldstart');
+            sessionStorage.removeItem('message');
+            sessionStorage.removeItem('pushLink');
+            sessionStorage.removeItem('pushType');
+
             var url = data.additionalData.category;
-            localStorage.setItem('foreground', data.additionalData.foreground);
-            localStorage.setItem('coldstart', data.additionalData.coldstart);
-            localStorage.setItem('message', data.message);
+
+            sessionStorage.setItem('foreground', data.additionalData.foreground);
+            sessionStorage.setItem('coldstart', data.additionalData.coldstart);
+            sessionStorage.setItem('message', data.message);
 
             if (url.indexOf('?type=') > 0) {
                 var pushType = url.split('?type=')[1],
                     pushLink = url.split('?type=')[0];
-                localStorage.setItem('pushLink', pushLink);
-                localStorage.setItem('pushType', pushType);
+                sessionStorage.setItem('pushLink', pushLink);
+                sessionStorage.setItem('pushType', pushType);
             } else {
-                localStorage.setItem('pushLink', url);
+                sessionStorage.setItem('pushLink', url);
             }
             // window.location.replace(url);
             // window.location = host + url;
@@ -166,6 +173,7 @@ var app = {
         });
 
         push.on('error', function(e) {
+            aleert(e.message);
             // e.message
         });
         var parentElement = document.getElementById(id);

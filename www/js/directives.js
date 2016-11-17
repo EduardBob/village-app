@@ -25,7 +25,7 @@ angular.module('headerDirective', [])
           }
         }
         $scope.isShownHeader = function(path) {
-          if (path === '/login' || path === '/offline') {
+          if (path === '/login' || path === '/offline' || path === '/loading') {
             return true;
           }
         }
@@ -65,8 +65,10 @@ angular.module('headerDirective', [])
             case '/profile/email':
             case '/profile/password':
             case '/profile/phone':
-            case '/profile/numbers':
               title = 'Мой профиль';
+              break;
+            case '/profile/numbers':
+              title = 'Важная информация';
               break;
             case '/profile/documents':
             case 'document':

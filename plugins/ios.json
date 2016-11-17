@@ -7,35 +7,50 @@
         "files": {}
     },
     "installed_plugins": {
+        "cordova-plugin-camera": {
+            "CAMERA_USAGE_DESCRIPTION": " ",
+            "PHOTOLIBRARY_USAGE_DESCRIPTION": " ",
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
         "cordova-plugin-customurlscheme": {
             "URL_SCHEME": "village",
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "cordova-plugin-device": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "cordova-plugin-dialogs": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "cordova-plugin-network-information": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "cordova-plugin-statusbar": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "cordova-plugin-whitelist": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-x-socialsharing": {
+            "PACKAGE_NAME": "ru.concierge.app"
         },
         "phonegap-plugin-push": {
             "SENDER_ID": "1055017294786",
-            "PACKAGE_NAME": "com.1centr"
-        },
-        "cordova-plugin-inappbrowser": {
-            "PACKAGE_NAME": "com.1centr"
-        },
-        "cordova-plugin-x-socialsharing": {
-            "PACKAGE_NAME": "com.1centr"
+            "PACKAGE_NAME": "ru.concierge.app"
         }
     },
-    "dependent_plugins": {}
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "ru.concierge.app"
+        }
+    }
 }

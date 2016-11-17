@@ -1,4 +1,4 @@
-<div ng-controller="ServiceOrderCtrl">
+<div ng-controller="ServiceOrderCtrl" class="dark-spinner">
   <form class="form form-order" name="serviceOrderForm">
     <div class="product-item ta-c">
       <div class="img-container"><img ng-src="{{basePath}}{{serviceImage}}"  ng-hide="{{imagePresentMain}}" alt=""></div>
@@ -32,12 +32,46 @@
       <div class="radio-container" ng-hide="justCash"><input type="radio" id="payment1" name="orderpayment" ng-model="paymentOption" value="card" ng-change="paymentOptionChange({{$index}})"><label for="payment1">оплатить сейчас</label></div>
       <div class="radio-container"><input type="radio" id="payment2" name="orderpayment" ng-model="paymentOption" value="cash" ng-change="paymentOptionChange({{$index}})"><label for="payment2">оплатить по факту</label></div>
     </div>
+    <div class="photo-block" ng-show="sentImg">Отправлено: {{imgLength}} фото</div>
+    <div ng-hide="orderMessage">
+      <div class="upload-block" ng-if="ios && allowMedia">
+        <ul class="list-images">
+          <li ng-repeat="f in filesAll">
+            <div class="img-container" ngf-background="f">
+              <span class="icon-remove" ng-click="removePicture(f)">&times;</span>
+            </div>
+          </li>
+        </ul>
+        <p class="upload-img" ng-hide="maxImg" ngf-multiple="true" ngf-select="addFiles(files)" ng-model="files" name="files" ngf-pattern="'image/*'"
+        ngf-accept="'image/*'" ngf-max-size="20MB" ngf-capture="camera" ngf-max-files="5" ngf-resize="{width: 1080, height: 1080, quality: .8}" ngf-resize-if="$width > 1080 || $height > 1080" ngf-before-model-change="beforeChange()" ngf-fix-orientation="true"> <span class="icon"><img src="img/img.svg" alt=""></span>Добавить изображение</p>
+        <span class="d-b col-l-gray fs-12 fw-lt">Вы можете добавить до 5 фото</span>
+      </div>
+      <div class="upload-block upload-android" ng-if="android && allowMedia">
+        <ul class="list-images">
+          <li ng-repeat="f in filesAll">
+            <div class="img-container" ngf-background="f">
+              <span class="icon-remove" ng-click="removePicture(f)">&times;</span>
+            </div>
+          </li>
+        </ul>
+        <div class="add-block">
+          <span class="icon icon-camera" ng-click="takePicture()" ng-hide="maxImg"><img src="img/camera.svg" alt=""></span> 
+          <p class="upload-img" ng-hide="maxImg" ngf-select="addFile(file)" ng-model="file" name="file" ngf-accept="'image/*'" ngf-max-size="20MB" ngf-capture="'camera'" ngf-pattern="'image/*'" ngf-resize="{width: 1080, height: 1080, quality: .8}"  ngf-resize-if="$width > 1080 || $height > 1080" ngf-before-model-change="beforeChange()" ngf-fix-orientation="true"> 
+            <span class="icon"><img src="img/img.svg" alt=""></span>
+            Добавить изображение 
+          </p>
+          <span class="d-b col-l-gray fs-12 fw-lt">Вы можете добавить до 5 фото</span>
+        </div>
+      </div>
+    </div>
+    <!-- <p style="line-height: 30px; background: #f9f9f9;" ng-click="sendFiles(filesAll)">Send to server</p> -->
     <div class="alert alert-padding" ng-show="orderMessage">Заказ успешно размещён. <br>Заказ отправлен администрации. <br>Когда заказ будет обработан, с Вами свяжется администратор. Вы можете следить за ходом выполнения <a class="col-orange" href="#/profile/history">в своём профиле.</a></div>
     <div class="alert alert-padding" ng-show="orderMessageDeclined">Платеж не прошел.<br> Ваш заказ отклонен. <span class="col-orange" ng-click="$back()">Попробуйте еще раз</span></div>
     <div class="button-block">
       <div class="button-hover" ng-show="waiting"></div>
-      <button class="button button-main" ng-bind="serviceData.order_button_label" ng-click="sendData($event, comment, paymentOption)" ></button>
+      <button class="button button-main" ng-bind="serviceData.order_button_label" ng-click="sendData($event, comment, paymentOption, filesAll)" ></button>
     </div>
     <span class="link-xl d-b ta-c col-l-gray fs-12 fw-lt" ng-bind="serviceBottomText" ng-hide="textHide || hideBlock"></span>
   </form>
+  <div class="spinner" ng-if="loading"><span class="sp"></span></div>
 </div>

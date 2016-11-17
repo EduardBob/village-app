@@ -27,6 +27,7 @@ var villageApp = angular.module('villageApp', [
   'tagged.directives.infiniteScroll',
   'infinite-scroll',
   'footerCustom',
+  'ngFileUpload',
   'villageAppControllers'
 ]);
 
@@ -229,6 +230,9 @@ villageApp
         }).
         when('/smart', {
           templateUrl: 'templates/smart/smart.html'
+        }).
+        when('/loading', {
+          templateUrl: 'templates/loading.html'
         }).
         otherwise({
           redirectTo: '/services'

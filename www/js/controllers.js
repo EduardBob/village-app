@@ -78,7 +78,7 @@ villageAppControllers.controller('InviteCodeCtrl', ['$scope', '$resource', '$loc
 
       if ($scope.agreementTextOld.indexOf('src="/assets/') > 0) {
         var d = 'src="' + BasePath.domain + '/assets/';
-        $scope.agreementTextOld = $scope.agreementTextOld.replace('src="/assets/', d);
+        $scope.agreementTextOld = $scope.agreementTextOld.replace(/(src="\/assets\/)/g, d);
       }
       $scope.agreementText = $sce.trustAsHtml(stripScript($scope.agreementTextOld));
     }, function(response) {
@@ -124,7 +124,7 @@ villageAppControllers.controller('AgreementCtrl', ['$scope', '$resource', '$loca
 
       if ($scope.agreementTextOld.indexOf('src="/assets/') > 0) {
         var d = 'src="' + BasePath.domain + '/assets/';
-        $scope.agreementTextOld = $scope.agreementTextOld.replace('src="/assets/', d);
+        $scope.agreementTextOld = $scope.agreementTextOld.replace(/(src="\/assets\/)/g, d);
       }
       $scope.agreementText = $sce.trustAsHtml(stripScript($scope.agreementTextOld));
     }, function(response) {
@@ -268,11 +268,16 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
       }, function(response) {
         console.log(response);
         if (response.status === 400) {
-          var messages = [];
-          var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
-          alert(message.join("\r\n"));
+          if (response.data.error === 'token_not_provided') {
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+          } else {
+            var messages = [];
+            var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
+            alert(message.join("\r\n"));
+          }
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-          // alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
     }
@@ -535,30 +540,16 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
       }
     });
 
-    // var url = 'http://village:8888/json/test.json';
-    // $http.get(url).success( function(data) {
-    //   $scope.contacts = data.data.building.data.village.data.important_contacts;
-      
-    //   if ($scope.contacts.length) {
-    //     $scope.noNumbers = false;
-    //   } else {
-    //     $scope.noNumbers = true;
-    //   }
-        
-    //   }).then(function() {
-
-    //   });
-
     user.get({urlId: 'me'}, {}, function(data) {
-      $scope.contactsOld = data.data.building.data.village.data.important_contacts;
+      $scope.contacts = data.data.building.data.village.data.important_contacts;
       
-      if ($scope.contactsOld.length) {
+      if ($scope.contacts.length) {
         $scope.noNumbers = false;
-        if ($scope.contactsOld.indexOf('src="/assets/') > 0) {
-          var d = 'src="' + BasePath.domain + '/assets/';
-          $scope.contactsOld = $scope.contactsOld.replace('src="/assets/', d);
+        if ($scope.contacts.indexOf('src="/assets/') > 0) {
+          var d = 'src="' + BasePath.domain + 'assets/';
+          $scope.contacts = $scope.contacts.replace(/(src="\/assets\/)/g, d);
         }
-        $scope.contacts = $sce.trustAsHtml(stripScript($scope.contactsOld));
+        $scope.contacts = $sce.trustAsHtml(stripScript($scope.contacts));
         // angular.forEach($scope.contacts, function (contact) {
 
         //   if (contact.title.indexOf('src="/assets/') > 0) {
@@ -718,7 +709,7 @@ villageAppControllers.controller('DocumentCtrl', ['$scope', '$resource', '$locat
 
       if ($scope.textNew.indexOf('src="/assets/') > 0) {
         var d = 'src="' + BasePath.domain + '/assets/';
-        $scope.textNew = $scope.textNew.replace('src="/assets/', d);
+        $scope.textNew = $scope.textNew.replace(/(src="\/assets\/)/g, d);
       }
 
       $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
@@ -1007,6 +998,10 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       // }
     }, function(response) {
       console.log(response);
+      if (response.data.error === 'token_not_provided') {
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+      } 
       if (response.status === 404 || response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
@@ -1185,7 +1180,7 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
 
       if ($scope.textNew.indexOf('src="/assets/') > 0) {
         var d = 'src="' + BasePath.domain + '/assets/';
-        $scope.textNew = $scope.textNew.replace('src="/assets/', d);
+        $scope.textNew = $scope.textNew.replace(/(src="\/assets\/)/g, d);
       }
 
       $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
@@ -1245,31 +1240,27 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         $scope.loading = false;
       }
 
-      localStorage.setItem('temp', 'temp');
-      var temp = localStorage.getItem('temp');
-      localStorage.removeItem('temp');
 
-      var pushLink = localStorage.getItem('pushLink');
-      var pushType = localStorage.getItem('pushType');
+      var pushLinkA = sessionStorage.getItem('pushLink');
+      var pushTypeA = sessionStorage.getItem('pushType');
 
-      pushLink = localStorage.getItem('pushLink');
-      pushType = localStorage.getItem('pushType');
-
-      pushLink = localStorage.getItem('pushLink');
-      pushType = localStorage.getItem('pushType');
-
-      if (typeof pushLink != 'undefined' && pushLink != null) {
+      if (typeof pushLinkA != 'undefined' && pushLinkA != null) {
         // $location.path('/survey');
-        if (typeof pushType != 'undefined' && pushType != null) {
-          $location.path(pushLink).search({show: pushType});
+        if (typeof pushTypeA != 'undefined' && pushTypeA != null) {
+          sessionStorage.removeItem('pushLink');
+          sessionStorage.removeItem('pushType');
+          sessionStorage.removeItem('foreground');
+          sessionStorage.removeItem('message');
+          sessionStorage.removeItem('coldstart');
+          $location.path(pushLinkA).search({show: pushTypeA});
         } else {
-          $location.path(pushLink);
+          sessionStorage.removeItem('pushLink');
+          sessionStorage.removeItem('pushType');
+          sessionStorage.removeItem('foreground');
+          sessionStorage.removeItem('message');
+          sessionStorage.removeItem('coldstart');
+          $location.path(pushLinkA);
         }
-        localStorage.removeItem('pushLink');
-        localStorage.removeItem('pushType');
-        localStorage.removeItem('foreground');
-        localStorage.removeItem('message');
-        localStorage.removeItem('coldstart');
       }
 
       // alert('run');
@@ -1455,7 +1446,10 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
               alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
             }
           });
-        }
+        } else if (response.data.error === 'token_not_provided') {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+        } 
       });
       
       $scope.allNews = [];
@@ -1493,6 +1487,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         // }
       }, function(response) {
         console.log(response);
+        // alert(JSON.stringify(response));
         if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -1577,8 +1572,8 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
   }]);
 
 
-villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$location', '$window', '$routeParams', '$filter', '$q', '$sce', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', 
-  function($scope, $resource, $location, $window, $routeParams, $filter,$q, $sce, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$http', '$location', '$window', '$routeParams', 'Upload', '$filter', '$q', '$sce', '$timeout', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$cordovaCamera',
+  function($scope, $resource, $http, $location, $window, $routeParams, Upload, $filter,$q, $sce, $timeout, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $cordovaCamera) {
 
 
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
@@ -1605,6 +1600,203 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
         }
       });
     }
+
+    $scope.loading = false;
+
+    var ua = $window.navigator.userAgent,
+        ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
+
+    var type = ios ? "ios" : "gcm";
+
+    if (type == 'ios') {
+      $scope.ios = true;
+    } else {
+      $scope.android = true;
+    }
+    
+    $scope.filesAll = [];
+
+    $scope.addFiles = function(files) {
+      angular.forEach(files, function(file) {
+        var newFileName = Math.floor(Math.random()*1000000) + '_' + Date.now();
+        Upload.rename(file,  newFileName + '.' + file.name.substr(file.name.lastIndexOf(".") + 1));
+      })
+      $scope.filesAll = $scope.filesAll.concat(files);
+      if ($scope.filesAll.length >= 5) {
+        $scope.maxImg = true;
+        
+        var len = $scope.filesAll.length;
+        while(len > 5) {
+          $scope.filesAll.pop();
+          len = $scope.filesAll.length;
+        }
+      }
+      $scope.loading = false;
+      console.log($scope.filesAll);
+    }
+
+    $scope.addFile = function(file) {
+      if (file != null) {
+        var newFileName = Math.floor(Math.random()*1000000) + '_' + Date.now();
+        Upload.rename(file,  newFileName + '.' + file.name.substr(file.name.lastIndexOf(".") + 1));
+        $scope.filesAll.push(file);
+      }
+      if ($scope.filesAll.length >= 5) {
+        $scope.maxImg = true;
+        
+        var len = $scope.filesAll.length;
+        while(len > 5) {
+          $scope.filesAll.pop();
+          len = $scope.filesAll.length;
+        }
+      }
+      $scope.loading = false;
+      console.log($scope.filesAll);
+    }
+
+    $scope.beforeChange = function() {
+      $scope.loading = true;
+    }
+
+    // $scope.submit = function() {
+    //   if ($scope.form.file.$valid && $scope.files) {
+    //     $scope.uploadFiles($scope.files);
+    //     // $scope.upload($scope.file);
+    //   }
+    // };
+
+
+    $scope.removePicture = function(f) {
+      var id = f.$$hashKey;
+      $scope.filesAll = $scope.filesAll.filter(function(el) { return el.$$hashKey != id;});
+      $scope.maxImg = false;
+    }
+
+    // upload on file select or drop
+    $scope.sendFiles = function (filesAll) {
+      // alert(filesAll);
+        $scope.loading = true;
+        Upload.upload({
+            url: BasePath.api + 'ping/sendfiles',
+            data: {files: filesAll}
+        }).then(function (resp) {
+            console.log(resp);
+            $scope.loading = false;
+        }, function (err) {
+            $scope.loading = false;
+          // alert('err' + JSON.stringify(err));
+            // console.log('Error status: ' + resp.status);
+        });
+
+        // $scope.loading = true;
+        // $scope.filesToSend = [];
+        // angular.forEach($scope.filesAll, function(file) {
+        //   Upload.resize(file, {width:1080, height: 1080}).then(function(fileNew) {
+        //     $scope.filesToSend.push(fileNew);
+        //     return fileNew;
+        //     Upload.upload({
+        //       url: BasePath.api + 'ping/sendfiles',
+        //       data: {files: filesAll}
+        //     }).then(function (resp) {
+        //         console.log(resp);
+        //         $scope.loading = false;
+        //     }, function (err) {
+        //         $scope.loading = false;
+        //       // alert('err' + JSON.stringify(err));
+        //         // console.log('Error status: ' + resp.status);
+        //     });
+        //   })
+        // })
+    };
+    $scope.takePicture = function() {
+     var options = {
+        destinationType: Camera.DestinationType.FILE_URI,
+        sourceType: Camera.PictureSourceType.CAMERA,
+        targetWidth: 1080,
+        targetHeight: 1080,
+        saveToPhotoAlbum: true
+      };
+
+      $cordovaCamera.getPicture(options).then(function(imageData) {
+        // alert(imageData);
+        var urlToBlob = function(url) {
+          var defer = $q.defer();
+          $http({url: url, method: 'get', responseType: 'arraybuffer'}).then(function (resp) {
+            var arrayBufferView = new Uint8Array(resp.data);
+            var type = resp.headers('content-type') || 'image/WebP';
+            var blob = new window.Blob([arrayBufferView], {type: type});
+            var matches = url.match(/.*\/(.+?)(\?.*)?$/);
+            if (matches.length > 1) {
+              blob.name = matches[1];
+            }
+            var newFileName = Math.floor(Math.random()*1000000) + '_' + Date.now();
+            Upload.rename(blob,  newFileName + '.' + blob.name.substr(blob.name.lastIndexOf(".") + 1));
+
+            $scope.filesAll.push(blob);
+            if ($scope.filesAll.length >= 5) {
+              $scope.maxImg = true;
+            }
+            defer.resolve(blob);
+          }, function (e) {
+            defer.reject(e);
+          });
+          return defer.promise;
+        };
+        urlToBlob(imageData);
+
+        // var aaa = function(imageData) {
+        //   window.resolveLocalFileSystemURI(imageData, function(fileEntry) {
+        //     // alert(JSON.stringify(fileEntry));
+        //     // alert('all' + $scope.filesAll);
+        //     // $scope.filesAll.push(fileEntry);
+        //     // alert('all again' + $scope.filesAll);
+        //     // fileEntry.file(function(file) {
+        //     //   alert(JSON.stringify(file));
+        //     //   $scope.filesAll.push(file);
+        //     // })
+
+        //     var readBinaryFile = function (fileEntry) {
+        //       fileEntry.file(function (file) {
+        //         var reader = new FileReader();
+
+        //         reader.onloadend = function() {
+
+        //           console.log("Successful file read: " + this.result);
+        //           // displayFileData(fileEntry.fullPath + ": " + this.result);
+
+        //           var blob = new Blob([new Uint8Array(this.result)], { type: "image/png" });
+        //           // displayImage(blob);
+        //           // alert(blob);
+        //           $scope.filesAll.push(blob);
+        //         };
+
+        //         reader.readAsArrayBuffer(file);
+
+        //       }, function() {
+
+        //       });
+        //     }
+        //     readBinaryFile(fileEntry);
+
+
+        //     // $scope.picData = fileEntry.nativeURL;
+        //     // $scope.ftLoad = true;
+        //     // alert('url' + $scope.picData);
+        //     // var image = document.getElementById('myImage');
+        //     // image.src = fileEntry.nativeURL;
+        //   }, function(error) {
+        //     alert('err' + error)
+
+        //   });
+        // }
+        // aaa(imageData);
+      }, function(err) {
+        // alert('')
+      });
+
+    }
+
+
     // function getResource() {
     //   var defered = $q.defer();
     //   return $resource(BasePath.api + ':urlId/:routeId', {}, {
@@ -1641,6 +1833,9 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       if (data.data.show_perform_time == 0) {
         $scope.hideTime = true;
       }
+      if (data.data.allow_media) {
+        $scope.allowMedia = true;
+      }
 
       if (data.data.type == "sc") {
         $scope.commentRequired = true;
@@ -1650,7 +1845,7 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
       if ($scope.serviceData.text.length) {
           if ($scope.serviceData.text.indexOf('src="/assets/') > 0) {
             var d = 'src="' + BasePath.domain + '/assets/';
-            $scope.serviceData.text = $scope.serviceData.text.replace('src="/assets/', d);
+            $scope.serviceData.text = $scope.serviceData.text.replace(/(src="\/assets\/)/g, d);
           }
           $scope.serviceData.text = $sce.trustAsHtml(stripScript($scope.serviceData.text));
       }
@@ -1710,14 +1905,21 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
     }
     $scope.currentDate = new Date().toISOString().split("T")[0];
 
-    $scope.sendData = function($event, comment, paymentOption) {
-      $scope.canceler = $q.defer();
-      var flag = 0;
-      $timeout(function() {
-        flag = 1;
-        $scope.canceler.resolve();
-        $scope.waiting = false;
-      }, 10000);
+    $scope.sendData = function($event, comment, paymentOption, filesAll) {
+
+      var timerData = $timeout(
+        function() {
+          alert('Невозможно отправить заявку. Пожалуйста, повторите попытку позже.');
+          upload.abort();
+          $scope.loading = false;
+        }, 90000);
+      // $scope.canceler = $q.defer();
+      // var flag = 0;
+      // $timeout(function() {
+      //   flag = 1;
+      //   $scope.canceler.resolve();
+      //   $scope.waiting = false;
+      // }, 10000);
       
 
       $scope.perform_date = TransferDataService.getData('serviceDate');
@@ -1727,37 +1929,55 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
 
       if (!$scope.serviceOrderForm.inputDate.$valid) {
         alert('Выбранная дата не может быть меньше текущей даты');
-        $timeout.cancel();
+        $timeout.cancel(timerData);
         $scope.waiting = false;
       } else if (!$scope.serviceOrderForm.inputComment.$valid) {
         alert('Для данного заказа все поля обязательны');
-        $timeout.cancel();
+        $timeout.cancel(timerData);
         $scope.waiting = false;
       } else {
 
-        getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
-          $timeout.cancel();
-          if (!flag) {
-            // $scope.canceler = $q.defer();
+      $scope.loading = true;
+      console.log($scope.filesAll);
 
-            $scope.orderMessage = true;
-            // $scope.waiting = false;
-            $($event.target).css('display','none');
-            $scope.textHide = true;
-
-            $scope.serviceOrdered = true;
-            
-            $scope.dataOrder = data.data;
-            if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-              $scope.link = $scope.dataOrder.pay.data.link;
-              $window.open($scope.link, '_system');
-            }
+      var upload = Upload.upload({
+          url: BasePath.api + 'services/orders',
+          data: {
+            files: filesAll,
+            'perform_date': $scope.perform_date, 
+            'perform_time': $scope.perform_time, 
+            'comment': comment, 
+            'service_id': $scope.service_id,  
+            'payment_type' : paymentOption
+          },
+          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      });
+      upload.then(function (data) {
+          console.log(data);
+          $timeout.cancel(timerData);
+          $scope.imgLength = $scope.filesAll.length;
+          if ($scope.imgLength > 0) {
+            $scope.sentImg = true;
           }
-          // if (TransferDataService.getData('paymentOption') === 'card') {
-          //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
-          // }
-        }, function(response) {
-          $timeout.cancel();
+          $scope.loading = false;
+          $scope.orderMessage = true;
+          $($event.target).css('display','none');
+          $scope.textHide = true;
+
+          $scope.serviceOrdered = true;
+          
+          $scope.dataOrder = data.data;
+          if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+            $scope.link = $scope.dataOrder.pay.data.link;
+            $window.open($scope.link, '_system');
+          }
+
+          $scope.filesAll = [];
+          $scope.maxImg = false;
+      }, function (response) {
+          // alert(response.status);
+          $timeout.cancel(timerData);
+          $scope.loading = false;
           $($event.target).css('display','block');
           $scope.changedDate = false;
           $scope.changedTime = false;
@@ -1771,10 +1991,119 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$l
             // alert(message.join("\r\n"));
           } else if (response.status === 404 || response.status === 403 || response.status === 500) {
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+          } else {
+            alert('Невозможно отправить заявку. Пожалуйста, повторите попытку позже');
           }
-        });
+        // alert('err' + JSON.stringify(err));
+          // console.log('Error status: ' + resp.status);
+      });
+
+        // getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
+        //   $timeout.cancel();
+        //   if (!flag) {
+        //     // $scope.canceler = $q.defer();
+
+        //     $scope.orderMessage = true;
+        //     // $scope.waiting = false;
+        //     $($event.target).css('display','none');
+        //     $scope.textHide = true;
+
+        //     $scope.serviceOrdered = true;
+            
+        //     $scope.dataOrder = data.data;
+        //     if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+        //       $scope.link = $scope.dataOrder.pay.data.link;
+        //       $window.open($scope.link, '_system');
+        //     }
+        //   }
+        //   // if (TransferDataService.getData('paymentOption') === 'card') {
+        //   //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+        //   // }
+        // }, function(response) {
+        //   $timeout.cancel();
+        //   $($event.target).css('display','block');
+        //   $scope.changedDate = false;
+        //   $scope.changedTime = false;
+        //   $scope.orderMessage = false;
+        //   $scope.waiting = false;
+        //   if (response.status === 400) {
+        //     // alert('Введите дату и время заказа');
+        //     alert('Введите дату заказа');
+        //     // var messages = [];
+        //     // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
+        //     // alert(message.join("\r\n"));
+        //   } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        //   }
+        // });
       }
     }
+
+    // $scope.sendData = function($event, comment, paymentOption) {
+    //   $scope.canceler = $q.defer();
+    //   var flag = 0;
+    //   $timeout(function() {
+    //     flag = 1;
+    //     $scope.canceler.resolve();
+    //     $scope.waiting = false;
+    //   }, 10000);
+      
+
+    //   $scope.perform_date = TransferDataService.getData('serviceDate');
+    //   $scope.perform_time = TransferDataService.getData('serviceTime');
+    //   $scope.service_id = $routeParams.serviceId;
+    //   $scope.waiting = true;
+
+    //   if (!$scope.serviceOrderForm.inputDate.$valid) {
+    //     alert('Выбранная дата не может быть меньше текущей даты');
+    //     $timeout.cancel();
+    //     $scope.waiting = false;
+    //   } else if (!$scope.serviceOrderForm.inputComment.$valid) {
+    //     alert('Для данного заказа все поля обязательны');
+    //     $timeout.cancel();
+    //     $scope.waiting = false;
+    //   } else {
+
+    //     getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
+    //       $timeout.cancel();
+    //       if (!flag) {
+    //         // $scope.canceler = $q.defer();
+
+    //         $scope.orderMessage = true;
+    //         // $scope.waiting = false;
+    //         $($event.target).css('display','none');
+    //         $scope.textHide = true;
+
+    //         $scope.serviceOrdered = true;
+            
+    //         $scope.dataOrder = data.data;
+    //         if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
+    //           $scope.link = $scope.dataOrder.pay.data.link;
+    //           $window.open($scope.link, '_system');
+    //         }
+    //       }
+    //       // if (TransferDataService.getData('paymentOption') === 'card') {
+    //       //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
+    //       // }
+    //     }, function(response) {
+    //       $timeout.cancel();
+    //       $($event.target).css('display','block');
+    //       $scope.changedDate = false;
+    //       $scope.changedTime = false;
+    //       $scope.orderMessage = false;
+    //       $scope.waiting = false;
+    //       if (response.status === 400) {
+    //         // alert('Введите дату и время заказа');
+    //         alert('Введите дату заказа');
+    //         // var messages = [];
+    //         // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
+    //         // alert(message.join("\r\n"));
+    //       } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+    //         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+    //       }
+    //     });
+    //   }
+    // }
 
   }]);
 
@@ -1807,7 +2136,12 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
         $scope.basePath = BasePath.domain;
       }
     }, function(response) {
+      // alert(JSON.stringify(response));
       console.log(response);
+      if (response.data.error === 'token_not_provided') {
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+      } 
       if (response.status === 404 || response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
@@ -1971,7 +2305,7 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
 
           if ($scope.productData.text.indexOf('src="/assets/') > 0) {
             var d = 'src="' + BasePath.domain + '/assets/';
-            $scope.productData.text = $scope.productData.text.replace('src="/assets/', d);
+            $scope.productData.text = $scope.productData.text.replace(/(src="\/assets\/)/g, d);
           }
           $scope.productData.text = $sce.trustAsHtml(stripScript($scope.productData.text));
         }
@@ -2347,7 +2681,6 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
         });
       }
     }, function(response) {
-      console.log(response);
       if (response.status === 404) {
         $scope.noCurrentSurvey = true;
       } else if (response.status === 403 || response.status === 500) {
@@ -2403,6 +2736,53 @@ villageAppControllers.controller('SmartCtrl', ['$scope', '$resource', '$location
 
   }]);
 
+villageAppControllers.controller('LoadingCtrl', ['$scope', '$rootScope', '$resource', '$timeout', '$interval', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $rootScope, $resource, $timeout, $interval, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+    var timeout = 3000,
+        flag2 = 0,
+        retries = 0;
+
+    function func() {
+      if (!flag2) {
+        user.get({urlId: 'ping'}, {}, function(data) {
+          flag2 = 1;
+        }, function(response) {
+          flag2 = 1;
+          if (response.status === 400 && response.data.error === 'token_not_provided') {
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+          }
+        });
+
+        retries++;
+        timeout = timeout + 500;
+        timer = setTimeout(func, timeout);
+
+        if (retries > 10) {
+          clearTimeout(timer);
+          $scope.loading = true;
+          $scope.loadingMessage = true;
+        }
+      } else {
+        clearTimeout(timer);
+        $location.path($rootScope.page);
+      }
+    }
+    var timer = setTimeout(func, timeout);
+  }]);
+
 
 villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService', 'BasePath',
   function($scope, $location, FooterCustom, TransferDataService, localStorageService, BasePath) {
@@ -2455,6 +2835,7 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
         case 'profile':
         case 'services':
         case 'service':
+        case 'smart':
         case 'news':
         case 'newsitem':
         case 'survey':
@@ -2468,6 +2849,7 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
         case 'profile':
         case 'services':
         case 'service':
+        case 'smart':
         case 'news':
         case 'newsitem':
         case 'survey':
@@ -2478,8 +2860,8 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
     }
   }]);
 
-villageAppControllers.controller('PathCtrl', ['$scope', '$sce', '$routeParams', '$timeout', '$location', 'onlineStatus', 'localStorageService', '$interval',
-  function($scope, $sce, $routeParams, $timeout, $location, onlineStatus, localStorageService, $interval) {
+villageAppControllers.controller('PathCtrl', ['$scope', '$rootScope', '$resource', '$route', '$sce', '$routeParams', '$timeout', '$location', 'onlineStatus', 'localStorageService', '$interval', 'BasePath',
+  function($scope, $rootScope, $resource, $route, $sce, $routeParams, $timeout, $location, onlineStatus, localStorageService, $interval, BasePath) {
     $scope.routeMain = function() {
       return $location.path();
       // return route === $location.path().split('/', 2)[1];
@@ -2510,6 +2892,7 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$sce', '$routeParams', 
         case '/register/welcome':
         case '/smart':
         case '/offline':
+        case '/loading':
           return true;
       }
     }
@@ -2557,92 +2940,109 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$sce', '$routeParams', 
     //     // }
     // });
 
-    // localStorage.setItem('pushLink', '/survey');
-    // localStorage.setItem('foreground', true);
-    // localStorage.setItem('pushType', 'product');
-    // localStorage.setItem('message', 'рпворыпвао\n\"ljhdfjak\"');
-    // $scope.message = 'рпворыпвао\n\"ljhdfjak\"'
-    localStorage.setItem('temp2', 'temp');
-    var temp = localStorage.getItem('temp2');
-    localStorage.removeItem('temp2');
+    // var pushLink = localStorage.getItem('pushLink');
 
-    var pushLink = localStorage.getItem('pushLink');
+    var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
+      get: {
+        method: 'GET',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      },
+      save: {
+        method: 'POST',
+        params: {urlId: '@urlId', routeId: '@routeId'},
+        headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
+      }
+    });
+
+    var timeStamp = new Date();
+    var flag = 0;
+
+    $scope.$on('$routeChangeStart', function(ev, next, current) { 
+      var timeStampNew = new Date(),
+          diffMs = timeStampNew - timeStamp,
+          timeLeft = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+
+      timeStamp = timeStampNew;
+
+      if (timeLeft > 30) {
+        user.get({urlId: 'ping'}, {}, function(data) {
+          flag = 1;
+        }, function(response) {
+          flag = 1;
+          if (response.status === 400 && response.data.error === 'token_not_provided') {
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+          }
+        });
+        var timer = $timeout(
+          function() {
+            if (!flag) {
+              $rootScope.page = next.originalPath;
+              $location.path('/loading');
+            } else {
+              flag = 0;
+            }
+          }, 5000);
+      }
+     });
 
     $interval(callAtInterval, 100);
 
     function callAtInterval() {
-      var newLink = localStorage.getItem('pushLink');
-      if (newLink !== pushLink && newLink != null && typeof newLink != 'undefined' && localStorage.getItem('coldstart') == 'false') {
-        
-        // alert('NEW link' + newLink);
-        // pushLink = newLink;
-        // localStorage.removeItem('pushLink');
-        // localStorage.removeItem('pushType');
-        // localStorage.removeItem('foreground');
-        // localStorage.removeItem('message');
-        // localStorage.removeItem('coldstart');
+      var newLink = sessionStorage.getItem('pushLink');
+      // alert('new' + newLink);
+      // alert('old' + pushLink);
+      if (newLink != null && typeof newLink != 'undefined' && sessionStorage.getItem('coldstart') == 'false') {
 
-        if (localStorage.getItem('foreground') == 'true') {
+        if (sessionStorage.getItem('foreground') == 'true') {
           $scope.pushReceived = true;
-          $scope.message = localStorage.getItem('message');
-          pushLink = newLink;
-        } else if (localStorage.getItem('foreground') == 'false') {
-          var newLink = localStorage.getItem('pushLink');
-          var pushType = localStorage.getItem('pushType');
+          $scope.message = sessionStorage.getItem('message');
+          // newLink = null;
+        } else if (sessionStorage.getItem('foreground') == 'false') {
+          var newLink = sessionStorage.getItem('pushLink');
+          var pushType = sessionStorage.getItem('pushType');
           if (typeof pushType != 'undefined' && pushType != null) {
             $location.path(newLink).search({show: pushType});
           } else {
             $location.path(newLink);
           }
-          localStorage.removeItem('pushLink');
-          localStorage.removeItem('pushType');
-          localStorage.removeItem('foreground');
-          localStorage.removeItem('message');
-          localStorage.removeItem('coldstart');
-          pushLink = null;
+          sessionStorage.removeItem('pushLink');
+          sessionStorage.removeItem('pushType');
+          sessionStorage.removeItem('foreground');
+          sessionStorage.removeItem('message');
+          sessionStorage.removeItem('coldstart');
+          // pushLink = null;
         }
       };
     }
 
     $scope.pushOk = function() {
       $scope.pushReceived = false;
-      var newLink = localStorage.getItem('pushLink');
-      var pushType = localStorage.getItem('pushType');
+      var newLink = sessionStorage.getItem('pushLink');
+      var pushType = sessionStorage.getItem('pushType');
       if (typeof pushType != 'undefined' && pushType != null) {
         $location.path(newLink).search({show: pushType});
       } else {
         $location.path(newLink);
       }
-      localStorage.removeItem('pushLink');
-      localStorage.removeItem('pushType');
-      localStorage.removeItem('foreground');
-      localStorage.removeItem('message');
-      localStorage.removeItem('coldstart');
-      pushLink = null;
+      sessionStorage.removeItem('pushLink');
+      sessionStorage.removeItem('pushType');
+      sessionStorage.removeItem('foreground');
+      sessionStorage.removeItem('message');
+      sessionStorage.removeItem('coldstart');
+      // pushLink = null;
     }
 
     $scope.pushCancel = function() {
       $scope.pushReceived = false;
-      localStorage.removeItem('pushLink');
-      localStorage.removeItem('pushType');
-      localStorage.removeItem('foreground');
-      localStorage.removeItem('message');
-      localStorage.removeItem('coldstart');
-      pushLink = null;
+      sessionStorage.removeItem('pushLink');
+      sessionStorage.removeItem('pushType');
+      sessionStorage.removeItem('foreground');
+      sessionStorage.removeItem('message');
+      sessionStorage.removeItem('coldstart');
+      // pushLink = null;
     }
-
-    // $scope.$watch(function () { 
-    //   return localStorageService.get('pushLink'); 
-    // }, function(newVal, oldVal) {
-    //   console.log(newVal);
-    //   console.log(oldVal);
-    //   // localStorage.removeItem('pushLink');
-    //   //  if(oldVal!==newVal && newVal !== undefined && newVal != null){
-    //   //   localStorage.removeItem('pushLink');
-    //   //   localStorage.removeItem('pushType');
-    //   //   $location.path('/survey');
-    //   // }
-    // })
 
   }]);
 

@@ -20,10 +20,11 @@
     under the License.
 -->
 
-<html lang="en" ng-app="villageApp">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="format-detection" content="telephone=no" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src * gap://ready file:; style-src 'self' 'unsafe-inline' *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *">  -->
     <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
           <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
     <title>Village</title>
@@ -55,7 +56,7 @@
   </div>
   <div class="bg-image no-p-b wrapper" ng-show="offlineShow" ng-class="{'offline-wrapper' : offlineShow === true}">
     <p class="col-orange fs-18 fw-md p-md mb-md">Соединение с интернетом отсутствует.</p>
-    <p class="p-md fs-15">Когда связь восстановится, вы сможете продолжить работу.</p>
+    <p class="p-md fs-15">Когда связь восстановится, Вы сможете продолжить работу.</p>
   </div>
 
 
@@ -73,6 +74,8 @@
     <script src="bower_components/angular-dropdowns/dist/angular-dropdowns.js"></script>
     <script src="bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js"></script>
     <script src="bower_components/ngCordova/dist/ng-cordova.min.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload-shim.min.js"></script>
+    <script src="bower_components/ng-file-upload/ng-file-upload.min.js"></script>
     <script src="js/lib/inputmask.js"></script>
     <script src="js/lib/jquery.inputmask.js"></script>
     <script src="js/lib/inputmask.phone.extensions.js"></script>
@@ -89,7 +92,8 @@
         angular.element(document).ready(function () {
           if (window.cordova) {
             console.log("Running in Cordova, will bootstrap AngularJS once 'deviceready' event fires.");
-            document.addEventListener('deviceready', function () {
+            // document.addEventListener('deviceready', function () {
+            angular.element(document).ready(function() {
               console.log("Deviceready event has fired, bootstrapping AngularJS.");
               angular.bootstrap(document.body, ['villageApp']);
             }, false);
