@@ -73,7 +73,7 @@ var app = {
         
 
         app.handleExternalURLs();
-        // app.showAlert();
+        app.showAlert();
 
     },
     // deviceready Event Handler
@@ -173,7 +173,7 @@ var app = {
         });
 
         push.on('error', function(e) {
-            aleert(e.message);
+            // aleert(e.message);
             // e.message
         });
         var parentElement = document.getElementById(id);

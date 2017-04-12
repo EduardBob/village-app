@@ -45,19 +45,19 @@
 
 var basePath = angular.module('basePath', []);
 
+  // basePath.constant('BasePath', {
+  //   'domain' : 'http://village.fruitware.ru/',
+  //   'api' : 'http://village.fruitware.ru/api/v1/'
+  // });
+
   basePath.constant('BasePath', {
-    'domain' : 'http://village.fruitware.ru/',
-    'api' : 'http://village.fruitware.ru/api/v1/'
+    'domain' : 'http://1centr.com/',
+    'api' : 'http://1centr.com/api/v1/'
   });
 
   // basePath.constant('BasePath', {
-  //   'domain' : 'http://1centr.com/',
-  //   'api' : 'http://1centr.com/api/v1/'
-  // });
-
-  // basePath.constant('BasePath', {
-  //   'domain' : 'http://192.168.99.45/',
-  //   'api' : 'http://192.168.99.45/api/v1/'
+  //   'domain' : 'http://192.168.88.3/',
+  //   'api' : 'http://192.168.88.3/api/v1/'
   // });
 
   // basePath

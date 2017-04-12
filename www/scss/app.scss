@@ -1691,7 +1691,7 @@ footer {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.7);
   z-index: 100;
   &.ng-scope {
     display: block;
@@ -1892,13 +1892,15 @@ footer {
   }
 }
 
-/* Temp */
-.packet-widget {
-  
+@media only screen and (max-width: 330px) {
+  .footer-block span {
+    font-size: 12px;
+  }
 }
-.box {
-
+@media only screen and (max-width: 300px) {
+  .footer-block:nth-child(3) {
+      padding-left: 3px;
+  }
 }
-
 
 

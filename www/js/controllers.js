@@ -266,26 +266,36 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
         tokenHandler.set(data.data.token);
         TransferDataService.addData('token', data.data.token);
       }, function(response) {
-        console.log(response);
-        if (response.status === 400) {
-          if (response.data.error === 'token_not_provided') {
-            $location.path('/login');
-            localStorageService.set('token', 'none');
-          } else {
-            var messages = [];
-            var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
-            alert(message.join("\r\n"));
-          }
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+          
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        }
+        } 
+        // if (response.status === 400) {
+        //   if (response.data.error === 'token_not_provided') {
+        //     $location.path('/login');
+        //     localStorageService.set('token', 'none');
+        //   } else {
+        //     var messages = [];
+        //     var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
+        //     alert(message.join("\r\n"));
+        //   }
+        // } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        //   alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        // }
       });
     }
   }]);
 
 
-villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$location', '$timeout', '$http', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
-  function($scope, $resource, $location, $timeout, $http, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
+villageAppControllers.controller('ProfileCtrl', ['$scope', '$rootScope', '$resource', '$location', '$timeout', '$http', 'TransferDataService', 'TokenHandler', 'Users', 'localStorageService', 'BasePath',
+  function($scope, $rootScope, $resource, $location, $timeout, $http, TransferDataService, tokenHandler, Users, localStorageService,  BasePath) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -329,14 +339,14 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
       TransferDataService.addData('email', data.data.email);
       TransferDataService.addData('address', data.data.building.data.address);
     }, function(response) {
-      console.log(response);
-      if (response.status === 400) {
-        if (response.data.error === 'token_not_provided') {
-          $location.path('/login');
-          localStorageService.set('token', 'none');
-        } else {
-          alert(response.data.error.message.join("\r\n"));
-        }
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+
       } else if (response.status === 404 || response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
@@ -396,8 +406,17 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$resource', '$locati
         function() {
           user.save({urlId: 'me', routeId: 'mail-notifications'}, {'has_mail_notifications' : stat}, function(data) {
           }, function(response) {
-            console.log(response);
-            alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+            if (response.status === -1) {
+              alert('Нет связи с сервером. Попробуйте позже.');
+            }
+            if (response.status === 400 || response.status === 401) {
+
+              $location.path('/login');
+              localStorageService.set('token', 'none');
+              
+            } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+              alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+            } 
           });
         }, 500);
       
@@ -431,11 +450,17 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         $scope.nameSuccess = 'Данные успешно изменены';
       }, function(response) {
         console.log(response);
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
         if (response.status === 400) {
           $scope.nameSuccess = false;
           var messages = [];
           var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name);
           alert(message.join("\r\n"));
+        } else if (response.status === 401) {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -446,10 +471,16 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         $scope.nameSuccess = 'Данные успешно изменены';
       }, function(response) {
         console.log(response);
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
         if (response.status === 400) {
           $scope.nameSuccess = false;
           alert(response.data.error.message.email[0]);
           // alert(response.data.error.message.email);
+        } else if (response.status === 401) {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -465,6 +496,9 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
           var messages = [];
           var message = messages.concat(response.data.error.message.error, response.data.error.message.new_password, response.data.error.message.password);
           alert(message.join("\r\n"));
+        } else if (response.status === 401) {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
@@ -480,6 +514,9 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
         console.log(response);
         if (response.status === 400) {
           alert(response.data.error.message.new_phone);
+        } else if (response.status === 401) {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
         } else if (response.status === 403) {
           var alertMsg = '';
           switch(response.data.error.message) {
@@ -507,9 +544,11 @@ villageAppControllers.controller('ProfileChangeDataCtrl', ['$scope', '$resource'
       user.save({urlId: 'me', routeId: 'phone'}, {'session': $scope.session, 'code': $scope.code}, function(data) {
         $location.path('/profile');
       }, function(response) {
-        console.log(response);
         if (response.status === 400) {
           alert(response.data.error.message.code);
+        } else if (response.status === 401) {
+          $location.path('/login');
+          localStorageService.set('token', 'none');
         } else if (response.status === 404) {
           alert('Неправильный код');
         } else if (response.status === 403 || response.status === 500) {
@@ -571,7 +610,17 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
       }
       
     }, function(response) {
-      alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+        
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      } 
     });
 
   }]);
@@ -609,10 +658,17 @@ villageAppControllers.controller('ProfileDocumentsCtrl', ['$scope', '$resource',
       $scope.ddSelectOptions.push($scope.mainCat);
 
     }, function(response) {
-      console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
       }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+        
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      } 
     });
 
     $scope.filterNews = function(selected) {
@@ -653,10 +709,17 @@ villageAppControllers.controller('ProfileDocumentsCtrl', ['$scope', '$resource',
           $scope.emptyServiceText = "В данной категории документов нет"
         }
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
         }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+          
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        } 
       });
     };
 
@@ -720,7 +783,15 @@ villageAppControllers.controller('DocumentCtrl', ['$scope', '$resource', '$locat
       
       $scope.basePath = BasePath.domain; 
     }, function(response) {
-      if (response.status === 404) {
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+        
+      } else if (response.status === 404) {
         alert('Этот документ был удален');
         $location.path('/profile/documents');
       }
@@ -769,8 +840,15 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
       user.get({urlId: 'buildings', routeId: localStorageService.get('invitecode')}, {}, function(data) {
         $scope.siteName = data.data.village.data.name;
       }, function(response) {
-        console.log(response);
-        if (response.status === 404) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+          
+        } else if (response.status === 404) {
           localStorageService.remove('invitecode');
           alert('Вы должны зарегистрироваться');
         } else if (response.status === 500) {
@@ -811,6 +889,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
              // alert(JSON.stringify(response));
           });
         } else {
+          
           $location.path('/services');
         }
         // if (localStorageService.get('tokendevice')) {
@@ -835,6 +914,7 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
         // console.log(localStorageService.get('token'));
         
       }, function(response) {
+        // alert(response.status);
         if (response.status === 401 || response.status === 400) {
           alert('Неверный телефон или пароль');
         } else if (response.status === 403) {
@@ -928,8 +1008,8 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
     }
   }]);
 
-villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams', '$sce',
-  function($scope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams, $sce) {
+villageAppControllers.controller('NewsListCtrl', ['$scope', '$rootScope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams', '$sce',
+  function($scope, $rootScope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams, $sce) {
     // Users.get({urlId: 'articles'}, {}, function(data) {
     //   $scope.allNews = [];
     //   angular.forEach(data.data, function (news) {
@@ -991,20 +1071,23 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       });
       localStorageService.set('oldNews', $scope.allNews);
       
-      // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1'  && localStorageService.get('maxNews') != null) {
+      // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1  && localStorageService.get('maxNews') != null) {
       //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
       // } else {
       //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
       // }
     }, function(response) {
-      console.log(response);
-      if (response.data.error === 'token_not_provided') {
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
         $location.path('/login');
         localStorageService.set('token', 'none');
-      } 
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
+        
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-      }
+      } 
     });
 
     $scope.catIdNew = $routeParams.category_id;
@@ -1023,10 +1106,17 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
       $scope.ddSelectOptions.push($scope.mainCat);
 
     }, function(response) {
-      console.log(response);
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
-        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
       }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+        
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      } 
     });
 
     $scope.filterNews = function(selected) {
@@ -1103,10 +1193,17 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$resource', '$locat
           $scope.emptyServiceText = "В данной категории новостей нет"
         }
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
-          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
         }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+          
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        } 
       });
     };
 
@@ -1186,6 +1283,17 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
       $scope.textNew = $sce.trustAsHtml(stripScript($scope.textNew));
       $scope.basePath = BasePath.domain;
     }, function(response) {
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+        
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
+        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+      } 
       // alert(JSON.stringify(response));
     });
   }]);
@@ -1368,8 +1476,12 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         }, 100);
 
       }, function(response) {
+        console.log(response.status);
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
         console.log(response);
-        if (response.data.error = 'token_expired') {
+        if (response.data.error === 'token_expired') {
           user.save({urlId: 'auth', routeId: 'refresh'}, {}, function(data) {
             localStorageService.set('token', data.data.token);
             var newTokenUser = $resource(BasePath.api + ':urlId/:routeId', {}, {
@@ -1426,7 +1538,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
               } else {
                 localStorageService.set('newArticles', false);
               }
-              // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1' && localStorageService.get('maxNews') != null) {
+              // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1 && localStorageService.get('maxNews') != null) {
               //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
               //   TransferDataService.addData('nrNews', $scope.nrNews);
               //   localStorageService.set('newArticles', true);
@@ -1435,14 +1547,28 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
               //   localStorageService.set('newArticles', false);
               // }
             }, function(response) {
-              console.log(response);
-              if (response.status === 404 || response.status === 403 || response.status === 500) {
+              if (response.status === -1) {
+                alert('Нет связи с сервером. Попробуйте позже.');
+              }
+              if (response.status === 400 || response.status === 401) {
+
+                $location.path('/login');
+                localStorageService.set('token', 'none');
+
+              } else if (response.status === 404 || response.status === 403 || response.status === 500) {
                 alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
               }
             });
           }, function(response) {
-            console.log(response);
-            if (response.status === 404 || response.status === 403 || response.status === 500) {
+            if (response.status === -1) {
+              alert('Нет связи с сервером. Попробуйте позже.');
+            }
+            if (response.status === 400 || response.status === 401) {
+
+              $location.path('/login');
+              localStorageService.set('token', 'none');
+
+            } else if (response.status === 404 || response.status === 403 || response.status === 500) {
               alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
             }
           });
@@ -1477,7 +1603,7 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         } else {
           localStorageService.set('newArticles', false);
         }
-        // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== '-1' && localStorageService.get('maxNews') != null) {
+        // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1 && localStorageService.get('maxNews') != null) {
         //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
         //   TransferDataService.addData('nrNews', $scope.nrNews);
         //   localStorageService.set('newArticles', true);
@@ -1486,9 +1612,15 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         //   localStorageService.set('newArticles', false);
         // }
       }, function(response) {
-        console.log(response);
-        // alert(JSON.stringify(response));
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -1508,7 +1640,15 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
             $location.path('/service/search/' + text);
           }
         }, function(response) {
-          if (response.status === 404 || response.status === 403 || response.status === 500) {
+          if (response.status === -1) {
+            alert('Нет связи с сервером. Попробуйте позже.');
+          }
+          if (response.status === 400 || response.status === 401) {
+
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
           }
         });
@@ -1563,8 +1703,15 @@ villageAppControllers.controller('ServicesCtrl', ['$scope', '$resource', '$locat
         $scope.serviceList = $scope.serviceList.concat(data.data);
         $scope.basePath = BasePath.domain;
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -1876,10 +2023,17 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
       if ((response.data.error.message === "Not Found") && response.status === 404) {
         alert('Эта услуга была удалена');
         $location.path('/profile/history');
-      }
-      if (esponse.status === 403 || response.status === 500) {
-        alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-      }
+      } else if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 403 || response.status === 500) {
+          alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
+        }
     });
     // $scope.$watchGroup(['date', 'time'], function() {
     //   if (typeof TransferDataService.getData('serviceDate') != 'undefined' && typeof TransferDataService.getData('serviceTime') != 'undefined') {
@@ -1979,8 +2133,8 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
           $timeout.cancel(timerData);
           $scope.loading = false;
           $($event.target).css('display','block');
-          $scope.changedDate = false;
-          $scope.changedTime = false;
+          // $scope.changedDate = false;
+          // $scope.changedTime = false;
           $scope.orderMessage = false;
           $scope.waiting = false;
           if (response.status === 400) {
@@ -1993,6 +2147,14 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
           } else {
             alert('Невозможно отправить заявку. Пожалуйста, повторите попытку позже');
+          }
+          if (response.status === -1) {
+            alert('Нет связи с сервером. Попробуйте позже.');
+          } else if (response.status === 401) {
+
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+
           }
         // alert('err' + JSON.stringify(err));
           // console.log('Error status: ' + resp.status);
@@ -2107,8 +2269,8 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
 
   }]);
 
-villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
-  function($scope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
+villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$rootScope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
+  function($scope, $rootScope, $resource, $location, TransferDataService, tokenHandler, BasePath, localStorageService, Users) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -2136,13 +2298,15 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
         $scope.basePath = BasePath.domain;
       }
     }, function(response) {
-      // alert(JSON.stringify(response));
-      console.log(response);
-      if (response.data.error === 'token_not_provided') {
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
         $location.path('/login');
         localStorageService.set('token', 'none');
-      } 
-      if (response.status === 404 || response.status === 403 || response.status === 500) {
+
+      } else if (response.status === 404 || response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
       }
     });
@@ -2159,7 +2323,15 @@ villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$resource
             $location.path('/product/search/' + text);
           }
         }, function(response) {
-          if (response.status === 404 || response.status === 403 || response.status === 500) {
+          if (response.status === -1) {
+            alert('Нет связи с сервером. Попробуйте позже.');
+          }
+          if (response.status === 400 || response.status === 401) {
+
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+
+          } else if (response.status === 404 || response.status === 403 || response.status === 500) {
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
           }
         });
@@ -2198,8 +2370,15 @@ villageAppControllers.controller('ProductsAllCtrl', ['$scope', '$resource', '$lo
         });
         $scope.productsAll = $scope.productsAll.concat(data.data);
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -2251,8 +2430,15 @@ villageAppControllers.controller('ProductsCtrl', ['$scope', '$resource', '$locat
         }
         $scope.basePath = BasePath.domain;
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -2402,7 +2588,15 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           alert('Этот продукт был удален');
           $location.path('/profile/history');
         }
-        if (esponse.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -2485,6 +2679,15 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
           } else if (response.status === 404 || response.status === 403 || response.status === 500) {
             alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
           }
+          if (response.status === -1) {
+            alert('Нет связи с сервером. Попробуйте позже.');
+          }
+          if (response.status === 401) {
+
+            $location.path('/login');
+            localStorageService.set('token', 'none');
+
+          }
         });
       }
     }
@@ -2542,8 +2745,15 @@ villageAppControllers.controller('OrdersServicesCtrl', ['$scope', '$resource', '
         $scope.services = $scope.services.concat(data.data);
         $scope.basePath = BasePath.domain;
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -2619,8 +2829,15 @@ villageAppControllers.controller('OrdersProductsCtrl', ['$scope', '$resource', '
         $scope.basePath = BasePath.domain;
 
       }, function(response) {
-        console.log(response);
-        if (response.status === 404 || response.status === 403 || response.status === 500) {
+        if (response.status === -1) {
+          alert('Нет связи с сервером. Попробуйте позже.');
+        }
+        if (response.status === 400 || response.status === 401) {
+
+          $location.path('/login');
+          localStorageService.set('token', 'none');
+
+        } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
       });
@@ -2645,8 +2862,8 @@ villageAppControllers.controller('HistoryTabCtrl', ['$scope', '$resource', '$loc
     }
   }]);
 
-villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
-  function($scope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
+villageAppControllers.controller('SurveyCtrl', ['$scope', '$rootScope', '$resource', '$location', '$routeParams', 'TransferDataService', 'TokenHandler', 'localStorageService', 'Users', 'BasePath',
+  function($scope, $rootScope, $resource, $location, $routeParams, TransferDataService, tokenHandler, localStorageService, Users, BasePath) {
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -2681,7 +2898,15 @@ villageAppControllers.controller('SurveyCtrl', ['$scope', '$resource', '$locatio
         });
       }
     }, function(response) {
-      if (response.status === 404) {
+      if (response.status === -1) {
+        alert('Нет связи с сервером. Попробуйте позже.');
+      }
+      if (response.status === 400 || response.status === 401) {
+
+        $location.path('/login');
+        localStorageService.set('token', 'none');
+
+      } else if (response.status === 404) {
         $scope.noCurrentSurvey = true;
       } else if (response.status === 403 || response.status === 500) {
         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
@@ -2958,7 +3183,11 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$rootScope', '$resource
     var timeStamp = new Date();
     var flag = 0;
 
+    // console.log($scope.offlineShow);
+
     $scope.$on('$routeChangeStart', function(ev, next, current) { 
+      // $scope.offlineShow = $rootScope.offlineShow;
+      // console.log($scope.offlineShow);
       var timeStampNew = new Date(),
           diffMs = timeStampNew - timeStamp,
           timeLeft = Math.round(((diffMs % 86400000) % 3600000) / 60000);
