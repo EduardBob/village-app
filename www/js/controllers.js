@@ -277,18 +277,7 @@ villageAppControllers.controller('ProfileDataCtrl', ['$scope', '$resource', '$lo
         } else if (response.status === 404 || response.status === 403 || response.status === 500) {
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         } 
-        // if (response.status === 400) {
-        //   if (response.data.error === 'token_not_provided') {
-        //     $location.path('/login');
-        //     localStorageService.set('token', 'none');
-        //   } else {
-        //     var messages = [];
-        //     var message = messages.concat(response.data.error.message.first_name, response.data.error.message.last_name, response.data.error.message.email, response.data.error.message.password);
-        //     alert(message.join("\r\n"));
-        //   }
-        // } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-        //   alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        // }
+
       });
     }
   }]);
@@ -388,15 +377,6 @@ villageAppControllers.controller('ProfileCtrl', ['$scope', '$rootScope', '$resou
       
     };
 
-    // if (localStorageService.get('push')) {
-    //   $scope.checkEmail = localStorageService.get('push');
-    // } else {
-    //   $scope.checkEmail = false;
-    // }
-
-    // $scope.$watch('checkEmail', function() {
-    //   localStorageService.set('push', $scope.checkEmail);
-    // }, true); 
     
     $scope.changeNotification = function(checkEmail) {
       var stat = checkEmail ? 1 : 0;
@@ -589,22 +569,7 @@ villageAppControllers.controller('ProfileNumbersCtrl', ['$scope', '$resource', '
           $scope.contacts = $scope.contacts.replace(/(src="\/assets\/)/g, d);
         }
         $scope.contacts = $sce.trustAsHtml(stripScript($scope.contacts));
-        // angular.forEach($scope.contacts, function (contact) {
 
-        //   if (contact.title.indexOf('src="/assets/') > 0) {
-        //     var d = 'src="' + BasePath.domain + '/assets/';
-        //     contact.title = contact.title.replace('src="/assets/', d);
-        //   }
-        //   contact.title = $sce.trustAsHtml(stripScript(contact.title));
-
-
-        //   if (contact.phone.indexOf('src="/assets/') > 0) {
-        //     var d = 'src="' + BasePath.domain + '/assets/';
-        //     contact.phone = contact.phone.replace('src="/assets/', d);
-        //   }
-        //   contact.phone = $sce.trustAsHtml(stripScript(contact.phone));
-
-        // });
       } else {
         $scope.noNumbers = true;
       }
@@ -830,9 +795,6 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
         params: {urlId: '@urlId', routeId: '@routeId'}
       }
     });
-    // $timeout(function() {
-    //     angular.element('.main-container').css('min-height', $(window).height());
-    // });
 
     if (localStorageService.get('villageName') != null) {
       $scope.siteName = localStorageService.get('villageName');
@@ -892,26 +854,6 @@ villageAppControllers.controller('AuthCtrl', ['$scope', '$resource', '$http', '$
           
           $location.path('/services');
         }
-        // if (localStorageService.get('tokendevice')) {
-        //   var type = localStorageService.get('devicetype'),
-        //     tokenDevice = localStorageService.get('tokendevice');
-        //   var req = {
-        //      method: 'POST',
-        //      url: BasePath.api + 'me/device',
-        //      headers: { 'Authorization': 'Bearer ' + data.data.token },
-        //      data: {type: type, token: tokenDevice}
-        //     }
-
-        //   $http(req).then(function(){
-        //     $location.path('/services');
-        //   }, function(response){
-
-        //   });
-        // } else {
-        //   $location.path('/services');
-        // }
-        
-        // console.log(localStorageService.get('token'));
         
       }, function(response) {
         // alert(response.status);
@@ -1010,44 +952,7 @@ villageAppControllers.controller('ResetCtrl', ['$scope', '$resource', '$location
 
 villageAppControllers.controller('NewsListCtrl', ['$scope', '$rootScope', '$resource', '$location', '$sanitize', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users', '$http', '$routeParams', '$sce',
   function($scope, $rootScope, $resource, $location, $sanitize, TransferDataService, tokenHandler, BasePath, localStorageService, Users, $http, $routeParams, $sce) {
-    // Users.get({urlId: 'articles'}, {}, function(data) {
-    //   $scope.allNews = [];
-    //   angular.forEach(data.data, function (news) {
-    //     $scope.allNews.push(news.id);
-    //   });
-    //   //       if (!angular.equals($scope.allNews, $scope.allNews2)) {
-    //   //         $scope.allNews2 = $scope.allNews2.concat($scope.allNews);
-    //   //       }
 
-    //   // $scope.allNews2 = ["502", "38"];
-    //   // $scope.result = [];
-    //   // angular.forEach($scope.allNews2, function(key) {
-    //   //   if (-1 === $scope.allNews.indexOf(key)) {
-    //   //     $scope.result.push(key);
-    //   //   }
-    //   // });
-    //   // $scope.nrNew = $scope.result.length;
-
-    //   $scope.maxNews = Math.max.apply(Math, $scope.allNews);
-
-    //   localStorageService.set('nrNews', $scope.maxNews);
-
-
-    //   // GetMeta.setData(data.data);
-    //   // $scope.siteName = GetMeta.getData('core::site-name');
-
-    //   // for (var i in $scope.allNews) {
-    //   //       if (!$scope.allNews2.hasOwnProperty(i)) {
-    //   //               $scope.allNews2 = $scope.allNews2.concat($scope.allNews);
-    //   //       }
-    //   //   }
-    //   //   console.log($scope.allNews2);
-    // }, function(response) {
-    //   console.log(response);
-    //   if (response.status === 404 || response.status === 403 || response.status === 500) {
-    //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-    //   }
-    // });
 
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
@@ -1071,11 +976,6 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$rootScope', '$reso
       });
       localStorageService.set('oldNews', $scope.allNews);
       
-      // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1  && localStorageService.get('maxNews') != null) {
-      //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
-      // } else {
-      //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
-      // }
     }, function(response) {
       if (response.status === -1) {
         alert('Нет связи с сервером. Попробуйте позже.');
@@ -1172,18 +1072,6 @@ villageAppControllers.controller('NewsListCtrl', ['$scope', '$rootScope', '$reso
           } else {
             news.textNew = news.short;
           }
-
-          // if (news.short.indexOf('%%') > 0) {
-          //   var a = news.short.split("%%")[1],
-          //       b = a.split('^'),
-          //       itemName = b[0],
-          //       item = b[1],
-          //       itemId = b[2];
-          //   var c = '%%' + a + '%%';
-          //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
-          //   news.short = news.short.replace(c, d);
-          // }
-          // $scope.add(news, news.category_title);
         });
 
         $scope.newsBlocks = $scope.newsBlocks.concat(data.data);
@@ -1225,21 +1113,6 @@ villageAppControllers.controller('NewsDetailCtrl', ['$scope', '$resource', '$loc
         headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') }
       }
     });
-
-
-    // $scope.article = {};
-    // $scope.article.text = "<p>В одном из населённых пунктов Самарской области автомобилист %поворачивал|15% налево и столкнулся с машиной, ехавшей по обочине. Как сообщает &laquo;Российская газета&raquo;, инспекторы ГИБДД назвали виновными обоих водителей: одного, так как двигался по обочине, второго, поскольку не уступил помехе справа. Верховный суд, рассмотрев дело, постановил: водитель, движущийся по обочине, не имел преимущественного права движения, а у водителя другого автомобиля при повороте налево на прилегающую территорию вне перекрестка отсутствовала обязанность уступить дорогу движущемуся по обочине транспортному средству. Проще говоря, машины на обочине вообще не должно было быть, соответственно, и уступать дорогу некому. Таким образом, из постановления Верховного суда России можно сделать вывод, что дорогу автомобилям, которые движутся по обочине, можно не уступать &mdash; поскольку езда по обочине запрещена как таковая, то при любом столкновении будет виноват &laquo;обочечник&raquo;.</p>"
-      
-    // if ($scope.article.text.indexOf('%') > 0) {
-    //   var a = $scope.article.text.split("%")[1],
-    //       b = a.split('^'),
-    //       itemName = b[0],
-    //       item = b[1],
-    //       itemId = b[2];
-    //   var c = '%' + a + '%';
-    //   var d = '<a href="#/' + item + '/' + itemId + '">' + itemName + '</a>';
-    //   $scope.article.text = $scope.article.text.replace(c, d);
-    // }
 
     localStorageService.set('newArticles', false);
 
@@ -1370,93 +1243,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
           $location.path(pushLinkA);
         }
       }
-
-      // alert('run');
-
-      // var newToken = localStorageService.get('tokendevice');
-      // var ua = $window.navigator.userAgent,
-      //     ios = ~ua.indexOf('iPhone') || ~ua.indexOf('iPod') || ~ua.indexOf('iPad');
-
-      // var type = ios ? "ios" : "gcm";
-
-      // var options = {
-      //   android: {
-      //     senderID: "1055017294786"
-      //   },
-      //   ios: {
-      //     alert: "true",
-      //     badge: "true",
-      //     sound: "true"
-      //   },
-      //   windows: {}
-      // };
-      
-      // // initialize
-      // $cordovaPushV5.initialize(options).then(function() {
-      //   alert('init');
-      //   // start listening for new notifications
-      //   $cordovaPushV5.onNotification();
-      //   // start listening for errors
-      //   $cordovaPushV5.onError();
-
-        
-      //   // register to get registrationId
-      //   $cordovaPushV5.register().then(function(data) {
-      //     alert('register');
-
-      //     if (newToken != data) {
-      //       var req = {
-      //          method: 'POST',
-      //          url: BasePath.api + 'me/device',
-      //          headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
-      //          data: {type: type, token: data}
-      //         }
-
-      //       $http(req).then(function(){
-      //         alert('ok');
-      //         $scope.loading = false;
-      //         localStorageService.set('tokendevice', data);
-      //         localStorageService.set('devicetype', type);
-      //       }, function(response){
-      //         // alert(response.status);
-      //          // alert(JSON.stringify(response));
-      //       });
-      //     } else {
-      //       $scope.loading = false;
-      //     }
-      //     // `data.registrationId` save it somewhere;
-      //   }, function(error) {
-      //     // alert(error);
-      //   })
-      // });
-      
-      // // triggered every time notification received
-      // $rootScope.$on('$cordovaPushV5:notificationReceived', function(event, data){
-      //   // alert(data.additionalData.url);
-      //   // localStorageService.set('aaaa', data.additionalData.url);
-      //   if (typeof data.additionalData.url != 'undefined') {
-      //     alert('isurl');
-      //     if (typeof data.additionalData.type != 'undefined') {
-      //       alert('istype');
-      //       $location.path(data.additionalData.url).search({show: data.additionalData.type});
-      //     } else {
-      //       $location.path(data.additionalData.url);
-      //     }
-      //   }
-      //   // alert(JSON.stringify(data));
-      //   // data.message,
-      //   // data.title,
-      //   // data.count,
-      //   // data.sound,
-      //   // data.image,
-      //   // data.additionalData
-      // });
-
-      // // triggered every time error occurs
-      // $rootScope.$on('$cordovaPushV5:errorOcurred', function(event, e){
-      //   alert(e.message);
-      //   // e.message
-      // });
     }
 
     if (localStorageService.get('token') != 'none' && localStorageService.get('token') != null) {
@@ -1538,14 +1324,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
               } else {
                 localStorageService.set('newArticles', false);
               }
-              // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1 && localStorageService.get('maxNews') != null) {
-              //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
-              //   TransferDataService.addData('nrNews', $scope.nrNews);
-              //   localStorageService.set('newArticles', true);
-              // } else {
-              //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
-              //   localStorageService.set('newArticles', false);
-              // }
             }, function(response) {
               if (response.status === -1) {
                 alert('Нет связи с сервером. Попробуйте позже.');
@@ -1603,14 +1381,6 @@ villageAppControllers.controller('ServicesCategoriesCtrl', ['$scope', '$rootScop
         } else {
           localStorageService.set('newArticles', false);
         }
-        // if (localStorageService.get('maxNews') < Math.max.apply(Math, $scope.allNews) && $scope.allNews.indexOf('' + localStorageService.get('maxNews') + '') !== -1 && localStorageService.get('maxNews') != null) {
-        //   $scope.nrNews = parseFloat($scope.allNews.indexOf('' + localStorageService.get('maxNews') + '')) - parseFloat($scope.allNews.indexOf('' + Math.max.apply(Math, $scope.allNews) + ''));
-        //   TransferDataService.addData('nrNews', $scope.nrNews);
-        //   localStorageService.set('newArticles', true);
-        // } else {
-        //   localStorageService.set('maxNews', Math.max.apply(Math, $scope.allNews));
-        //   localStorageService.set('newArticles', false);
-        // }
       }, function(response) {
         if (response.status === -1) {
           alert('Нет связи с сервером. Попробуйте позже.');
@@ -1805,13 +1575,6 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
       $scope.loading = true;
     }
 
-    // $scope.submit = function() {
-    //   if ($scope.form.file.$valid && $scope.files) {
-    //     $scope.uploadFiles($scope.files);
-    //     // $scope.upload($scope.file);
-    //   }
-    // };
-
 
     $scope.removePicture = function(f) {
       var id = f.$$hashKey;
@@ -1835,25 +1598,6 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
             // console.log('Error status: ' + resp.status);
         });
 
-        // $scope.loading = true;
-        // $scope.filesToSend = [];
-        // angular.forEach($scope.filesAll, function(file) {
-        //   Upload.resize(file, {width:1080, height: 1080}).then(function(fileNew) {
-        //     $scope.filesToSend.push(fileNew);
-        //     return fileNew;
-        //     Upload.upload({
-        //       url: BasePath.api + 'ping/sendfiles',
-        //       data: {files: filesAll}
-        //     }).then(function (resp) {
-        //         console.log(resp);
-        //         $scope.loading = false;
-        //     }, function (err) {
-        //         $scope.loading = false;
-        //       // alert('err' + JSON.stringify(err));
-        //         // console.log('Error status: ' + resp.status);
-        //     });
-        //   })
-        // })
     };
     $scope.takePicture = function() {
      var options = {
@@ -1890,71 +1634,12 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
           return defer.promise;
         };
         urlToBlob(imageData);
-
-        // var aaa = function(imageData) {
-        //   window.resolveLocalFileSystemURI(imageData, function(fileEntry) {
-        //     // alert(JSON.stringify(fileEntry));
-        //     // alert('all' + $scope.filesAll);
-        //     // $scope.filesAll.push(fileEntry);
-        //     // alert('all again' + $scope.filesAll);
-        //     // fileEntry.file(function(file) {
-        //     //   alert(JSON.stringify(file));
-        //     //   $scope.filesAll.push(file);
-        //     // })
-
-        //     var readBinaryFile = function (fileEntry) {
-        //       fileEntry.file(function (file) {
-        //         var reader = new FileReader();
-
-        //         reader.onloadend = function() {
-
-        //           console.log("Successful file read: " + this.result);
-        //           // displayFileData(fileEntry.fullPath + ": " + this.result);
-
-        //           var blob = new Blob([new Uint8Array(this.result)], { type: "image/png" });
-        //           // displayImage(blob);
-        //           // alert(blob);
-        //           $scope.filesAll.push(blob);
-        //         };
-
-        //         reader.readAsArrayBuffer(file);
-
-        //       }, function() {
-
-        //       });
-        //     }
-        //     readBinaryFile(fileEntry);
-
-
-        //     // $scope.picData = fileEntry.nativeURL;
-        //     // $scope.ftLoad = true;
-        //     // alert('url' + $scope.picData);
-        //     // var image = document.getElementById('myImage');
-        //     // image.src = fileEntry.nativeURL;
-        //   }, function(error) {
-        //     alert('err' + error)
-
-        //   });
-        // }
-        // aaa(imageData);
       }, function(err) {
         // alert('')
       });
 
     }
 
-
-    // function getResource() {
-    //   var defered = $q.defer();
-    //   return $resource(BasePath.api + ':urlId/:routeId', {}, {
-    //     save: {
-    //       method: 'POST',
-    //       params: {urlId: '@urlId', routeId: '@routeId'},
-    //       headers: { 'Authorization': 'Bearer ' + localStorageService.get('token') },
-    //       timeout: defered.promise
-    //     }
-    //   });
-    // }
     TransferDataService.addData('serviceDate', '');
     TransferDataService.addData('serviceTime', '');
     TransferDataService.addData('service_perform_at', '');
@@ -2035,11 +1720,6 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
           alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
         }
     });
-    // $scope.$watchGroup(['date', 'time'], function() {
-    //   if (typeof TransferDataService.getData('serviceDate') != 'undefined' && typeof TransferDataService.getData('serviceTime') != 'undefined') {
-    //     TransferDataService.addData('service_perform_at', TransferDataService.getData('serviceDate') + ' ' + TransferDataService.getData('serviceTime'));
-    //   }
-    // });
     $scope.changeDate = function() {
       $scope.changedDate = true;
       $scope.dateNew = $filter('date')($scope.date, 'yyyy-MM-dd');
@@ -2159,114 +1839,10 @@ villageAppControllers.controller('ServiceOrderCtrl', ['$scope', '$resource', '$h
         // alert('err' + JSON.stringify(err));
           // console.log('Error status: ' + resp.status);
       });
-
-        // getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
-        //   $timeout.cancel();
-        //   if (!flag) {
-        //     // $scope.canceler = $q.defer();
-
-        //     $scope.orderMessage = true;
-        //     // $scope.waiting = false;
-        //     $($event.target).css('display','none');
-        //     $scope.textHide = true;
-
-        //     $scope.serviceOrdered = true;
-            
-        //     $scope.dataOrder = data.data;
-        //     if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-        //       $scope.link = $scope.dataOrder.pay.data.link;
-        //       $window.open($scope.link, '_system');
-        //     }
-        //   }
-        //   // if (TransferDataService.getData('paymentOption') === 'card') {
-        //   //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
-        //   // }
-        // }, function(response) {
-        //   $timeout.cancel();
-        //   $($event.target).css('display','block');
-        //   $scope.changedDate = false;
-        //   $scope.changedTime = false;
-        //   $scope.orderMessage = false;
-        //   $scope.waiting = false;
-        //   if (response.status === 400) {
-        //     // alert('Введите дату и время заказа');
-        //     alert('Введите дату заказа');
-        //     // var messages = [];
-        //     // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
-        //     // alert(message.join("\r\n"));
-        //   } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-        //     alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-        //   }
-        // });
       }
     }
 
-    // $scope.sendData = function($event, comment, paymentOption) {
-    //   $scope.canceler = $q.defer();
-    //   var flag = 0;
-    //   $timeout(function() {
-    //     flag = 1;
-    //     $scope.canceler.resolve();
-    //     $scope.waiting = false;
-    //   }, 10000);
-      
-
-    //   $scope.perform_date = TransferDataService.getData('serviceDate');
-    //   $scope.perform_time = TransferDataService.getData('serviceTime');
-    //   $scope.service_id = $routeParams.serviceId;
-    //   $scope.waiting = true;
-
-    //   if (!$scope.serviceOrderForm.inputDate.$valid) {
-    //     alert('Выбранная дата не может быть меньше текущей даты');
-    //     $timeout.cancel();
-    //     $scope.waiting = false;
-    //   } else if (!$scope.serviceOrderForm.inputComment.$valid) {
-    //     alert('Для данного заказа все поля обязательны');
-    //     $timeout.cancel();
-    //     $scope.waiting = false;
-    //   } else {
-
-    //     getResource($scope.canceler.promise).save({urlId: 'services', routeId: 'orders'}, {'perform_date': $scope.perform_date, 'perform_time': $scope.perform_time, 'comment': comment, 'service_id': $scope.service_id,  'payment_type' : paymentOption}, function(data) {
-    //       $timeout.cancel();
-    //       if (!flag) {
-    //         // $scope.canceler = $q.defer();
-
-    //         $scope.orderMessage = true;
-    //         // $scope.waiting = false;
-    //         $($event.target).css('display','none');
-    //         $scope.textHide = true;
-
-    //         $scope.serviceOrdered = true;
-            
-    //         $scope.dataOrder = data.data;
-    //         if ($scope.dataOrder.payment_type === 'card' && $scope.dataOrder.payment_status === 'not_paid') {
-    //           $scope.link = $scope.dataOrder.pay.data.link;
-    //           $window.open($scope.link, '_system');
-    //         }
-    //       }
-    //       // if (TransferDataService.getData('paymentOption') === 'card') {
-    //       //   $window.open('https://mpi.mkb.ru:9443/MPI_payment/?site_link=test-api.html&mid=500000000011692&oid=12341236&aid=443222&amount=000000010000&merchant_mail=test@mkb.ru&signature=coo0re7VuwMFnY%2Bsc4EmhWEvejc%3D&client_mail=pos@mkb.ru');
-    //       // }
-    //     }, function(response) {
-    //       $timeout.cancel();
-    //       $($event.target).css('display','block');
-    //       $scope.changedDate = false;
-    //       $scope.changedTime = false;
-    //       $scope.orderMessage = false;
-    //       $scope.waiting = false;
-    //       if (response.status === 400) {
-    //         // alert('Введите дату и время заказа');
-    //         alert('Введите дату заказа');
-    //         // var messages = [];
-    //         // var message = messages.concat(response.data.error.message.comment, response.data.error.message.perform_at, response.data.error.message.quantity);
-    //         // alert(message.join("\r\n"));
-    //       } else if (response.status === 404 || response.status === 403 || response.status === 500) {
-    //         alert('Произошла неизвестная ошибка. Пожалуйста, свяжитесь с нами, или попробуйте позже.');
-    //       }
-    //     });
-    //   }
-    // }
-
+    
   }]);
 
 villageAppControllers.controller('ProductsCategoriesCtrl', ['$scope', '$rootScope', '$resource', '$location', 'TransferDataService', 'TokenHandler', 'BasePath', 'localStorageService', 'Users',
@@ -2602,11 +2178,6 @@ villageAppControllers.controller('ProductOrderCtrl', ['$scope', '$resource', '$l
       });
 
     });
-    // $scope.$watchGroup(['date', 'time'], function() {
-    //   if (typeof TransferDataService.getData('productDate') != 'undefined' && typeof TransferDataService.getData('productTime') != 'undefined') {
-    //     TransferDataService.addData('product_perform_at', TransferDataService.getData('productDate') + ' ' + TransferDataService.getData('productTime'));
-    //   }
-    // });
 
     var today=new Date();
     $scope.currentDate = today.toISOString().split("T")[0];
@@ -3012,21 +2583,7 @@ villageAppControllers.controller('LoadingCtrl', ['$scope', '$rootScope', '$resou
 villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCustom', 'TransferDataService', 'localStorageService', 'BasePath',
   function($scope, $location, FooterCustom, TransferDataService, localStorageService, BasePath) {
     $scope.footerBlocks = FooterCustom.query();
-    // $scope.nrNews = TransferDataService.getData('nrNews');
-    // $scope.newArticles = localStorageService.get('newArticles');
-    // $scope.$watch(localStorageService.get('newArticles'), function() {
-    //   $scope.newArticles = localStorageService.get('newArticles');
-    // console.log(localStorageService.get('newArticles'));
-    // });
-    // $scope.$watch(TransferDataService.getData('nrNews'), function() {
-    //   $scope.nrNews = TransferDataService.getData('nrNews');
-    // });
-    // $scope.newArticles = function() {
-    //   return localStorageService.get('newArticles');
-    // }
-    // $scope.nrNews = function() {
-    //   return TransferDataService.getData('nrNews');
-    // }
+    
     $scope.isActive = function(route) {
       var r = $location.path().split('/', 2)[1];
       if (r === 'products' || r === 'product') {
@@ -3034,8 +2591,6 @@ villageAppControllers.controller('FooterCtrl', ['$scope', '$location', 'FooterCu
       } else {
         return route === r;
       }
-
-      // return route === r;
     }
     $scope.routeFooter = function() {
       return $location.path().split('/', 2)[1];
@@ -3150,23 +2705,6 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$rootScope', '$resource
         $scope.offlineShow = online ? false : true;
     });
 
-    // $scope.$on('linkChanged', function(event, data) { 
-    //     // do things with the new counter
-    //     alert(data);
-    //     // var url = data;
-    //     // if (url.indexOf('?type=') > 0) {
-    //     //     var pushType = url.split('?type=')[1],
-    //     //         pushLink = url.split('?type=')[0];
-    //     //     // localStorage.removeItem('pushLink');
-    //     //     $location.path(pushLink).search({show: pushType});
-    //     // } else {
-    //     //     // localStorage.removeItem('pushLink');
-    //     //     $location.path(url);
-    //     // }
-    // });
-
-    // var pushLink = localStorage.getItem('pushLink');
-
     var user = $resource(BasePath.api + ':urlId/:routeId', {}, {
       get: {
         method: 'GET',
@@ -3186,8 +2724,6 @@ villageAppControllers.controller('PathCtrl', ['$scope', '$rootScope', '$resource
     // console.log($scope.offlineShow);
 
     $scope.$on('$routeChangeStart', function(ev, next, current) { 
-      // $scope.offlineShow = $rootScope.offlineShow;
-      // console.log($scope.offlineShow);
       var timeStampNew = new Date(),
           diffMs = timeStampNew - timeStamp,
           timeLeft = Math.round(((diffMs % 86400000) % 3600000) / 60000);
