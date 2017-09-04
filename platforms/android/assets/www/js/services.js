@@ -55,9 +55,14 @@ var basePath = angular.module('basePath', []);
   //   'api' : 'http://1centr.com/api/v1/'
   // });
 
+//  basePath.constant('BasePath', {
+//    'domain' : 'http://192.168.99.45/',
+//    'api' : 'http://192.168.99.45/api/v1/'
+//  });
+
   basePath.constant('BasePath', {
-    'domain' : 'http://192.168.99.45/',
-    'api' : 'http://192.168.99.45/api/v1/'
+    'domain' : 'http://concierge.promo/',
+    'api' : 'http://concierge.promo/api/v1/'
   });
 
   // basePath
